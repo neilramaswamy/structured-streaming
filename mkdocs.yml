@@ -1,0 +1,75 @@
+site_name: Structured Streaming Documentation
+theme:
+  name: material
+  
+  palette:
+    # Palette toggle for automatic mode
+    - media: "(prefers-color-scheme)"
+      primary: indigo
+      toggle:
+        icon: material/brightness-auto
+        name: Switch to light mode
+        
+    # Palette toggle for light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+
+    # Palette toggle for dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to system preference
+  features:
+    - navigation.tracking
+    - navigation.instant
+    - navigation.expand
+    - navigation.tabs
+    - navigation.indexes
+    - navigation.tabs.sticky
+    - navigation.footer
+    - content.tabs.link
+    - content.code.copy
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+
+nav:
+  - Home: index.md
+  - Tour:
+    - Welcome: tour/welcome.md
+    - Installation: tour/installation.md
+    - Quick Example: tour/quick_example.md
+    - Execution Model:
+      - Sources and DataFrames: tour/model/sources.md
+      - Spark Operators: tour/model/spark_operators.md
+      - Sinks: tour/model/sinks.md
+      # Should move running_streaming_jobs.md here
+      - Triggers and Checkpoints: tour/model/triggers_and_checkpoints.md
+      - Summary: tour/model/summary.md
+    - Stateless Streaming:
+      - Selection and Projection: tour/stateless/selection_projection.md
+      - Additional Operators: tour/stateless/additional_operators.md
+    - Stateful Streaming:
+      - Introduction: tour/stateful/introduction.md
+      - Concepts:
+        - Time Domains: tour/stateful/concepts/time_domains.md
+        - Emitting Results: tour/stateful/concepts/emitting_results.md
+        - Watermarks: tour/stateful/concepts/watermarks.md
+      - Operators:
+        - Aggregation: tour/stateful/operators/aggregation.md
+        - Deduplication: tour/stateful/operators/deduplication.md
+        - Joins: tour/stateful/operators/joins.md
+        - (Flat)MapGroupsWithState: tour/stateful/groups_with_state.md
+      - Examples: tour/stateful/examples.md
+    - Operations:
+      - Monitoring: tour/operations/monitoring.md
+      - Performance: tour/operations/performance.md
+  - API Reference:
+    - Output Mode: api/output_mode.md
