@@ -28,7 +28,6 @@ theme:
   features:
     - navigation.tracking
     - navigation.instant
-    - navigation.expand
     - navigation.tabs
     - navigation.indexes
     - navigation.tabs.sticky
@@ -36,9 +35,20 @@ theme:
     - content.tabs.link
     - content.code.copy
 markdown_extensions:
-  - admonition
-  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
   - pymdownx.superfences
+  - pymdownx.details
+  - admonition
+  - md_in_html
+  - attr_list
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
 
 nav:
   - Home: index.md
@@ -46,13 +56,11 @@ nav:
     - Welcome: tour/welcome.md
     - Installation: tour/installation.md
     - Quick Example: tour/quick_example.md
-    - Execution Model:
-      - Sources and DataFrames: tour/model/sources.md
-      - Spark Operators: tour/model/spark_operators.md
-      - Sinks: tour/model/sinks.md
-      # Should move running_streaming_jobs.md here
-      - Triggers and Checkpoints: tour/model/triggers_and_checkpoints.md
-      - Summary: tour/model/summary.md
+    - Overview:
+      - Execution Model: tour/overview/execution_model.md
+      - Sources and DataFrames: tour/overview/sources.md
+      - Spark Operators: tour/overview/spark_operators.md
+      - Sinks: tour/overview/sinks.md
     - Stateless Streaming:
       - Selection and Projection: tour/stateless/selection_projection.md
       - Additional Operators: tour/stateless/additional_operators.md
@@ -68,8 +76,25 @@ nav:
         - Joins: tour/stateful/operators/joins.md
         - (Flat)MapGroupsWithState: tour/stateful/groups_with_state.md
       - Examples: tour/stateful/examples.md
+    - Running Streaming Jobs:
+      - Triggers and Checkpoints: tour/jobs/triggers_and_checkpoints.md
+      - Operational Considerations: tour/jobs/operational_considerations.md
+      - Deployment: tour/jobs/deployment.md
+  - Guides:
+    - Overview: guides/overview.md
+    - Reading and Writing Binary Formats:
+      - Protobuf: guides/binary_formats/protobuf.md
+      - Avro: guides/binary_formats/avro.md
+      - Thrift: guides/binary_formats/thrift.md
     - Operations:
-      - Monitoring: tour/operations/monitoring.md
-      - Performance: tour/operations/performance.md
+      - Monitoring: guides/operations/streaming_query_listeners.md
+      - Understanding the SparkUI: guides/operations/spark_ui.md
+    - Performance:
+      - Optimizations: guides/performance/optimizations.md
+      - State Stores: guides/performance/state_stores.md
+    - Custom Streaming Logic:
+      - (Flat)MapGroupsWithState: guides/custom/groups_with_state.md
+      - State Processor: guides/custom/state_processor.md
+      - foreach(Batch): guides/custom/foreach_batch.md
   - API Reference:
     - Output Mode: api/output_mode.md

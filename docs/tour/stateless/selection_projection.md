@@ -1,3 +1,5 @@
+TODO(neil): Complete this
+
 Stateless stream processing is the first type of stream processing we'll explore. It's characterized by a very simple property: every record can be emitted downstream (or not, in the case of deduplication) _fully_ independently of any other record. For example:
 
 - Projecting is stateless, since taking a subset of a record's columns and emitting them downstream can be done without looking at any other records
@@ -28,15 +30,6 @@ TODO(wei), code example. This doesn't need to work E2E, we can just assume the e
 
 Yay for a unified batch and streaming API!
 
-## Generation
-
-But sometimes, upstream sources might not have all the information you need for your streaming job. In that case, you might need to _generate_ new columns. There are two flavors of generation:
-
-- You generate a column based off an existing column
-- You generate a column based off a "standalone" function
-
-TODO(wei), code example. Should probably use `selectExpr` and some built-in Spark function. Not sure the most commonly used built-in Spark function (though we probably should avoid `current_timestamp` just because processing-time/event-time is discussed only later).
-
 ## Selecting
 
 Selection is all about keeping certain rows that satisfy a condition that you specify. In SQL, the operator used for this is commonly known as `where`, while in programming languages, this function is usually refered to as the higher-order-function (usually abbreviated as _HOF_) named `filter`. You can use either on a DataFrame. But regardless of whether you use the SQL operator or HOF, the formula is generally the same:
@@ -47,13 +40,13 @@ Selection is all about keeping certain rows that satisfy a condition that you sp
 
 TODO(wei), code example.
 
-## Selection and Projection
+## Projection and Selection
 
 Now, we'll put the following four concepts together to write a fairly useful stateless stream:
 
-- Debugging sources (TODO: neil)
+- Debugging sources (TODO: argh, I wish we had the memory source)
 - Column projection
 - Column generation
 - Column selection
 
-TODO(neil). I need to work with Ryan to figure out what to put here, and also need to see if we can use the "memory" source.
+TODO(not wei). I need to work with Ryan to figure out what to put here, and also need to see if we can use the "memory" source.
