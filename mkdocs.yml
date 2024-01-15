@@ -82,19 +82,47 @@ nav:
       - Deployment: tour/jobs/deployment.md
   - Guides:
     - Overview: guides/overview.md
+    # TODO(neil/matthew/etc.): How do we do sources/sinks/connectors without overlap?
     - Reading and Writing Binary Formats:
       - Protobuf: guides/binary_formats/protobuf.md
       - Avro: guides/binary_formats/avro.md
-      - Thrift: guides/binary_formats/thrift.md
-    - Operations:
-      - Monitoring: guides/operations/streaming_query_listeners.md
-      - Understanding the SparkUI: guides/operations/spark_ui.md
-    - Performance:
+    - Fault Tolerance and Checkpoints:
+      - Delivery Semantics: guides/checkpointing/delivery_semantics.md
+      - Checkpoint Management: guides/checkpointing/management.md
+    - Triggers: guides/triggers/overview.md
+    - Output Mode: guides/output_mode/overview.md
+    - Rate Limiting: guides/rate_limiting/overview.md
+    - State Stores:
+      - Overview: guides/state/overview.md
+      - RocksDB Configuration: guides/state/rocksdb.md
+    - Performance Considerations:
+      - Partitions and Parallelism: guides/performance/partitions_parallelism.md
       - Optimizations: guides/performance/optimizations.md
       - State Stores: guides/performance/state_stores.md
+    - Stateful Streaming:
+      - Overview: guides/stateful/overview.md
+      - Watermarks:
+        - Overview: guides/watermarks/overview.md
+        - Multiple Watermarks: guides/watermarks/multiple.md
+      - Aggregation: guides/stateful/aggregation.md
+      - Deduplication: guides/stateful/deduplication.md
+      - Joins: guides/stateful/joins.md
+      # Will mostly link to "Custom Streaming Logic"
+      - Arbitrary Stateful Processing: guides/stateful/arbitrary.md
     - Custom Streaming Logic:
       - (Flat)MapGroupsWithState: guides/custom/groups_with_state.md
       - State Processor: guides/custom/state_processor.md
       - foreach(Batch): guides/custom/foreach_batch.md
-  - API Reference:
-    - Output Mode: api/output_mode.md
+      - UDFs: guides/custom/udfs.md
+    - Testing:
+      - Unit Testing: guides/testing/unit_testing.md
+      - Performance Testing and Benchmarking: guides/testing/performance_testing.md
+    - Operations:
+      - Managing the Query Lifecycle: guides/operations/lifecycle.md
+      - Exception Handling: guides/operations/exception_handling.md
+      - Metrics and Monitoring: guides/operations/streaming_query_listeners.md
+      - Cluster Management: guides/operations/cluster_management.md
+    - Unsupported Behavior:
+      - Unsupported Spark Operators: guides/unsupported/operators.md
+      - Unsupported Output Modes: guides/unsupported/output_modes.md
+      - Unsupported Join Types: guides/unsupported/joins.md
