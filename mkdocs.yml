@@ -121,6 +121,7 @@ nav:
       - Managing the Query Lifecycle: guides/operations/lifecycle.md
       - Exception Handling: guides/operations/exception_handling.md
       - Metrics and Monitoring: guides/operations/streaming_query_listeners.md
+      - Debugging: guides/operations/debugging.md
       - Cluster Management: guides/operations/cluster_management.md
     - Unsupported Behavior:
       - Unsupported Spark Operators: guides/unsupported/operators.md
