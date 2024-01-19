@@ -1,7 +1,8 @@
 site_name: Structured Streaming Documentation
 theme:
   name: material
-  
+
+
   palette:
     # Palette toggle for automatic mode
     - media: "(prefers-color-scheme)"
@@ -9,7 +10,7 @@ theme:
       toggle:
         icon: material/brightness-auto
         name: Switch to light mode
-        
+
     # Palette toggle for light mode
     - media: "(prefers-color-scheme: light)"
       scheme: default
@@ -46,6 +47,8 @@ markdown_extensions:
   - admonition
   - md_in_html
   - attr_list
+  - pymdownx.tabbed:
+      alternate_style: true
   - pymdownx.emoji:
       emoji_index: !!python/name:material.extensions.emoji.twemoji
       emoji_generator: !!python/name:material.extensions.emoji.to_svg
@@ -53,82 +56,82 @@ markdown_extensions:
 nav:
   - Home: index.md
   - Tour:
-    - Welcome: tour/welcome.md
-    - Installation: tour/installation.md
-    - Quick Example: tour/quick_example.md
-    - Overview:
-      - Execution Model: tour/overview/execution_model.md
-      - Sources and DataFrames: tour/overview/sources.md
-      - Spark Operators: tour/overview/spark_operators.md
-      - Sinks: tour/overview/sinks.md
-    - Stateless Streaming:
-      - Selection and Projection: tour/stateless/selection_projection.md
-      - Additional Operators: tour/stateless/additional_operators.md
-    - Stateful Streaming:
-      - Introduction: tour/stateful/introduction.md
-      - Concepts:
-        - Time Domains: tour/stateful/concepts/time_domains.md
-        - Emitting Results: tour/stateful/concepts/emitting_results.md
-        - Watermarks: tour/stateful/concepts/watermarks.md
-      - Operators:
-        - Aggregation: tour/stateful/operators/aggregation.md
-        - Deduplication: tour/stateful/operators/deduplication.md
-        - Joins: tour/stateful/operators/joins.md
-        - (Flat)MapGroupsWithState: tour/stateful/groups_with_state.md
-      - Examples: tour/stateful/examples.md
-    - Running Streaming Jobs:
-      - Triggers and Checkpoints: tour/jobs/triggers_and_checkpoints.md
-      - Operational Considerations: tour/jobs/operational_considerations.md
-      - Deployment: tour/jobs/deployment.md
+      - Welcome: tour/welcome.md
+      - Installation: tour/installation.md
+      - Quick Example: tour/quick_example.md
+      - Overview:
+          - Execution Model: tour/overview/execution_model.md
+          - Sources and DataFrames: tour/overview/sources.md
+          - Spark Operators: tour/overview/spark_operators.md
+          - Sinks: tour/overview/sinks.md
+      - Stateless Streaming:
+          - Selection and Projection: tour/stateless/selection_projection.md
+          - Additional Operators: tour/stateless/additional_operators.md
+      - Stateful Streaming:
+          - Introduction: tour/stateful/introduction.md
+          - Concepts:
+              - Time Domains: tour/stateful/concepts/time_domains.md
+              - Emitting Results: tour/stateful/concepts/emitting_results.md
+              - Watermarks: tour/stateful/concepts/watermarks.md
+          - Operators:
+              - Aggregation: tour/stateful/operators/aggregation.md
+              - Deduplication: tour/stateful/operators/deduplication.md
+              - Joins: tour/stateful/operators/joins.md
+              - (Flat)MapGroupsWithState: tour/stateful/groups_with_state.md
+          - Examples: tour/stateful/examples.md
+      - Running Streaming Jobs:
+          - Triggers and Checkpoints: tour/jobs/triggers_and_checkpoints.md
+          - Operational Considerations: tour/jobs/operational_considerations.md
+          - Deployment: tour/jobs/deployment.md
   - Guides:
-    - Overview: guides/overview.md
-    # TODO(neil/matthew/etc.): How do we do sources/sinks/connectors without overlap?
-    - Reading and Writing Binary Formats:
-      - Protobuf: guides/binary_formats/protobuf.md
-      - Avro: guides/binary_formats/avro.md
-    - Stateless Streaming:
-      - Overview: guides/stateless/overview.md
-    - Stateful Streaming:
-      - Overview: guides/stateful/overview.md
-      - Watermarks:
-        - Overview: guides/watermarks/overview.md
-        - Multiple Watermarks: guides/watermarks/multiple.md
-      - Aggregation: guides/stateful/aggregation.md
-      - Deduplication: guides/stateful/deduplication.md
-      - Joins: guides/stateful/joins.md
-      # Will mostly link to "Custom Streaming Logic"
-      - Arbitrary Stateful Processing: guides/stateful/arbitrary.md
-    - Custom Streaming Logic:
-      - (Flat)MapGroupsWithState: guides/custom/groups_with_state.md
-      - State Processor: guides/custom/state_processor.md
-      - foreach(Batch): guides/custom/foreach_batch.md
-      - UDFs: guides/custom/udfs.md
-    - Stream Options:
-        - Overivew: guides/stream_options/overview.md
-        - Triggers: guides/stream_options/triggers.md
-        - Output Mode: guides/stream_options/output_mode.md
-        - State Stores:
-          - Overview: guides/stream_options/state/overview.md
-          - RocksDB Configuration: guides/stream_options/state/rocksdb.md
-        - Fault Tolerance and Checkpoints:
-          - Delivery Semantics: guides/stream_options/checkpointing/delivery_semantics.md
-          - Checkpoint Management: guides/stream_options/checkpointing/management.md
-        - Rate Limiting: guides/stream_options/rate_limiting/overview.md
-    - Testing:
-      - Unit Testing: guides/testing/unit_testing.md
-      - Performance Testing and Benchmarking: guides/testing/performance_testing.md
-    - Operations:
-      - Deployment: guides/operations/deployment.md
-      - Managing the Query Lifecycle: guides/operations/lifecycle.md
-      - Exception Handling: guides/operations/exception_handling.md
-      - Metrics and Monitoring: guides/operations/streaming_query_listeners.md
-      - Debugging: guides/operations/debugging.md
-      - Cluster Management: guides/operations/cluster_management.md
-    - Performance Considerations:
-      - Partitions and Parallelism: guides/performance/partitions_parallelism.md
-      - Optimizations: guides/performance/optimizations.md
-      - State Stores: guides/performance/state_stores.md
-    - Unsupported Behavior:
-      - Unsupported Spark Operators: guides/unsupported/operators.md
-      - Unsupported Output Modes: guides/unsupported/output_modes.md
-      - Unsupported Join Types: guides/unsupported/joins.md
+      - Overview: guides/overview.md
+      # TODO(neil/matthew/etc.): How do we do sources/sinks/connectors without overlap?
+      - Reading and Writing Binary Formats:
+          - Protobuf: guides/binary_formats/protobuf.md
+          - Avro: guides/binary_formats/avro.md
+      - Stateless Streaming:
+          - Overview: guides/stateless/overview.md
+      - Stateful Streaming:
+          - Overview: guides/stateful/overview.md
+          - Watermarks:
+              - Overview: guides/watermarks/overview.md
+              - Multiple Watermarks: guides/watermarks/multiple.md
+          - Aggregation: guides/stateful/aggregation.md
+          - Deduplication: guides/stateful/deduplication.md
+          - Joins: guides/stateful/joins.md
+          # Will mostly link to "Custom Streaming Logic"
+          - Arbitrary Stateful Processing: guides/stateful/arbitrary.md
+      - Custom Streaming Logic:
+          - (Flat)MapGroupsWithState: guides/custom/groups_with_state.md
+          - State Processor: guides/custom/state_processor.md
+          - foreach(Batch): guides/custom/foreach_batch.md
+          - UDFs: guides/custom/udfs.md
+      - Stream Options:
+          - Overivew: guides/stream_options/overview.md
+          - Triggers: guides/stream_options/triggers.md
+          - Output Mode: guides/stream_options/output_mode.md
+          - State Stores:
+              - Overview: guides/stream_options/state/overview.md
+              - RocksDB Configuration: guides/stream_options/state/rocksdb.md
+          - Fault Tolerance and Checkpoints:
+              - Delivery Semantics: guides/stream_options/checkpointing/delivery_semantics.md
+              - Checkpoint Management: guides/stream_options/checkpointing/management.md
+          - Rate Limiting: guides/stream_options/rate_limiting/overview.md
+      - Testing:
+          - Unit Testing: guides/testing/unit_testing.md
+          - Performance Testing and Benchmarking: guides/testing/performance_testing.md
+      - Operations:
+          - Deployment: guides/operations/deployment.md
+          - Managing the Query Lifecycle: guides/operations/lifecycle.md
+          - Exception Handling: guides/operations/exception_handling.md
+          - Metrics and Monitoring: guides/operations/streaming_query_listeners.md
+          - Debugging: guides/operations/debugging.md
+          - Cluster Management: guides/operations/cluster_management.md
+      - Performance Considerations:
+          - Partitions and Parallelism: guides/performance/partitions_parallelism.md
+          - Optimizations: guides/performance/optimizations.md
+          - State Stores: guides/performance/state_stores.md
+      - Unsupported Behavior:
+          - Unsupported Spark Operators: guides/unsupported/operators.md
+          - Unsupported Output Modes: guides/unsupported/output_modes.md
+          - Unsupported Join Types: guides/unsupported/joins.md
