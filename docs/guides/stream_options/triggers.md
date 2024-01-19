@@ -1,8 +1,8 @@
 # Triggers
 
-## Motivation
+## What is a trigger
 
-In the [Triggers]() section of the Tour, we note that Structured Streaming "repeatedly" reads and processes data from the source in micro-batches. Triggers allow you to configure the precise definition of "repeatedly reads and process data." They specify how frequently micro-batches are run.
+Structured Streaming repeatedly reads and processes data from the source in micro-batches. Triggers allow you to configure the precise definition of "repeatedly reads and process data." They specify how frequently micro-batches are run.
 
 Some reasonable triggers could be the following behaviors:
 
