@@ -2,19 +2,19 @@
 
 ## What is a trigger
 
-Structured Streaming repeatedly reads and processes data from the source in micro-batches. Triggers allow you to configure the precise definition of "repeatedly reads and process data." They specify how frequently micro-batches are run.
+Structured Streaming repeatedly reads and processes data from the source in micro-batches. Triggers allow you to configure the precise definition of how frequently Structured Streaming micro-batches are run.
 
-Some reasonable triggers could be the following behaviors:
+The following are some examples of trigger definitions:
 
-- You read and process more data immediately after after one micro-batch finishes
-- You read and process data in a micro-batch every hour (or every 24 hours)
+- Read and process more data immediately after each micro-batch finishes
+- Read and process data in a micro-batch every hour (or every 24 hours)
 
-You might wonder why it would make sense to only process one micro-batch every hour (or 24); at that point, why not just schedule a batch job to run every hour (or 24)? Structured Streaming jobs running with time-based trigger allow you to _incrementally_ process your source data, without worrying about:
+  Processing a micro-batch on a schedule, such as hourly or daily, rather than just scheduling a batch job to run periodically allows you to _incrementally_ process your source data, without worrying about:
 
-- Delivery semantics, like at-least-once or exactly-once, as noted in [Fault Tolerance and Checkpoints]().
-- State created by [stateful operators](): they will automatically remove old state.
+  - Delivery semantics, like at-least-once or exactly-once, as noted in [Fault Tolerance and Checkpoints]().
+  - State created by [stateful operators](): old state is automatically removed.
 
-!!! tip
+  !!! tip
     If you have a batch Spark job that you run as a [cron job](https://en.wikipedia.org/wiki/Cron), it might be easier to run it as a Structured Streaming job with a trigger. You won't have to worry about the job failing and not processing that day's data, for example.
 
 
