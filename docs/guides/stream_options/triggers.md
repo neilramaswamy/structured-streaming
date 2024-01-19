@@ -18,25 +18,25 @@ The following are some examples of trigger definitions:
 
     If you have a batch Spark job that you run as a [cron job](https://wikipedia.org/wiki/Cron), consider running it as a Structured Streaming job with a trigger. For example, with a trigger you won't have to worry about the job failing and not processing that day's data.
 
-## API Overview
+## What are the available trigger types
 
 | Trigger | Description                          |
 | ----------- | ------------------------------------ |
-| Micro-batch Trigger (default)       | The default trigger is the micro-batch trigger, where a micro-batch starts as soon as thr previous micro-batch completes. Since there is no delay between micro-batches, the default trigger interval is effectively 0 seconds.  |
+| **Micro-batch Trigger (default)**       | The default trigger is the micro-batch trigger, where a micro-batch starts as soon as thr previous micro-batch completes. Since there is no delay between micro-batches, the default trigger interval is effectively 0 seconds.  |
 | Processing Time Trigger      | The processing time trigger starts micro-batches at a user-specified interval. If the previous micro-batch completes within the interval (before the time for the next specified time), then the Spark engine waits until the interval is over to start the next micro-batch. If the previous micro-batch takes longer than the interval to complete (runs over the time specified for the next micro-batch to start), then the next micro-batch starts as soon as the previous one completes (it will not wait for the next interval boundary). |
-| Trigger Available Now    | The trigger available now trigger starts a query that processes all available data at time of query creation and then stops. It processes the data in multiple micro-batches based on the source options (such as `maxFilesPerTrigger` for the file source). It processes all unprocessed data as of the time when the query starts. It does not process data that arrives _during_ the execution of the micro-batches. |
-| Trigger Once (deprecated) | The trigger once trigger starts a query that processes all unprocessed data at the time of query creation in _one_ batch. Beware: it will not respect source options.
-| Continuous (experimental) | The continuous trigger starts a query that executes in a new low-latency, continuous processing mode. See [continuous trigger](). |
+| **Trigger Available Now**    | The trigger available now trigger starts a query that processes all available data at time of query creation and then stops. It processes the data in multiple micro-batches based on the source options (such as `maxFilesPerTrigger` for the file source). It processes all unprocessed data as of the time when the query starts. It does not process data that arrives _during_ the execution of the micro-batches. |
+| **Trigger Once (deprecated)** | The trigger once trigger starts a query that processes all unprocessed data at the time of query creation in _one_ batch. Beware: it will not respect source options.
+| **Continuous (experimental)** | The continuous trigger starts a query that executes in a new low-latency, continuous processing mode. See [continuous trigger](). |
 
-## Use Cases
+## Use cases for trigger types
 
-If you're unsure about what trigger to choose, you might consider using the following table. Once a use case sounds like yours, you can check the specific semantics of it in the [API Overview]().
+The following table describes the use case for each trigger type.
 
-| Trigger | Use Cases |
+| Trigger | Use cases |
 | ----------- | ------------------------------------ |
-| Micro-Batch (default)       | If latency is your most important requirement, use this trigger. If you want to process data as fast as possible (perhaps because you're doing real-time fraud detection or real-time feature generation for a Machine Learning model), this is the production-ready trigger that will give you the lowest latency. |
-| Processing Time       | If you have a stream of data that needs to be processed _without_ a real-time latency requirement, you can use this trigger. For example, if you just need a daily report at the end of the day to say how many sales were made in the last 24 hours, you could set a processing time trigger of 24 hours. The benefit to using a processing time trigger is that when your query isn't running, your cluster can be used by other jobs running on it. This is the middle-ground between latency and cost.  |
-| Available Now    | If you have a stram of data that you need to process in a one-off fashion, but you don't want to have to reprocess data you already processed, use Available Now. This is the most cost-effective trigger: you can spin up a cluster and process all unprocessed data in your streaming source; the query will terminate, and you can spin down the cluster. |
+| **Micro-Batch (default)**       | If latency is your most important requirement, use this trigger. If you want to process data as fast as possible (perhaps because you're doing real-time fraud detection or real-time feature generation for a Machine Learning model), this is the production-ready trigger that will give you the lowest latency. |
+| **Processing Time**       | If you have a stream of data that needs to be processed _without_ a real-time latency requirement, you can use this trigger. For example, if you just need a daily report at the end of the day to say how many sales were made in the last 24 hours, you could set a processing time trigger of 24 hours. The benefit to using a processing time trigger is that when your query isn't running, your cluster can be used by other jobs running on it. This is the middle-ground between latency and cost.  |
+| **Available Now**    | If you have a stram of data that you need to process in a one-off fashion, but you don't want to have to reprocess data you already processed, use Available Now. This is the most cost-effective trigger: you can spin up a cluster and process all unprocessed data in your streaming source; the query will terminate, and you can spin down the cluster. |
 | Once | You really shouldn't be using this: it's deprecated. Use Available Now. | 
 | Continuous | This is an experimental mode, so it has limited support. It only supports [stateless]() queries, and doesn't emit any metrics. But if you have a stateless pipeline and need single-digit millisecond latency, you could try this mode. |
 
