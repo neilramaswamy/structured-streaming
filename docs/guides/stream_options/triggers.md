@@ -22,10 +22,10 @@ You might wonder why it would make sense to only process one micro-batch every h
 
 | Trigger | Description                          |
 | ----------- | ------------------------------------ |
-| Micro-Batch (default)       | By default, the query will be executed in micro-batch mode, where micro-batches will be generated as soon as the previous micro-batch has completed processing.  |
-| Processing Time       | The query will be executed with micro-batches mode, where micro-batches will be kicked off at the user-specified interval. If the previous micro-batch completes within the interval, then the engine will wait until the interval is over before kicking off the next micro-batch. If the previous micro-batch takes longer than the interval to complete (i.e. if an interval boundary is missed), then the next micro-batch will start as soon as the previous one completes (i.e., it will not wait for the next interval boundary). |
-| Available Now    | The query will process all the available data at time of query creation and then stop. It will process the data in multiple micro-batches based on the source options (e.g. `maxFilesPerTrigger` for the file source). It will definitely process all unprocessed data at the time at which the query starts, but will not process data that arrives _during_ the execution of these batches. |
-| Once (deprecated) | The query will process all the unprocessed data at the time of query creation in _one_ batch. Beware: it will not respect source options.
+| Micro-Batch Trigger (default)       | The default trigger is the micro-batch trigger, where a micro-batch will be started as soon as its previous micro-batch has completed. Since there is no delay between micro-batches, the default trigger interval is effectively 0 seconds.  |
+| Processing Time Trigger      | The processing time trigger kicks of micro-batches at the user-specified interval. If the previous micro-batch completes within the interval, then the engine will wait until the interval is over before kicking off the next micro-batch. If the previous micro-batch takes longer than the interval to complete (i.e. if an interval boundary is missed), then the next micro-batch will start as soon as the previous one completes (i.e., it will not wait for the next interval boundary). |
+| Trigger Available Now    | The query will process all the available data at time of query creation and then stop. It will process the data in multiple micro-batches based on the source options (e.g. `maxFilesPerTrigger` for the file source). It will definitely process all unprocessed data at the time at which the query starts, but will not process data that arrives _during_ the execution of these batches. |
+| Trigger Once (deprecated) | The query will process all the unprocessed data at the time of query creation in _one_ batch. Beware: it will not respect source options.
 | Continuous (experimental) | The query will be executed in the new low-latency, continuous processing mode. Read more about it [here](). |
 
 ## Use Cases
@@ -44,7 +44,7 @@ If you're unsure about what trigger to choose, you might consider using the foll
 
 === "Python"
 
-    ``` python
+    ``` python hl_lines="9 15 21 27"
     # Default trigger (runs the next micro-batch as soon as it can)
     df.writeStream \
         .format("console") \
@@ -77,7 +77,7 @@ If you're unsure about what trigger to choose, you might consider using the foll
 
 === "Scala"
 
-    ``` scala
+    ``` scala hl_lines="11 17 23 29"
     import org.apache.spark.sql.streaming.Trigger
 
     // Default trigger (runs the next micro-batch as soon as it can)
@@ -112,7 +112,7 @@ If you're unsure about what trigger to choose, you might consider using the foll
 
 === "Java"
 
-    ``` java 
+    ``` java hl_lines="11 17 23 29"
     import org.apache.spark.sql.streaming.Trigger
 
     // Default trigger (runs the next micro-batch as soon as it can)
