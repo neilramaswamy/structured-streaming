@@ -20,7 +20,7 @@ You might wonder why it would make sense to only process one micro-batch every h
 
 ## API Overview
 
-| Output Mode | Description                          |
+| Trigger | Description                          |
 | ----------- | ------------------------------------ |
 | Micro-Batch (default)       | By default, the query will be executed in micro-batch mode, where micro-batches will be generated as soon as the previous micro-batch has completed processing.  |
 | Processing Time       | The query will be executed with micro-batches mode, where micro-batches will be kicked off at the user-specified interval. If the previous micro-batch completes within the interval, then the engine will wait until the interval is over before kicking off the next micro-batch. If the previous micro-batch takes longer than the interval to complete (i.e. if an interval boundary is missed), then the next micro-batch will start as soon as the previous one completes (i.e., it will not wait for the next interval boundary). |
@@ -32,7 +32,7 @@ You might wonder why it would make sense to only process one micro-batch every h
 
 If you're unsure about what trigger to choose, you might consider using the following table. Once a use case sounds like yours, you can check the specific semantics of it in the [API Overview]().
 
-| Output Mode | Use Cases |
+| Trigger | Use Cases |
 | ----------- | ------------------------------------ |
 | Micro-Batch (default)       | If latency is your most important requirement, use this trigger. If you want to process data as fast as possible (perhaps because you're doing real-time fraud detection or real-time feature generation for a Machine Learning model), this is the production-ready trigger that will give you the lowest latency. |
 | Processing Time       | If you have a stream of data that needs to be processed _without_ a real-time latency requirement, you can use this trigger. For example, if you just need a daily report at the end of the day to say how many sales were made in the last 24 hours, you could set a processing time trigger of 24 hours. The benefit to using a processing time trigger is that when your query isn't running, your cluster can be used by other jobs running on it. This is the middle-ground between latency and cost.  |
