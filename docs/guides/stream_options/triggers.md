@@ -14,16 +14,16 @@ The following are some examples of trigger definitions:
   - Delivery semantics, like at-least-once or exactly-once, as noted in [Fault Tolerance and Checkpoints]().
   - State created by [stateful operators](): old state is automatically removed.
 
-  !!! tip
-    If you have a batch Spark job that you run as a [cron job](https://en.wikipedia.org/wiki/Cron), it might be easier to run it as a Structured Streaming job with a trigger. You won't have to worry about the job failing and not processing that day's data, for example.
+!!! tip
 
+    If you have a batch Spark job that you run as a [cron job](https://wikipedia.org/wiki/Cron), consider running it as a Structured Streaming job with a trigger. For example, with a trigger you won't have to worry about the job failing and not processing that day's data.
 
 ## API Overview
 
 | Trigger | Description                          |
 | ----------- | ------------------------------------ |
-| Micro-Batch Trigger (default)       | The default trigger is the micro-batch trigger, where a micro-batch will be started as soon as its previous micro-batch has completed. Since there is no delay between micro-batches, the default trigger interval is effectively 0 seconds.  |
-| Processing Time Trigger      | The processing time trigger kicks of micro-batches at the user-specified interval. If the previous micro-batch completes within the interval, then the engine will wait until the interval is over before kicking off the next micro-batch. If the previous micro-batch takes longer than the interval to complete (i.e. if an interval boundary is missed), then the next micro-batch will start as soon as the previous one completes (i.e., it will not wait for the next interval boundary). |
+| Micro-batch trigger (default)       | The default trigger is the micro-batch trigger, where a micro-batch starts as soon as thr previous micro-batch completes. Since there is no delay between micro-batches, the default trigger interval is effectively 0 seconds.  |
+| Processing time trigger      | The processing time trigger kicks off micro-batches at a user-specified interval. If the previous micro-batch completes within the interval (before the time for the next specified time), then the Spark engine waits until the interval is over to start the next micro-batch. If the previous micro-batch takes longer than the interval to complete (runs over the time specified for the next micro-batch to start), then the next micro-batch starts as soon as the previous one completes (it will not wait for the next interval boundary). |
 | Trigger Available Now    | The query will process all the available data at time of query creation and then stop. It will process the data in multiple micro-batches based on the source options (e.g. `maxFilesPerTrigger` for the file source). It will definitely process all unprocessed data at the time at which the query starts, but will not process data that arrives _during_ the execution of these batches. |
 | Trigger Once (deprecated) | The query will process all the unprocessed data at the time of query creation in _one_ batch. Beware: it will not respect source options.
 | Continuous (experimental) | The query will be executed in the new low-latency, continuous processing mode. Read more about it [here](). |
