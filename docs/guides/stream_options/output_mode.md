@@ -27,19 +27,22 @@ After processing these records, the streaming aggregation operator now has these
 
 Again, it could emit these results downstream now, since the aggregates have new values, or it could wait until its more confident that those aggregates won't change. How does it choose? The query's _output mode_ configures how its operators deal with these changing values:
 
-- In the _update_ output mode, the stateful operator emits all the windows that have changed during the micro-batch.
-- In the _append_ output mode, the stateful operator emits all the windows only once its sure that the windows won't change.
+- In the _update_ output mode, the aggregation operator emits all the windows that have changed during the micro-batch [^1].
+- In the _append_ output mode, the aggregation operator emits the windows that won't change; it determines this by using the watermark.
+
+[^1]:
+    Technically, it emits all the windows that have changed since the last _trigger_, not the last micro-batch. With the Available Now trigger, there could be multiple micro-batches in one trigger, so this distinction only makes sense for the Available Now trigger.
 
 Let's consider both modes for streaming aggregation below.
 
 ### Emitting aggregates with every update
 
-One output mode is _update_ mode, where the streaming operator emits all the updated aggregate values every micro-batch. Such behavior means that for the same window, the operator can emit a record multiple times (up to once per micro-batch). From our example earlier, this would mean that after the first micro-batch, it would emit two records downstream:
+One output mode is _update_ mode, where the streaming operator emits all the updated aggregate values every micro-batch. Such behavior means that for the same window, the operator can emit a record multiple times (up to once per trigger). From our example earlier, this would mean that after the first micro-batch, it would emit two records downstream:
 
 1. [2pm, 3pm): `$15 + $10` = $25
 2. [3pm, 4pm): `$30` = $30
 
-Then, after processing the next batch, it would emit the two updated aggregates:
+Then, after processing the next micro-batch, it would emit the two updated aggregates:
 
 1. [2pm, 3pm): `$15 + $10 + `**`$20`** = $45
 2. [3pm, 4pm): `$30 + `**`$25`** = $55
@@ -48,17 +51,17 @@ So, in total, across these two triggerings of micro-batches, Structured Streamin
 
 ### Emitting aggregates only once
 
-Another output mode is _append_ mode, where aggregate values are emitted only once the watermark _exceeds_ the end of that aggregate's window. The [watermarks section]() defined a watermark to be the earliest timestamp that the engine could now receive; if a window ended at 3pm and the watermark were 3:05pm, the engine would know that there would be no more records contributing to the window that ended at 3pm.
+Another output mode is _append_ mode, where the streaming aggregator emits aggregates only once once its sure those aggregate values won't change. It determines that an aggregate won't change once the streaming query's watermark exceeds the end of an aggregate's window. Recall that from the [watermarks section](), we defined a watermark to be the earliest timestamp that the engine could now receive; if a window ended at 3pm and the watermark were 3:05pm, the engine would know that there would be no more records contributing to the aggregate whose window ended at 3pm.
 
 So suppose the streaming operator had the following items in its state (these are the same records at the end of the first micro-batch in the example above):
 
 - \[2pm, 3pm\]: $25
 - \[3pm, 4pm\]: $30
 
-If the watermark were 1pm, the engine could still receive records for either of those two windows. As a result, it wouldn't emit _anything_. However, if the watermark were 3:30pm, it would know that it would no longer recieve records for the 2pm to 3pm window. In that case, it would emit `([2pm, 3pm], $25)` downstream. At that point, it would consider the aggregate for 2pm to 3pm _finalized_, and would _never_ emit an aggregate for 2pm to 3pm again.
+If the watermark were 1pm, the engine could still receive records for either of those two windows. As a result, it wouldn't emit _anything_. On the other hand, if the watermark were 3:30pm, it would know that it would no longer recieve records for the 2pm to 3pm window. In that case, it would emit `([2pm, 3pm], $25)` downstream, but _not_ emit `([3pm, 4pm], $30)`. At that point, it would consider the aggregate for 2pm to 3pm _finalized_, and would _never_ emit an aggregate for 2pm to 3pm again (unless a failure happened, and it had to reprocess that batch).
 
 !!! info "Interactions with delivery semantics"
-    Append mode differs from exactly-once delivery semantics, in that an aggregation operator in append mode will emit its results only once, assuming that you don't have any failures. If you have a failure and the micro-batch has to be retried, then the same record might be appended to the sink twice. At that point, you must rely on the supported delivery semantics of your sink.
+    Append mode differs from exactly-once delivery semantics in that an aggregation operator in append mode will emit its results only once, assuming that you don't have any failures. If you have a failure and the micro-batch has to be retried, then the same record might be appended to the sink twice. At that point, you must rely on the supported delivery semantics of your sink.
 
 ### Emitting all aggregates
 
@@ -87,15 +90,15 @@ Not all sinks support certain output modes. This limitation is not one with Stru
 
 ## Choosing the Right Output Mode
 
-First, if you're using only stateless operators, output mode doesn't really matter for you: you can stick with the default of append. In stateless pipelines, an individual record doesn't depend on any other record, so a record's emitted row will never change, so update mode behaves the same way as append mode.
+First, if you're using only stateless operators, output mode doesn't really matter for you: you can stick with the default of append. In stateless pipelines, an individual record doesn't depend on any other record, so an emitted row will never change, so update mode behaves the same way as append mode.
 
-However, if you have stateful pipelines, there are a few considerations to make. You can follow the following steps in the order they are presented.
+However, if you have stateful pipelines, there are a few considerations to make, which we outline below.
 
 ### Consider application semantics
 
 Primarily, you want to consider the semantics of your application:
 
-- If downstream services are trying to take a single action for every write to the sink, you likely want to use append mode. If you have a downstream notification service sending notifications based on new records in the sink, update mode would mean you send a notification for _every_ new update; this would likely be annoying for users.
+- If downstream services are trying to take a single action for every write to the sink, you likely want to use append mode. If you have a downstream notification service sending notifications for every new record written to the sink, update mode would mean you send a notification for _every_ new update; this would likely be annoying for users.
 - If downstream services are reading from your sink and needs fresh results (e.g. a machine learning model that is reading features from your sink in real-time), you could use update mode so that your sink stays as up-to-date as possible.
 
 ### Consider operator and sink compatibility
@@ -115,10 +118,10 @@ Finally, you should also keep in mind some non-functional (e.g. latency and cost
 
 You might go through the suggestions above and find that your semantics, operator or sink compatibility, and non-functional requirements don't align. For example, you might be in the following situation:
 
-- You need an outer join, but data can be really delayed on one side. You want to update your sink when a join occurs, but Structured Streaming joins don't support the update output mode.
-- You need to write your outer join to a file sink, but file sinks don't support update output mode.
+- You need an outer join, but data can be really delayed on one side. You want to update your sink when a join happens, but Structured Streaming joins don't support the update output mode.
+- You want to use update mode with your streaming aggregation operator, but you have a file sink; file sinks don't support update output mode.
 
-In that case, you need to use on of our "escape" hatches. Such a situation warrants caution: it is an advanced use of Structured Streaming. You might consider using `flatMapGroupsWithState` in combination with the `foreach`/`foreachBatch` sinks to make this work.
+In these cases, you need to use one of Structured Streaming's "escape" hatches. You will need to use [arbitrary stateful processing](), likely in combination with the `foreach`/`foreachBatch` sinks to make this work.
 
 ## Examples
 
