@@ -20,7 +20,7 @@ At the end of each batch, the HDFS state store will save its state to your [chec
 
 ## The RocksDB State Store
 
-As mentioned, the HDFS state store might have performance and memory issues with large amounts of state. To mitigate this, Spark 3.2 added support for the RocksDB state store. The RocksDB state store manages state between native memory and the local disk, which has two implications:
+As mentioned, the HDFS state store might have performance and memory issues with large amounts of state. To mitigate this, Spark 3.2 added support for the RocksDB state store. The RocksDB state store manages state between native memory and the local disk, which has two benefits:
 
 1. The state store doesn't create any JVM memory pressure.
 2. The state store can handle much more state, since RocksDB manages state between native memory and the local disk.
@@ -28,6 +28,22 @@ As mentioned, the HDFS state store might have performance and memory issues with
 RocksDB supports two ways of saving its state to your [checkpoint location](): the default mechanism saves the underlying SST files[^1] to your checkpoint location, while "changelog checkpointing" uploads only the state that has been changed. The latter has much higher performance, but needs to be enabled explicitly.
 
 ## Picking the Right State Store
+
+First, if your query doesn't have any stateful operators, you can stop reading: state stores won't help you!
+
+If you do have stateful queries, you should ask yourself: how many bytes of state do I have _per partition_? There are two ways of figuring this out:
+
+1. If you haven't started your query yet and you aren't sure, you can do some napkin math. Approximately speaking, the amount of state you'll have depends on your watermark duration, input rate, and size per record. For a 10 minute watermark and 10,000 records per second, you'll have 100,000 records in 10 minutes. If each record takes 64 bytes of space, then you'll have 6,400,000 bytes in your state store. You can divide that by the number of partitions you have to determine the amount of memory needed per partition.
+
+<!-- TODO: Plug-in a link to the SparkUI guide here. -->
+2. If your streaming query is already running, you can look at the Spark UI to determine the distribution of state sizes across your partitions. Ideally this would be fairly uniform, but if it's not, choose the largest one for the purposes of this guide.
+
+Once you have that number, if the amount of memory per partition is less than a gigabyte, you can probably use HDFS. Otherwise, you should use RocksDB.
+
+!!! warning
+    Once you choose a state store provider, there's no easy way for you to change your state store provider. The only way to do that is to create an entirely new query with a brand new checkpoint location and reprocess all your source data.
+    
+    As a result, use RocksDB if there's any chance that your per-partition state store sizes—which you can approximate with the napkin math above—could rise above the threshold in the future.
 
 
 ## Examples
