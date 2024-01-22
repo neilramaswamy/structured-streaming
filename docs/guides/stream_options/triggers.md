@@ -9,10 +9,11 @@ The following are some examples of trigger definitions:
 - Read and process more data immediately after each micro-batch finishes
 - Read and process data in a micro-batch every hour (or every 24 hours)
 
-  Processing a micro-batch on a schedule, such as hourly or daily, rather than just scheduling a batch job to run periodically allows you to _incrementally_ process your source data, without worrying about:
+Processing a micro-batch at a specified interval, such as hourly or daily, allows you to process your source data with the following benefits:
 
-  - Delivery semantics, like at-least-once or exactly-once, as noted in [Fault Tolerance and Checkpoints]().
-  - State created by [stateful operators](): old state is automatically removed.
+- Incremental processing: no need to keep track of what data you have and haven't processed
+- Delivery semantics: skuch as at-least-once or exactly-once, as noted in [Fault Tolerance and Checkpoints]()
+- State management: old state is automatically removed.
 
 !!! tip
 
@@ -25,10 +26,10 @@ The following are some examples of trigger definitions:
 | **Micro-batch trigger (default)**       | The default trigger is the micro-batch trigger, where a micro-batch starts as soon as thr previous micro-batch completes. Since there is no delay between micro-batches, the default trigger interval is effectively 0 seconds.  |
 | **Processing Time trigger**      | The processing time trigger starts micro-batches at a user-specified interval. If the previous micro-batch completes within the interval (before the time for the next specified time), then the Spark engine waits until the interval is over to start the next micro-batch. If the previous micro-batch takes longer than the interval to complete (runs over the time specified for the next micro-batch to start), then the next micro-batch starts as soon as the previous one completes (it will not wait for the next interval boundary). |
 | **Available Now trigger**    | The available now trigger starts a query that processes all available data at time of query creation and then stops. It processes the data in multiple micro-batches based on the source options (such as `maxFilesPerTrigger` for the file source). It processes all unprocessed data as of the time when the query starts. It does not process data that arrives _during_ the execution of the micro-batches. |
-| **Trigger Once (deprecated) trigger** | The trigger once trigger starts a query that processes all unprocessed data at the time of query creation in _one_ batch. Beware: it will not respect source options.
-| **Continuous (experimental) trigger** | The continuous trigger starts a query that executes in a new low-latency, continuous processing mode. See [continuous trigger](). |
+| **Once (deprecated) trigger** | The once trigger starts a query that processes all unprocessed data at the time of query creation in _one_ batch. Beware: it will not respect source options.
+| **Continuous trigger (experimental)** | The continuous trigger starts a query that executes in a low-latency, continuous processing mode. See [continuous trigger](). |
 
-## What is the use case for each trigger type
+## What is the use case for each trigger type?
 
 The following table describes the use case for each trigger type.
 
@@ -37,8 +38,8 @@ The following table describes the use case for each trigger type.
 | **Micro-batch (default) trigger**       | If latency is your most important requirement, use the micro-batch trigger for the lowest latency. With this trigger, you can process data as fast as possible (perhaps because you're doing real-time fraud detection or real-time feature generation for a Machine Learning model). |
 | **Processing Time trigger**       | If you have a stream of data that needs to be processed _without_ a real-time latency requirement, use the processing time trigger. For example, if your goal is to generate a daily report at the end of each day to report on sales made in the previous 24 hours, use a processing time trigger set for every 24 hours. The benefit to using a processing time trigger is that when your query isn't running, your cluster can be used to run other jobs. This trigger provides a balance between latency and cost.  |
 | **Available Now**    | If you have a stream of data that you need to process in a one-off fashion, but you don't want to have to reprocess data you already processed, use the available now trigger. This trigger is the most cost-effective trigger. You spin up a cluster to process all unprocessed data in your streaming source. Once the query terminates, you spin down the cluster. |
-| **Trigger Once trigger** | You really shouldn't be using this: it's deprecated. Use the available now trigger. | 
-| **Continuous trigger** | The continuous trigger is an experimental mode trigger with limited support. This trigger only supports [stateless]() queries and doesn't emit any metrics. If you have a stateless pipeline and require single-digit millisecond latency, try this mode. |
+| **Once trigger** | You really shouldn't be using this: it's deprecated. Use the available now trigger. | 
+| **Continuous trigger (experimental)** | The continuous trigger is an experimental mode trigger with limited support. This trigger only supports [stateless]() queries and doesn't emit any metrics. If you have a stateless pipeline and require single-digit millisecond latency, try this mode. |
 
 ## Examples
 
@@ -62,7 +63,7 @@ The following table describes the use case for each trigger type.
         .trigger(availableNow=True) \
         .start()
 
-    # Trigger Once trigger (Deprecated, encouraged to use Available Now trigger)
+    # Once trigger (Deprecated, encouraged to use Available Now trigger)
     df.writeStream \
         .format("console") \
         .trigger(once=True) \
@@ -97,7 +98,7 @@ The following table describes the use case for each trigger type.
         .trigger(Trigger.AvailableNow())
         .start()
 
-    // Trigger Once trigger (Deprecated, encouraged to use Available Now trigger)
+    // Once trigger (Deprecated, encouraged to use Available Now trigger)
     df.writeStream
         .format("console")
         .trigger(Trigger.Once())
@@ -132,7 +133,7 @@ The following table describes the use case for each trigger type.
         .trigger(Trigger.AvailableNow())
         .start();
 
-    // Trigger Once trigger (Deprecated, encouraged to use Available Now trigger)
+    // Once trigger (Deprecated, encouraged to use Available Now trigger)
     df.writeStream
         .format("console")
         .trigger(Trigger.Once())
@@ -155,7 +156,7 @@ The following table describes the use case for each trigger type.
     write.stream(df, "console", trigger.processingTime = "2 seconds")
 
     # TODO: Is Available Now supported?
-    # Trigger Once trigger //deprecated?
+    # Once trigger //deprecated?
     write.stream(df, "console", trigger.once = TRUE)
 
     # Continuous trigger is not yet supported
