@@ -1,10 +1,12 @@
 # Output Mode
 
+Output modes allow you to specify how stateful operators should write possibly-changing outputs to the streaming query's sink.
+
 ## Why do we need an output mode?
 
-In the world of streaming, some types of stateful queries have outputs that can change when new data arrives. Output modes allow you to specify how stateful operators should write possibly-changing outputs to the streaming query's sink. Let's look at an example.
+Some types of stateful streaming queries have outputs that can change when new data arrives. Let's look at an example.
 
-Consider a [streaming aggregation]() in which we want to calculate the total revenue made _every hour_ at a store. Suppose our Structured Streaming job processes the following records in its first micro-batch:
+Consider a [streaming aggregation]() that calculates the total revenue made _every hour_ at a store. Suppose our Structured Streaming job processes the following records in its first micro-batch:
 
 - $15 at 2:45pm
 - $10 at 2:30pm
@@ -15,7 +17,7 @@ At this point, the streaming aggregation operator has the following in its state
 - \[2pm, 3pm\]: $25
 - \[3pm, 4pm\]: $30
 
-It could emit these results downstream now, or it could wait for more records that might be part of those windows. The stream could, for example, receive two more records and processes them in a second micro-batch:
+The aggregation operator could emit these results downstream now, or it could wait for more records that might be part of those windows. The stream could, for example, receive two more records and processes them in a second micro-batch:
 
 - $20 at 2:15pm
 - $25 at 3:15pm
@@ -25,13 +27,13 @@ After processing these records, the streaming aggregation operator now has these
 - \[2pm, 3pm\]: $45
 - \[3pm, 4pm\]: $55
 
-Again, it could emit these results downstream now, since the aggregates have new values, or it could wait until its more confident that those aggregates won't change. How does it choose? The query's _output mode_ configures how its operators deal with these changing values:
+Again, the aggregation operator could emit these results downstream now, since the aggregates have new values, or it could wait until its more confident that those aggregates won't change. How does it choose? The query's _output mode_ configures how its operators deal with changing values:
 
 - In the _update_ output mode, the aggregation operator emits all the windows that have changed during the micro-batch [^1].
-- In the _append_ output mode, the aggregation operator emits the windows that won't change; it determines this by using the watermark.
+- In the _append_ output mode, the aggregation operator emits the windows that won't change; it determines this by using the [watermark]().
 
 [^1]:
-    Technically, it emits all the windows that have changed since the last _trigger_, not the last micro-batch. With the Available Now trigger, there could be multiple micro-batches in one trigger, so this distinction only makes sense for the Available Now trigger.
+    Technically, aggregation operator emits all the windows that have changed since the last _trigger_, not the last micro-batch. With the Available Now trigger, there could be multiple micro-batches in one trigger, so this distinction only makes sense for the Available Now trigger.
 
 Let's consider both modes for streaming aggregation below.
 
