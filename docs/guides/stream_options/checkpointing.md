@@ -1,6 +1,6 @@
-# Checkpoints
+# Checkpointing
 
-Structured Streaming 
+Structured Streaming uses 
 
 provides fault-tolerance and data consistency for streaming queries; using Azure Databricks workflows, you can easily configure your Structured Streaming queries to automatically restart on failure. By enabling checkpointing for a streaming query, you can restart the query after a failure. The restarted query continues where the failed one left off.
 
