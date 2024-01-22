@@ -1,19 +1,21 @@
 # Triggers
 
-## What is a trigger?
+A trigger defines how often a micro-batch executes a query and processes source data.
+
+## What are the trigger definitions?
 
 Structured Streaming repeatedly reads and processes data from the source in micro-batches. Triggers allow you to configure the precise definition of how frequently Structured Streaming micro-batches are run.
 
 The following are some examples of trigger definitions:
 
 - Start a micro-batch immediately after immediately after each micro-batch finishes
-- Start a micro-batch every hour (or every 24 hours)
+- Start a micro-batch on a schedule (such as every hour or every 24 hours)
 
 Processing a micro-batch at a specified interval, such as hourly or daily, allows you to process your source data with the following benefits:
 
-- Incremental processing: no need to keep track of what data you have and haven't processed
-- Delivery semantics: skuch as at-least-once or exactly-once, as noted in [Fault Tolerance and Checkpoints]()
-- State management: old state is automatically removed.
+- **Incremental processing**: no need to keep track of what data you have and haven't processed
+- **Delivery semantics**: skuch as at-least-once or exactly-once, as noted in [Fault Tolerance and Checkpoints]()
+- **State management**: old state is automatically removed.
 
 !!! tip
 

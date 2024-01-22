@@ -1,8 +1,17 @@
-# Checkpointing
+# Checkpoints
+
+Structured Streaming 
+
+provides fault-tolerance and data consistency for streaming queries; using Azure Databricks workflows, you can easily configure your Structured Streaming queries to automatically restart on failure. By enabling checkpointing for a streaming query, you can restart the query after a failure. The restarted query continues where the failed one left off.
+
+
+
+
+A checkpoint location stores your Structured Streaming queries to automatically restart on failure
 
 This guide covers the conceptual knowledge needed to understand and use checkpoint locations. To optimize checkpoint locations, please see the checkpoint location section in the [performance tuning]() guide.
 
-## Overview
+## What is a checkpoint?
 
 The Spark Structured Streaming checkpoint location is a cloud-storage backed directory that is used mainly for fault tolerance and failure recovery. The most popular cloud-storage systems for checkpoint locations are Amazon S3, Azure Blob Storage, and Google Cloud Storage. The checkpoint location directory stores two main things:
 
@@ -11,7 +20,7 @@ The Spark Structured Streaming checkpoint location is a cloud-storage backed dir
 
 Both progress tracking and state management are central to the functionality of the engine, so checkpoint locations cannot be fully disabled. However, there are some optimizations you can enable to make the effects of checkpoint location operations less expensive. We discuss these later.
 
-## Choosing a Checkpoint Location
+## How do I choose a checkpoint location?
 
 Your checkpoint location should be a fixed, per-query directory in cloud-storage. For your convenience, it should be somewhat self-describing, so that you know what query a given checkpoint location corresponds to. For example, if you are in the Data Science division of your company and you are generating a product usage dashboard, you could use `s3://data-science/streams/product-usage`. That will be the directory to which Structured Streaming performs progress tracking and stores intermediary state.
 
