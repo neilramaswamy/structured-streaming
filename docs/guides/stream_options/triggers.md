@@ -6,8 +6,8 @@ Structured Streaming repeatedly reads and processes data from the source in micr
 
 The following are some examples of trigger definitions:
 
-- Read and process more data immediately after each micro-batch finishes
-- Read and process data in a micro-batch every hour (or every 24 hours)
+- Start a micro-batch immediately after immediately after each micro-batch finishes
+- Start a micro-batch every hour (or every 24 hours)
 
 Processing a micro-batch at a specified interval, such as hourly or daily, allows you to process your source data with the following benefits:
 
