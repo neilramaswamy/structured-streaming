@@ -25,18 +25,20 @@ As mentioned, the HDFS state store might have performance and memory issues with
 1. The state store doesn't create any JVM memory pressure.
 2. The state store can handle much more state, since RocksDB manages state between native memory and the local disk.
 
-RocksDB supports two ways of saving its state to your [checkpoint location](): the default mechanism saves the underlying SST files[^1] to your checkpoint location, while "changelog checkpointing" uploads only the state that has been changed. The latter has much higher performance, but needs to be enabled explicitly.
+RocksDB supports two ways of saving its state to your [checkpoint location](): the default mechanism saves its underlying data files[^1] to your checkpoint location, while "changelog checkpointing" uploads only the state that has been changed. The latter has much higher performance, but needs to be enabled explicitly.
+
+In the examples below, we show you how to enable changelog checkpointing.
+
+[^1]:
+    RocksDB is an [LSM tree](https://en.wikipedia.org/wiki/Log-structured_merge-tree), so what we're referring to as "underlying data files" are its [SST files](https://github.com/facebook/rocksdb/wiki/A-Tutorial-of-RocksDB-SST-formats).
 
 ## Picking the Right State Store
 
 First, if your query doesn't have any stateful operators, you can stop reading: state stores won't help you!
 
-If you do have stateful queries, you should ask yourself: how many bytes of state do I have _per partition_? There are two ways of figuring this out:
+If you do have stateful queries, you should ask yourself: how many bytes of state do I have _per partition_? You can answer this question by doing some [napkin math](https://en.wiktionary.org/wiki/napkin_math).
 
-1. If you haven't started your query yet and you aren't sure, you can do some napkin math. Approximately speaking, the amount of state you'll have depends on your watermark duration, input rate, and size per record. For a 10 minute watermark and 10,000 records per second, you'll have 100,000 records in 10 minutes. If each record takes 64 bytes of space, then you'll have 6,400,000 bytes in your state store. You can divide that by the number of partitions you have to determine the amount of memory needed per partition.
-
-<!-- TODO: Plug-in a link to the SparkUI guide here. -->
-2. If your streaming query is already running, you can look at the Spark UI to determine the distribution of state sizes across your partitions. Ideally this would be fairly uniform, but if it's not, choose the largest one for the purposes of this guide.
+Approximately speaking, the amount of state you'll have depends on your watermark duration, input rate, and size per record. For a 10 minute watermark and 10,000 records per second, you'll have 100,000 records in 10 minutes. If each record takes 64 bytes of space, then you'll have 6,400,000 bytes in your state store. You can divide that by the number of partitions you have to determine the amount of memory needed per partition.
 
 Once you have that number, if the amount of memory per partition is less than a gigabyte, you can probably use HDFS. Otherwise, you should use RocksDB.
 
@@ -48,7 +50,65 @@ Once you have that number, if the amount of memory per partition is less than a 
 
 ## Examples
 
+<!-- TODO(neil): Can you figure out why this is? -->
+State store configurations happen at the SQL configuration level, not as an option on your stream. In all these examples below, we assume that you have a `spark` variable which refers to your current `SparkSession`; you can see how to construct one [here]().
 
+=== "Python"
+
+    ```python
+    # Explicitly use HDFS (default)
+    spark.conf.set(
+        "spark.sql.streaming.stateStore.providerClass",
+        "com.databricks.sql.streaming.state.HDFSStateStoreProvider")
+
+    # Enable RocksDB
+    spark.conf.set(
+        "spark.sql.streaming.stateStore.providerClass",
+        "com.databricks.sql.streaming.state.RocksDBStateStoreProvider")
+
+    # If you're using RocksDB, you can enable changelog checkpointing.
+    spark.conf.set(
+        "spark.sql.streaming.stateStore.rocksdb.changelogCheckpointing.enabled", 
+        "true")
+    ```
+
+=== "Scala"
+
+    ```scala
+    // Explicitly use HDFS (default)
+    spark.conf.set(
+        "spark.sql.streaming.stateStore.providerClass",
+        "com.databricks.sql.streaming.state.HDFSStateStoreProvider")
+
+    // Enable RocksDB
+    spark.conf.set(
+        "spark.sql.streaming.stateStore.providerClass",
+        "com.databricks.sql.streaming.state.RocksDBStateStoreProvider")
+
+    // If you're using RocksDB, you can enable changelog checkpointing.
+    spark.conf.set(
+        "spark.sql.streaming.stateStore.rocksdb.changelogCheckpointing.enabled", 
+        "true")
+    ```
+
+=== "Java"
+
+    ```java
+    // Explicitly use HDFS (default)
+    spark.conf.set(
+        "spark.sql.streaming.stateStore.providerClass",
+        "com.databricks.sql.streaming.state.HDFSStateStoreProvider")
+
+    // Enable RocksDB
+    spark.conf.set(
+        "spark.sql.streaming.stateStore.providerClass",
+        "com.databricks.sql.streaming.state.RocksDBStateStoreProvider")
+    
+    // If you're using RocksDB, you can enable changelog checkpointing.
+    spark.conf.set(
+        "spark.sql.streaming.stateStore.rocksdb.changelogCheckpointing.enabled", 
+        "true")
+    ```
 
 
 
