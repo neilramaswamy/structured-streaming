@@ -1,22 +1,19 @@
 # Checkpointing
 
-Structured Streaming uses 
+Structured Streaming uses a checkpoint storage location to provide fault-tolerance and data consistency for streaming queries. Checkpointing enables you to restart a failed queryfrom where the failed one left off.
 
-provides fault-tolerance and data consistency for streaming queries; using Azure Databricks workflows, you can easily configure your Structured Streaming queries to automatically restart on failure. By enabling checkpointing for a streaming query, you can restart the query after a failure. The restarted query continues where the failed one left off.
+## What are the checkpoint location options?
 
+The Spark Structured Streaming checkpoint location is a cloud-storage backed directory that is used mainly for fault tolerance and failure recovery. The most popular cloud-storage systems for checkpoint locations are Amazon S3, Azure Blob Storage, and Google Cloud Storage.
 
+To optimize checkpoint locations, see[checkpoint location optimization]().
 
+## What is stored in the checkpoint location?
 
-A checkpoint location stores your Structured Streaming queries to automatically restart on failure
+The checkpoint location directory stores the following:
 
-This guide covers the conceptual knowledge needed to understand and use checkpoint locations. To optimize checkpoint locations, please see the checkpoint location section in the [performance tuning]() guide.
-
-## What is a checkpoint?
-
-The Spark Structured Streaming checkpoint location is a cloud-storage backed directory that is used mainly for fault tolerance and failure recovery. The most popular cloud-storage systems for checkpoint locations are Amazon S3, Azure Blob Storage, and Google Cloud Storage. The checkpoint location directory stores two main things:
-
-- Progress through the stream. Each record in a stream usually has an offset number. Structured Streaming records which offsets it is going to process before starting a batch, and marks those offsets are processed when it finishes the batch. Thus, if the stream fails during a micro-batch, it can recovery by reading the checkpoint location and resuming at the last unprocessed offsets. This aspect of the checkpoint location is known as "progress tracking" or "offset management."
-- State management. As discussed in the [stateful streaming]() part of the Tour, stateful operators generate state, like intermediate aggregation output. This state is stored in the checkpoint location so that if the query is restarted, Structured Streaming can download the most recent state without having to replay the stream to rebuild that state.
+- **Stream progress**: Each record in a stream typically has an offset number. In the storage location, Structured Streaming records the offsets it is going to process before starting a micro-batch, and marks those offsets are processed when it finishes the micro-batch. Thus, if the stream fails during a micro-batch, the stream recovers by reading from the checkpoint location and resuming at the last unprocessed offset. This aspect of the checkpoint location is known as "progress tracking" or "offset management."
+- **Stream state**: [Stateful operators]() generate [state](), such as intermediate aggregation output. The stream state is stored in the checkpoint location so that if the query is restarted, Structured Streaming can download the most recent state without having to replay the stream from the beginning to rebuild that state.
 
 Both progress tracking and state management are central to the functionality of the engine, so checkpoint locations cannot be fully disabled. However, there are some optimizations you can enable to make the effects of checkpoint location operations less expensive. We discuss these later.
 
