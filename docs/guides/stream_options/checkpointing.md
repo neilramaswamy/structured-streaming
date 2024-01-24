@@ -1,10 +1,6 @@
-# Checkpoints
+# Checkpointing
 
-Structured Streaming stores checkpoint information to a storage location to provide fault-tolerance and data consistency for streaming queries. Checkpointing enables you to restart a failed query from where the failed one left off.
-
-## What are the popular checkpoint locations?
-
-The Spark Structured Streaming checkpoint location is a cloud-storage backed directory that is used mainly for fault tolerance and failure recovery. The most popular cloud-storage systems for checkpoint locations are Amazon S3, Azure Blob Storage, and Google Cloud Storage.
+Structured Streaming stores checkpoint information to a storage location to provide fault-tolerance and data consistency for streaming queries. Checkpointing enables you to restart a failed query from where the failed one left off. The Spark Structured Streaming checkpoint location is a cloud-storage backed directory, such as Amazon S3, Azure Blob Storage, and Google Cloud Storage, where Stuctured Streaming stores its progress through the stream - including state for stateful operators.
 
 To optimize checkpoint locations, see [checkpoint optimizations]().
 
@@ -13,7 +9,7 @@ To optimize checkpoint locations, see [checkpoint optimizations]().
 The checkpoint location directory stores the following:
 
 - **Stream progress**: Each record in a stream typically has an offset number. In the storage location, Structured Streaming records the offsets it is going to process before starting a micro-batch, and marks those offsets are processed when it finishes the micro-batch. Thus, if the stream fails during a micro-batch, the stream recovers by reading from the checkpoint location and resuming at the last unprocessed offset. This aspect of the checkpoint location is known as "progress tracking" or "offset management."
-- **Stream state**: [Stateful operators]() generate [state](), such as intermediate aggregation output. The stream state is stored in the checkpoint location so that if the query is restarted, Structured Streaming can download the most recent state without having to replay the stream from the beginning to rebuild that state.
+- **Stream state**: [Stateful operators]() generate [state](), such as intermediate aggregation output. The stream state is stored in the checkpoint location so that if the query is restarted, Structured Streaming can load the most recent state without having to rebuild it by replaying the entire stream over again.
 
 Both progress tracking and state management are central to the functionality of the Structured Streaming engine, so checkpointing cannot be fully disabled. However, there are some [checkpoint optimizations]() you can enable to make the effects of checkpoint location operations less expensive.
 
