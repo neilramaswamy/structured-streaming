@@ -41,7 +41,7 @@ If you're unsure about what trigger to choose, you might consider using the foll
 | Continuous | This is an experimental mode, so it has limited support. It only supports [stateless]() queries, and doesn't emit any metrics. But if you have a stateless pipeline and need single-digit millisecond latency, you could try this mode. |
 
 ## Examples
-
+ 
 === "Python"
 
     ``` python hl_lines="9 15 21 27"
