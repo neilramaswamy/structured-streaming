@@ -7,12 +7,12 @@ The output mode of a stream query determines when results are released downstrea
 
 ## What are the available output modes
 
-There are three output modes that tell an operator _when_ to release their results downstream: 
+There are three output modes that tell an operator _what_ records to release their results downstream: 
 
 | Output Mode         | Description                             |
 |---------------------|-----------------------------------------|
-| **Append mode (default)**    | By default, streaming queries run in append mode. In this mode, operators release rows once they're sure that resulting row won't change - either because no stateful operators are involved or because the stateful operator (such as an aggregation operator) has determined that the time window specified by the watermark has passed. |
-| **Update mode** | In this mode, operators release all rows that were updated since the last trigger, regardless of the fact that the value of a record in a row might be updated by a subsequent trigger. |
+| **Append mode (default)**    | By default, streaming queries run in append mode. In this mode, operators release rows that won't change - either because no stateful operators are involved or because the stateful operator (such as an aggregation operator) has determined that the time window specified by the watermark has passed. |
+| **Update mode** | In this mode, operators release all rows that changed in the last trigger, regardless of the fact that the value of a record in a row might be updated by a subsequent trigger. |
 | **Complete mode** | This mode is supported only with aggregations, with _all_ resulting rows ever produced are released downstream. |
 
 ## Why do we need an output mode?
@@ -78,7 +78,7 @@ If the watermark were 1pm, the engine could still receive records for either of 
 
 In addition to the Update and Append output modes, there also _Complete_ output mode. In this mode, all the writes for the query are written downstream _every_ batch, no matter how many micro-batches ago they were originally created. It is generally unadvisable to use this output mode as it requires the engine to store every single row it has ever written in the query's state. If these are a lot of rows, you might experience an Out of Memory error for large amounts of data.
 
-## Choosing the right Output Mode
+## Choosing the output mode for your pipeline type
 
 Choosing append or update mode:
 
@@ -115,7 +115,7 @@ You might go through the suggestions above and find that your semantics, operato
 - You need an outer join, but data can be really delayed on one side. You want to update your sink when a join happens, but Structured Streaming joins don't support the update output mode.
 - You want to use update mode with your streaming aggregation operator, but you have a file sink; file sinks don't support update output mode.
 
-In these cases, you need to use one of Structured Streaming's "escape" hatchesto make this work: [arbitrary stateful processing]() in combination with the `foreach`/`foreachBatch` sinks.
+In these cases, you need to use one of Structured Streaming's "escape" hatches to make this work: [arbitrary stateful processing]() in combination with the `foreach`/`foreachBatch` sinks.
 
 ## Examples
 
