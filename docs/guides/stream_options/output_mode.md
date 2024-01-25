@@ -1,6 +1,9 @@
 # Output Mode
 
-The output mode of a stream query determines when results are released downstream (to the next operator or the sink). Data can be released downstream with each trigger, or can be released downstream only when the operator determines that a value in a row won't change.
+!!! info
+    Before reading this article, you should be familiar with [watermarks]().
+
+The output mode of a stream query determines when results are emitted downstream (either the next operator or the sink). Data can be emitted downstream with each trigger, or can be released downstream only when the operator determines that a value in a row won't change.
 
 - With stateless operators, an individual record doesn't depend on any other record, so a released row can never change as the result of a subsequent row in the stream. In this scenario, results are released downstream with each trigger regardless of the output mode.
 - With stateful operators, a row can contain a record with an aggregated value that can (and frequently does) change with subsequent rows (such as an aggregation of values over a period of time). In this scenario, you need to choose when results should be released downstream. Results can be released with each trigger (regardless of the fact that the value of a record in a row might be updated by a subsequent trigger). You can also choose to only have results released downstream when an [aggregation operator]() determines that a row can no longer change - because the time window defined by the [watermark]() specifies that no new rows can appear that modify the aggregated value.
@@ -17,66 +20,40 @@ There are three output modes that tell an operator _what_ records to release the
 
 ## Why do we need an output mode?
 
-Consider a [streaming aggregation]() that calculates the total revenue made _every hour_ at a store. Suppose our Structured Streaming job processes the following records in its first micro-batch:
+Consider a [streaming aggregation]() that calculates the total revenue made _every hour_ at a store. Let's also assume that it uses a watermark delay of 15 minutes. Suppose our Structured Streaming query processes the following records in its first micro-batch:
 
-- $15 at 2:45pm
+- $15 at 2:40pm
 - $10 at 2:30pm
-- $30 at 3:30pm
+- $30 at 3:10pm
 
-At this point, the streaming aggregation operator has the following in its state:
+At this point, the engine's watermark must be _2:55pm_, since it would have subtracted 15 minutes (the delay) from the maximum time seen (3:10pm). Additionally, the streaming aggregation operator would have the following in its state:
 
 - \[2pm, 3pm\]: $25
 - \[3pm, 4pm\]: $30
 
-The streaming aggregation operator could release these results downstream now, or it could wait for more records from a subsequent query that might be part of those time windows. The stream could, for example, receive two more records and processes them in a second micro-batch:
+In append mode, the streaming aggregation operator wouldn't release anything downstream. This is because both of these windows still could change: the watermark of 2:55pm indicates that records _after_ 2:55pm can still arrive, and those records could fall into either the \[2pm, 3pm\] window or the \[3pm, 4pm\] window. In update mode, on the other hand, _both_ of these records would be released downstream, since they were just updated. In complete mode, both of these records would be emitted, simply because _all_ records are emitted—no caveats.
 
-- $20 at 2:15pm
-- $25 at 3:15pm
+Now, suppose that the stream received one more record:
 
-After processing these records, the streaming aggregation operator now has these results in its state:
+- $20 at 3:20pm
 
-- \[2pm, 3pm\]: $45
-- \[3pm, 4pm\]: $55
+The watermark would then update to 3:05pm, since the engine would subtract 15 minutes from 3:20pm. At _this_ point, the streaming aggregation operator would have the following in its state:
 
-Again, the streaming aggregation operator could release these results downstream now, since the aggregates have new values, or it could wait until its more confident that those aggregates won't change (determined using the [watermark]()). How does he streaming aggregation operator choose? The query's _output mode_ configures how its operators deal with changing values:
+- \[2pm, 3pm\]: $25
+- \[3pm, 4pm\]: $50
 
-- In _update_ output mode, the streaming aggregation operator releases all the windows that have changed during the micro-batch [^1].
-- In _append_ output mode, the streaming aggregation operator releases the windows that won't change.
+In append mode, the streaming aggregation operator would notice that the watermark of 3:05pm was greater than the end of the \[2pm, 3pm\] window. By the definition of the watermark, that window would _never_ change, so it could emit just that one window downstream. In update mode, however, the streaming aggregation operator would only emit the \[3pm, 4pm\] window because it had changed from $30 to $50. Finally, in complete mode, both of these records would be emitted.
+
+<!-- TODO(neil): check if in update mode the closed window would be emitted if it didn't change -->
+
+To summarize, stateful operators behave in the following way:
+
+- In append mode, records are emitted once they will no longer change, where "no longer change" is determined using the watermark
+- In update mode, records that changed since the previous micro-batch[^1] are (re-)emitted
+- In complete mode, all records ever produced by the stateful operator are (re-)emitted
 
 [^1]:
-    Technically, streaming aggregation operator releases all the windows that have changed since the last _trigger_, not the last micro-batch. With the Available Now trigger, there could be multiple micro-batches in one trigger, so this distinction only makes sense for the Available Now trigger.
-
-### Releasing aggregates with every update
-
-If the output mode is _update_ mode, the streaming aggregation operator releases all the updated aggregate values in every micro-batch. This behavior means that for the same window, the operator can release a record multiple times (up to once per trigger). From our previoius example, this would mean that after the first micro-batch, it would release two records downstream:
-
-1. [2pm, 3pm): `$15 + $10` = $25
-2. [3pm, 4pm): `$30` = $30
-
-Then, after processing the next micro-batch, it would release the two updated aggregates:
-
-1. [2pm, 3pm): `$15 + $10 + `**`$20`** = $45
-2. [3pm, 4pm): `$30 + `**`$25`** = $55
-
-So, in total, across these two triggerings of micro-batches, Structured Streaming has made _two_ downstream writes.
-
-### Releasing aggregates only once
-
-If the output mode is _append_ mode, the streaming aggregation operator releases aggregates only once once its sure those aggregate values won't change. The operator determines that an aggregate won't change once the streaming query's watermark exceeds the end of an aggregate's window. A [watermark]() is defined to be the earliest timestamp in the streaming query that the engine could now receive by the engine; if a window ended at 3pm and the watermark was 3:05pm, the engine would know that there would be no more records contributing to the aggregate whose window ended at 3pm.
-
-So suppose the streaming aggregation operator had the following items in its state:
-
-- \[2pm, 3pm\]: $25
-- \[3pm, 4pm\]: $30
-
-If the watermark were 1pm, the engine could still receive records for either of those two windows. As a result, it wouldn't release _anything_. On the other hand, if the watermark were 3:30pm, it would know that it would no longer recieve records for the 2pm to 3pm window. In that case, it would release `([2pm, 3pm], $25)` downstream, but _not_ release `([3pm, 4pm], $30)`. At that point, the engine would consider the aggregate for 2pm to 3pm _finalized_, and would _never_ release an aggregate for 2pm to 3pm again (unless a failure happened, and it had to reprocess that batch).
-
-!!! info "Interactions with delivery semantics"
-    Append mode differs from exactly-once delivery semantics in that a streaming aggregation operator in append mode releases its results only once, assuming no failures. If you have a failure and the micro-batch has to be retried, then the same record might be appended downstream twice. At that point, you must rely on the supported delivery semantics of your sink to resolve this duplication. See [link]().
-
-### Releasing all aggregates
-
-In addition to the Update and Append output modes, there also _Complete_ output mode. In this mode, all the writes for the query are written downstream _every_ batch, no matter how many micro-batches ago they were originally created. It is generally unadvisable to use this output mode as it requires the engine to store every single row it has ever written in the query's state. If these are a lot of rows, you might experience an Out of Memory error for large amounts of data.
+    Technically, streaming aggregation operator releases all the windows that have changed since the last _trigger_, not the last micro-batch. With the Available Now trigger, there could be multiple micro-batches in one trigger, so this distinction only makes sense for the Available Now trigger. Practically, you don't have to worry about this. 
 
 ## Choosing the output mode for your pipeline type
 
