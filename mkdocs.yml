@@ -60,6 +60,7 @@ markdown_extensions:
   - pymdownx.superfences
   - pymdownx.details
   - admonition
+  - footnotes
   - md_in_html
   - attr_list
   - pymdownx.tabbed:
