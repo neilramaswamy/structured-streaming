@@ -1,68 +1,80 @@
+<!-- 
+[x] denotes that the article addresses the respective Google search:
+
+spark structured streaming batch interval [x]
+spark structured streaming continuous trigger [x]
+spark structured streaming default trigger interval [x]
+spark structured streaming trigger once [x]
+spark structured streaming trigger [x]
+spark structured streaming trigger once [x]
+spark structured streaming trigger processingtime [x]
+spark structured streaming interval [x]
+
+-->
+
+
 # Triggers
 
-## Motivation
+Structured Streaming repeatedly reads and processes data from the source in micro-batches; triggers configure how frequently a Structured Streaming query runs its micro-batches. The following are some examples of trigger definitions:
 
-In the [Triggers]() section of the Tour, we note that Structured Streaming "repeatedly" reads and processes data from the source in micro-batches. Triggers allow you to configure the precise definition of "repeatedly reads and process data." They specify how frequently micro-batches are run.
+- Start a micro-batch immediately after the previous micro-batch finishes
+- Start a micro-batch periodically, such as hourly or daily
 
-Some reasonable triggers could be the following behaviors:
+While starting a micro-batch immediatley after the previous micro-batch finishes is great for low-latency use-cases, starting a micro-batch periodically still provides the benefits of streaming pipelines, such as incremental processing of the source, guaranteed delivery semantics, and automatic clean-up of old state from stateful operators.
 
-- You read and process more data immediately after after one micro-batch finishes
-- You read and process data in a micro-batch every hour (or every 24 hours)
-
-You might wonder why it would make sense to only process one micro-batch every hour (or 24); at that point, why not just schedule a batch job to run every hour (or 24)? Structured Streaming jobs running with time-based trigger allow you to _incrementally_ process your source data, without worrying about:
-
-- Delivery semantics, like at-least-once or exactly-once, as noted in [Fault Tolerance and Checkpoints]().
-- State created by [stateful operators](): they will automatically remove old state.
-
+<!-- TODO(neil): Add a link to the "migration" guide. -->
 !!! tip
-    If you have a batch Spark job that you run as a [cron job](https://en.wikipedia.org/wiki/Cron), it might be easier to run it as a Structured Streaming job with a trigger. You won't have to worry about the job failing and not processing that day's data, for example.
+    If you have a batch Spark job that you run as a [cron job](https://wikipedia.org/wiki/Cron), consider running it as a Structured Streaming job with a periodic trigger. It will be more reliable and efficient than repeated batch jobs.
 
+## What are the available trigger types?
 
-## API Overview
-
+<!-- TODO(neil): is maxFilesPerTrigger really maxFilesPerMicroBatch? -->
 | Trigger | Description                          |
 | ----------- | ------------------------------------ |
-| Micro-Batch Trigger (default)       | The default trigger is the micro-batch trigger, where a micro-batch will be started as soon as its previous micro-batch has completed. Since there is no delay between micro-batches, the default trigger interval is effectively 0 seconds.  |
-| Processing Time Trigger      | The processing time trigger kicks of micro-batches at the user-specified interval. If the previous micro-batch completes within the interval, then the engine will wait until the interval is over before kicking off the next micro-batch. If the previous micro-batch takes longer than the interval to complete (i.e. if an interval boundary is missed), then the next micro-batch will start as soon as the previous one completes (i.e., it will not wait for the next interval boundary). |
-| Trigger Available Now    | The query will process all the available data at time of query creation and then stop. It will process the data in multiple micro-batches based on the source options (e.g. `maxFilesPerTrigger` for the file source). It will definitely process all unprocessed data at the time at which the query starts, but will not process data that arrives _during_ the execution of these batches. |
-| Trigger Once (deprecated) | The query will process all the unprocessed data at the time of query creation in _one_ batch. Beware: it will not respect source options.
-| Continuous (experimental) | The query will be executed in the new low-latency, continuous processing mode. Read more about it [here](). |
+| **Micro-batch trigger (default)**       | The default trigger is the Micro-batch trigger, where a micro-batch starts as soon as the previous micro-batch completes. Since there is no delay between micro-batches, the default trigger interval is effectively 0 seconds.  |
+| **Processing Time trigger**      | The Processing Time trigger starts micro-batches at a user-defined interval. If a micro-batch completes within this interval, Spark waits until the interval elapses for the next one. If a micro-batch exceeds the interval duration, the next one starts immediately upon completion, without waiting for the next interval. |
+| **Available Now trigger**    | The Available Now trigger starts a query that processes all available data at time of query creation and then exits. It processes the data in multiple micro-batches based on the source options (such as `maxFilesPerTrigger` for the file source). It processes all unprocessed data as of the time when the query starts. It does not process data that arrives _during_ the execution of the micro-batches. |
+| **Once trigger (deprecated)** | The Once trigger starts a query that processes all unprocessed data at the time of query creation in _one_ batch. Beware: it will not respect source options.
+| **Continuous trigger (experimental)** | The Continuous trigger starts a query that executes in a low-latency, continuous processing mode. See [Continuous trigger](). |
 
-## Use Cases
+## What is the use case for each trigger type?
 
-If you're unsure about what trigger to choose, you might consider using the following table. Once a use case sounds like yours, you can check the specific semantics of it in the [API Overview]().
+The following table describes the use case for each trigger type.
 
-| Trigger | Use Cases |
+| Trigger | Use case |
 | ----------- | ------------------------------------ |
-| Micro-Batch (default)       | If latency is your most important requirement, use this trigger. If you want to process data as fast as possible (perhaps because you're doing real-time fraud detection or real-time feature generation for a Machine Learning model), this is the production-ready trigger that will give you the lowest latency. |
-| Processing Time       | If you have a stream of data that needs to be processed _without_ a real-time latency requirement, you can use this trigger. For example, if you just need a daily report at the end of the day to say how many sales were made in the last 24 hours, you could set a processing time trigger of 24 hours. The benefit to using a processing time trigger is that when your query isn't running, your cluster can be used by other jobs running on it. This is the middle-ground between latency and cost.  |
-| Available Now    | If you have a stram of data that you need to process in a one-off fashion, but you don't want to have to reprocess data you already processed, use Available Now. This is the most cost-effective trigger: you can spin up a cluster and process all unprocessed data in your streaming source; the query will terminate, and you can spin down the cluster. |
-| Once | You really shouldn't be using this: it's deprecated. Use Available Now. | 
-| Continuous | This is an experimental mode, so it has limited support. It only supports [stateless]() queries, and doesn't emit any metrics. But if you have a stateless pipeline and need single-digit millisecond latency, you could try this mode. |
+| **Micro-batch (default) trigger**       | If latency is your most important requirement, use the Micro-batch trigger for the lowest latency. With this trigger, you can process data as fast as possible. |
+| **Processing Time trigger**       | If you have a stream of data that needs to be processed _without_ a real-time latency requirement, use the Processing Time trigger. For example, if your goal is to generate a daily report at the end of each day to report on that day's sales, use a Processing Time trigger set for 24 hours. The benefit to using a Processing Time trigger is that when your query isn't running, your cluster can be used to run other jobs. This trigger provides a balance between latency and cost.  |
+| **Available Now**    | If you have a stream of data that you need to process in a one-off fashion, but you don't want to have to reprocess data you already processed, use the Available Now trigger. This trigger is the most cost-effective trigger. You could spin up a cluster, run a stream with an Available Now trigger, wait for it to terminate [^1], and then spin down your cluster. |
+| **Once trigger (deprecated)** | You really shouldn't be using the Once trigger: it's deprecated. Use the Available Now trigger. | 
+| **Continuous trigger (experimental)** | The Continuous trigger is an experimental mode trigger with limited support. This trigger only supports [stateless]() queries and doesn't emit any metrics. If you have a stateless pipeline and require single-digit millisecond latency, try this mode. |
+
+[^1]:
+    We discuss how to wait for termination (and other such lifecycle events) in [Managing the Query Lifecycle]().
 
 ## Examples
  
 === "Python"
 
     ``` python hl_lines="9 15 21 27"
-    # Default trigger (runs the next micro-batch as soon as it can)
+    # Micro-batch (default) trigger (runs the next micro-batch as soon as it can)
     df.writeStream \
         .format("console") \
         .start()
 
-    # ProcessingTime trigger with two-seconds between micro-batches 
+    # Processing Time trigger with two-seconds between micro-batches 
     df.writeStream \
         .format("console") \
         .trigger(processingTime='2 seconds') \
         .start()
 
-    # Available-now trigger
+    # Available Now trigger
     df.writeStream \
         .format("console") \
         .trigger(availableNow=True) \
         .start()
 
-    # One-time trigger (Deprecated, encouraged to use Available-now trigger)
+    # Once trigger (Deprecated, encouraged to use Available Now trigger)
     df.writeStream \
         .format("console") \
         .trigger(once=True) \
@@ -80,24 +92,24 @@ If you're unsure about what trigger to choose, you might consider using the foll
     ``` scala hl_lines="11 17 23 29"
     import org.apache.spark.sql.streaming.Trigger
 
-    // Default trigger (runs the next micro-batch as soon as it can)
+    // Micro-batch (default) trigger (runs the next micro-batch as soon as it can)
     df.writeStream
         .format("console")
         .start()
 
-    // ProcessingTime trigger with two-seconds between micro-batches 
+    // Processing Time trigger with two-seconds between micro-batches 
     df.writeStream
         .format("console")
         .trigger(Trigger.ProcessingTime("2 seconds"))
         .start()
 
-    // Available-now trigger
+    // Available Now trigger
     df.writeStream
         .format("console")
         .trigger(Trigger.AvailableNow())
         .start()
 
-    // One-time trigger (Deprecated, encouraged to use Available-now trigger)
+    // Once trigger (Deprecated, encouraged to use Available Now trigger)
     df.writeStream
         .format("console")
         .trigger(Trigger.Once())
@@ -115,24 +127,24 @@ If you're unsure about what trigger to choose, you might consider using the foll
     ``` java hl_lines="11 17 23 29"
     import org.apache.spark.sql.streaming.Trigger
 
-    // Default trigger (runs the next micro-batch as soon as it can)
+    // Micro-batch (default) trigger (runs the next micro-batch as soon as it can)
     df.writeStream
         .format("console")
         .start();
 
-    // ProcessingTime trigger with two-seconds between micro-batches 
+    // Processing Time trigger with two-seconds between micro-batches 
     df.writeStream
         .format("console")
         .trigger(Trigger.ProcessingTime("2 seconds"))
         .start();
 
-    // Available-now trigger
+    // Available Now trigger
     df.writeStream
         .format("console")
         .trigger(Trigger.AvailableNow())
         .start();
 
-    // One-time trigger (Deprecated, encouraged to use Available-now trigger)
+    // Once trigger (Deprecated, encouraged to use Available Now trigger)
     df.writeStream
         .format("console")
         .trigger(Trigger.Once())
@@ -148,21 +160,15 @@ If you're unsure about what trigger to choose, you might consider using the foll
 === "R"
 
     ```R
-    # Default trigger (runs the next micro-batch as soon as it can)
+    # Micro-batch (default) trigger (runs the next micro-batch as soon as it can)
     write.stream(df, "console")
 
-    # ProcessingTime trigger with two-seconds between micro-batches 
+    # Processing Time trigger with two-seconds between micro-batches 
     write.stream(df, "console", trigger.processingTime = "2 seconds")
 
-    # TODO: Is AvailableNow supported?
-    # One-time trigger
+    # TODO: Is Available Now supported?
+    # Once trigger //deprecated?
     write.stream(df, "console", trigger.once = TRUE)
 
     # Continuous trigger is not yet supported
     ```
-
-
-
-
-
-
