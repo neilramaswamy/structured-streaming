@@ -51,36 +51,41 @@ The file source is named `files`. In addition to the generically supported optio
 
 The Kafka source is named `kafka`. It's compatible with Kafka broker versions 0.10.0 or higher. See the [Kafka Integration Guide](https://spark.apache.org/docs/latest/structured-streaming-kafka-integration.html) for the supported options and examples.
 
-<!-- TODO(carl): You can port over the options from the Programming Guide. Most of these should be straight-forward. -->
 
 ### Socket Source
 
-The file source is named `files`. Its supported options are below.
+<!-- TODO(carl): You can port over the options from the Programming Guide on sockets. -->
+
+The socket source is named `socket`. Its supported options are below.
 
 ??? info "Supported Options"
     Hello world!
 
 ??? example
-    woah hello?
+    todo
 
 ### Rate Source
 
-The file source is named `files`. Its supported options are below.
+<!-- TODO(carl): You can port over the options from the Programming Guide on the rate source. -->
+
+The rate source is named TODO. Its supported options are below.
 
 ??? info "Supported Options"
     Hello world!
 
 ??? example
-    woah hello?
+    todo
 
 ### Rate Source per Micro-Batch
 
-The file source is named `files`. Its supported options are below.
+<!-- TODO(carl): You can port over the options from the Programming Guide on the rate source per microbatch. -->
+
+The rate source per micro-batch is named TODO. Its supported options are below.
 
 ??? info "Supported Options"
     Hello world!
 
 ??? example
-    woah hello?
+    todo
 
 
