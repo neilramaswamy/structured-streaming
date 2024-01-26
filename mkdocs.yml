@@ -129,7 +129,7 @@ nav:
           - State Stores:
               - Overview: guides/stream_options/state/overview.md
               - RocksDB Tuning: guides/stream_options/state/rocksdb.md
-          - Checkpoints: guides/stream_options/checkpointing.md
+          - Checkpointing: guides/stream_options/checkpointing.md
           - Rate Limiting: guides/stream_options/rate_limiting/overview.md
       - Testing:
           - Unit Testing: guides/testing/unit_testing.md
