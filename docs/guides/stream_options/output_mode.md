@@ -1,22 +1,25 @@
 # Output Mode
 
 !!! info
-    Before reading this article, you should be familiar with [watermarks]().
+    Before reading this article, you should be familiar with [watermarks]() and [triggers]().
 
-With a Structured Streaming query, output mode configures what records operators emit during a trigger. For a [stateless operator](), there’s only one behavior; for a [stateful operator](), you can choose to have the operator only emit the records that will no longer change or emit all the records that chamged during the trigger. For example, a stateful aggregation might end a micro-batch with a window with aggregate value 10; after processing more data in the next micro-batch, the streaming aggregator could update that aggregate value to 20. The output mode configures whether to emit the aggregate value at the end of every batch or once the aggregate value won't change anymore.
+A Structured Streaming query's output mode configures what records the query's operators emit during each trigger. For example, operators could emit the records that changed since the last trigger, or the rows that will never change in _future_ triggers.
 
-!!! note 
-    _Stateless_ operators never emit resulting rows that change as more data arrives. Per the definition of a stateless operator, every record can be processed fully on its own. As such, setting an output mode on a stateless query won't change its behavior.
+This distinction is important for [stateful operators](), since a particular row produced by a stateful operator may change from trigger to trigger. For example, as a streaming aggregation operator recevies more rows for a particular window, that window's aggregation value (like the minimum, maximum, or sum) may change across triggers. Output mode configures whether the streaming aggregation operator should emit the latest result at the end of each trigger, or just emit the result once, when the watermark determines that the particular window's aggregation value will never change again.
 
-## What are the available output modes
+For [stateless operators](), this distinction does not affect the behavior of the operator. The records a stateless operator emits during a trigger are _only_ the source records processed during that trigger: unlike stateful operators, results do not change as more triggers execute.
 
-There are three output modes that tell an operator _what_ records to emit their results downstream: 
+## Available output modes
+
+There are three output modes that tell an operator _what_ records to emit during a particular trigger: 
 
 | Output Mode         | Description                             |
 |---------------------|-----------------------------------------|
-| **Append mode (default)**    | By default, streaming queries run in append mode. In this mode, a stateful operator only emits rows that won't change - because the time window specified by the watermark has passed. |
-| **Update mode** | In update mode, stateful operators emit all rows that changed during the trigger, regardless of the fact that the value of a record in a row might be updated during a subsequent trigger. |
-| **Complete mode** | Complete mode is supported only with aggregations, with _all_ resulting rows ever produced emitted downstream. |
+| **Append mode (default)**    | By default, streaming queries run in append mode. In this mode, operators only emits rows that won't change in future triggers; stateful operators use the watermark to deterine when this happens. |
+| **Update mode** | In update mode, operators emit all rows that changed during the trigger, even if the emitted record might change in a subsequent trigger. |
+| **Complete mode** | In complete mode, _all_ resulting rows ever produced by the operator are emitted downstream. It is supported only with streaming aggregations. |
+
+Note that append mode and update mode are semantically equivalent for stateless operators. For a stateless operator like `.select`, the row that results from taking a subset of a a source record's columns in a given trigger has two properties: it will never change in the future  (i.e. it satisfies append mode), and that particular record must not have existed in the previous trigger (i.e. it satisfies update mode).
 
 ## Why do we need an output mode?
 
@@ -26,7 +29,7 @@ Consider a [streaming aggregation]() that calculates the total revenue generatee
 - $10 at 2:30pm
 - $30 at 3:10pm
 
-At this point, the engine's watermark must be _2:55pm_, since it would have subtracted 15 minutes (the delay) from the maximum time seen (3:10pm). Additionally, the streaming aggregation operator would have the following in its state:
+At this point, the engine's watermark must be 2:55pm, since it would have subtracted 15 minutes (the delay) from the maximum time seen (3:10pm). Additionally, the streaming aggregation operator would have the following in its state:
 
 - \[2pm, 3pm\]: $25
 - \[3pm, 4pm\]: $30
@@ -49,19 +52,14 @@ In append mode, the streaming aggregation operator would notice that the waterma
 To summarize, stateful operators behave in the following way:
 
 - In append mode, records are emitted once they will no longer change, where "no longer change" is determined using the watermark
-- In update mode, records that changed since the previous micro-batch[^1] are (re-)emitted
+- In update mode, records that changed since the previous trigger are (re-)emitted
 - In complete mode, all records ever produced by the stateful operator are (re-)emitted
 
-[^1]:
-    Technically, streaming aggregation operator emits all the windows that have changed since the last _trigger_, not the last micro-batch. With the Available Now trigger, there could be multiple micro-batches in one trigger, so this distinction only makes sense for the Available Now trigger. Practically, you don't have to worry about this. 
+## Selecting the right output mode
 
-## Choosing the output mode for your pipeline type
+If you're using only stateless operators in your query, you don't need to configure an output mode. With a query using only stateless operators, an individual record doesn't depend on any other record, so an emitted row can never change; thus, update mode behaves the same way as append mode.
 
-Choosing append or update mode:
-
-- If you're using only stateless operators in your pipeline, use the default of append mode. In stateless pipelines, an individual record doesn't depend on any other record, so an emitted row can never change, so update mode behaves the same way as append mode.
-
-- If you have stateful operators in your pipeline, see the following considerations.
+If you have _any_ stateful operators in your pipeline, see the following considerations.
 
 ### Consider application semantics
 
@@ -89,8 +87,8 @@ Finally, you should also keep in mind some non-functional (such as latency and c
 
 After going through the suggestions above, you may find that your semantics, operator or sink compatibility, and non-functional requirements don't align. For example, consider the following situation:
 
-- You need an outer join, but data can be substantially delayed on one side. You want to update your sink when a join happens, but Structured Streaming joins don't support the update output mode.
 - You want to use update mode with your streaming aggregation operator, but you have a file sink; file sinks don't support update output mode.
+- You need an outer join, but data can be substantially delayed on one side. You want to update your sink when a join happens, but Structured Streaming joins don't support the update output mode.
 
 In these cases, you need to use one of Structured Streaming's "escape" hatches to make this work: [arbitrary stateful processing]() in combination with the `foreach`/`foreachBatch` sinks.
 
