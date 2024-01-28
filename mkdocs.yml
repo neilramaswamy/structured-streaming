@@ -50,6 +50,7 @@ theme:
     - navigation.footer
     - content.tabs.link
     - content.code.copy
+    - content.code.annotate
 markdown_extensions:
   - pymdownx.highlight:
       anchor_linenums: true
@@ -62,7 +63,6 @@ markdown_extensions:
   - admonition
   - footnotes
   - md_in_html
-  - footnotes
   - attr_list
   - pymdownx.tabbed:
       alternate_style: true
@@ -104,7 +104,6 @@ nav:
           - Deployment: tour/jobs/deployment.md
   - Guides:
       - Overview: guides/overview.md
-      # TODO(neil/matthew/etc.): How do we do sources/sinks/connectors without overlap?
       - Connectors:
         - Sources: guides/connectors/sources.md
         - Sinks: guides/connectors/sinks.md
@@ -129,24 +128,22 @@ nav:
           - foreach(Batch): guides/custom/foreach_batch.md
           - UDFs: guides/custom/udfs.md
       - Stream Options:
-          - Overivew: guides/stream_options/overview.md
+          - Overview: guides/stream_options/overview.md
           - Triggers: guides/stream_options/triggers.md
           - Output Mode: guides/stream_options/output_mode.md
           - State Stores:
               - Overview: guides/stream_options/state/overview.md
               - RocksDB Tuning: guides/stream_options/state/rocksdb.md
           - Checkpoints: guides/stream_options/checkpointing.md
-          - Rate Limiting: guides/stream_options/rate_limiting/overview.md
-      - Testing:
-          - Unit Testing: guides/testing/unit_testing.md
-          - Performance Testing and Benchmarking: guides/testing/performance_testing.md
+    #   - Testing:
+    #       - Unit Testing: guides/testing/unit_testing.md
+    #       - Performance Testing and Benchmarking: guides/testing/performance_testing.md
       - Operations:
-          - Deployment: guides/operations/deployment.md
+          # - Deployment: guides/operations/deployment.md
           - Managing the Query Lifecycle: guides/operations/lifecycle.md
-          - Exception Handling: guides/operations/exception_handling.md
           - Metrics and Monitoring: guides/operations/streaming_query_listeners.md
-          - Debugging: guides/operations/debugging.md
-          - Cluster Management: guides/operations/cluster_management.md
+          # - Debugging: guides/operations/debugging.md
+          # - Cluster Management: guides/operations/cluster_management.md
       - Performance Considerations:
           - Partitions and Parallelism: guides/performance/partitions_parallelism.md
           - Optimizations: guides/performance/optimizations.md
