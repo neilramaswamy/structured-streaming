@@ -1,0 +1,5 @@
+/* Selects the first column of each table row in tbody, but only if it contains a single code element */
+/* This is meant to make sure that options in Option tables render on one line */
+tbody tr td:first-child code:only-child {
+    white-space: nowrap;
+}
