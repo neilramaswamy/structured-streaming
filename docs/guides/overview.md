@@ -2,13 +2,13 @@ The guides in this section are _opinionated_ articles that aim to walk users thr
 
 ???+ abstract "API Reference"
     === "Python"
-        :material-api: [PySpark Reference](https://spark.apache.org/docs/latest/api/python/index.html)
+        :material-api: [`PySpark Reference`](https://spark.apache.org/docs/latest/api/python/index.html)
     
     === "Scala"
-        :material-api: [Scala Reference](https://spark.apache.org/docs/latest/api/scala/org/apache/spark/index.html)
+        :material-api: [`Scala Reference`](https://spark.apache.org/docs/latest/api/scala/org/apache/spark/index.html)
 
     === "Java"
-        :material-api: [Java Reference](https://spark.apache.org/docs/latest/api/java/)
+        :material-api: [`Java Reference`](https://spark.apache.org/docs/latest/api/java/)
 
 For a very brief, example-oriented introduction to Structured Streaming, you can look at the example below. On most lines, there is a button you can click that concisely explain what that line does and links you to the relevant guide.
 

@@ -55,3 +55,7 @@ We've mentioned the `query.stop()` API a few times, and its worth adding a few m
 3. You're developing your query in an interactive environment (like a notebook), and you just want it to stop (perhaps because you found a mistake in your code).
 
 After `query.stop()` has been called, the query will finish the trigger it is currently executing and then exit.
+
+## Reading metrics
+
+<!-- TODO(neil) -->

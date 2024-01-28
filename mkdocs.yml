@@ -104,15 +104,17 @@ nav:
           - Deployment: tour/jobs/deployment.md
   - Guides:
       - Overview: guides/overview.md
-      - Connectors:
-        - Sources: guides/connectors/sources.md
-        - Sinks: guides/connectors/sinks.md
-      - Reading and Writing Binary Formats:
+      - Input and Output:
+        - Sources: guides/io/sources.md
+        - Sinks: guides/io/sinks.md
+        - Connectors:
+          - Kafka: guides/io/connectors/kafka.md
+        - Working with Binary Formats:
           - Protobuf: guides/binary_formats/protobuf.md
           - Avro: guides/binary_formats/avro.md
-      - Stateless Streaming:
+      - Stateless Operators:
           - Overview: guides/stateless/overview.md
-      - Stateful Streaming:
+      - Stateful Operators:
           - Overview: guides/stateful/overview.md
           - Watermarks:
               - Overview: guides/watermarks/overview.md
@@ -131,17 +133,15 @@ nav:
           - Overview: guides/stream_options/overview.md
           - Triggers: guides/stream_options/triggers.md
           - Output Mode: guides/stream_options/output_mode.md
-          - State Stores:
-              - Overview: guides/stream_options/state/overview.md
-              - RocksDB Tuning: guides/stream_options/state/rocksdb.md
           - Checkpoints: guides/stream_options/checkpointing.md
+          - State Stores: guides/stream_options/state_stores.md
     #   - Testing:
     #       - Unit Testing: guides/testing/unit_testing.md
     #       - Performance Testing and Benchmarking: guides/testing/performance_testing.md
       - Operations:
           # - Deployment: guides/operations/deployment.md
           - Managing the Query Lifecycle: guides/operations/lifecycle.md
-          - Metrics and Monitoring: guides/operations/streaming_query_listeners.md
+          - Monitoring: guides/operations/monitoring.md
           # - Debugging: guides/operations/debugging.md
           # - Cluster Management: guides/operations/cluster_management.md
       - Performance Considerations:
