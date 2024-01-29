@@ -17,7 +17,6 @@ theme:
 
   name: material
 
-
   palette:
     # Palette toggle for automatic mode
     - media: "(prefers-color-scheme)"
@@ -105,15 +104,12 @@ nav:
   - Guides:
       - Overview: guides/overview.md
       - Input and Output:
-        - Sources: guides/io/sources.md
-        - Sinks: guides/io/sinks.md
-        - Connectors:
-          - Kafka: guides/io/connectors/kafka.md
-        - Working with Binary Formats:
-          - Protobuf: guides/binary_formats/protobuf.md
-          - Avro: guides/binary_formats/avro.md
+          - Sources: guides/io/sources.md
+          - Sinks: guides/io/sinks.md
+          - Binary Formats: guides/io/binary_formats.md
       - Stateless Operators:
-          - Overview: guides/stateless/overview.md
+          - Projection and Selection: guides/stateless/projection_selection.md
+          - Additional Operators: guides/stateless/additional_operators.md
       - Stateful Operators:
           - Overview: guides/stateful/overview.md
           - Watermarks:
@@ -122,22 +118,15 @@ nav:
           - Aggregation: guides/stateful/aggregation.md
           - Deduplication: guides/stateful/deduplication.md
           - Joins: guides/stateful/joins.md
-          # Will mostly link to "Custom Streaming Logic"
-          - Arbitrary Stateful Processing: guides/stateful/arbitrary.md
-      - Custom Streaming Logic:
-          - (Flat)MapGroupsWithState: guides/custom/groups_with_state.md
-          - State Processor: guides/custom/state_processor.md
-          - foreach(Batch): guides/custom/foreach_batch.md
-          - UDFs: guides/custom/udfs.md
+          - Groups with State: guides/stateful/groups_with_state.md
       - Stream Options:
           - Overview: guides/stream_options/overview.md
           - Triggers: guides/stream_options/triggers.md
           - Output Mode: guides/stream_options/output_mode.md
           - Checkpoints: guides/stream_options/checkpointing.md
           - State Stores: guides/stream_options/state_stores.md
-    #   - Testing:
-    #       - Unit Testing: guides/testing/unit_testing.md
-    #       - Performance Testing and Benchmarking: guides/testing/performance_testing.md
+      - Testing:
+          - Unit Testing: guides/testing/unit_testing.md
       - Operations:
           # - Deployment: guides/operations/deployment.md
           - Managing the Query Lifecycle: guides/operations/lifecycle.md
