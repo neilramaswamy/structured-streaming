@@ -38,7 +38,7 @@ The file source is named `files`. In addition to the generically supported optio
 ??? info "Supported Options"
     | Option Name             | Information                                                                                        | Default         | Required?   |
     |-------------------------|----------------------------------------------------------------------------------------------------|-----------------|-------------|
-    | `path`                  | The path to the input directory, and common to all file formats. Glob paths are supported, but multiple comma-separated globs are not supported.                                                           | None            | Yes         |
+    | `path`                  | The path to the input directory. Glob paths are supported, but multiple comma-separated globs are not supported.                                                           | None            | Yes         |
     | `maxFilesPerTrigger`    | The maximum number of new files to be considered in every trigger.                                     | No maximum      | No          |
     | `latestFirst`           | Whether to process the latest new files first. This is useful when there is a large backlog of files.      | False           | No          |
     | `fileNameOnly`          | Whether to check new files based on only the filename instead of on the full path (default: false). With this set to `true`, the following files would be considered as the same file: `file:///dataset.txt` and `s3://a/dataset.txt`.                                                  | False           | No          |
