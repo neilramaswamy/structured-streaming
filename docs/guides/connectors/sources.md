@@ -21,7 +21,7 @@ Structured Streaming also supports several non-production sources for testing pu
 [^1]:
     A source is fault-tolerant if it is able to replay data in the case of failure. The socket source doesn't persist the data it receives, so it can't replay data. The file source and Kafka source both support replay, so they are considered fault-tolerant.
 
-Each of thesesources support many options. See [Source reference](#source-reference). 
+Each of these sources support many options. See [Source reference](#source-reference). 
 
 <!-- TODO(neil): Link an example here. -->
 !!! tip
