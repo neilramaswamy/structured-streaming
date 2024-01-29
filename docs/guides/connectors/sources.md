@@ -16,7 +16,7 @@ Structured Streaming also supports several non-production sources for testing pu
 
 - **Socket source**: Reads UTF8 text data from a socket connection into a streaming DataFrame. The listening server socket is at the driver. Never use this in production, since it isn't fault-tolerant[^1].
 - **Rate source**: Generates data at the specified number of rows _per second_ into a streaming DataFrame to test performance. Each output row contains a `timestamp` and `value`, where timestamp is a `timestamp` type containing the time of message dispatch, and value is of `long` type containing the message count, starting from 0 as the first row. This source is useful when load-testing your jobs, since it allows you to easily generate thousands of rows per second.
-- **Rate source per micro-batch**: Generates data at the specified number of rows _per micro-batch_ into a streaming DataFrame for performance testing. Each output row contains a `timestamp` and `value`, where timestamp is a `timestamp` type containing the time of message dispatch, and value is of `long` type containing the message count, starting from 0 as the first row.. Unlike rate data source, this data source provides a consistent set of input rows per micro-batch regardless of query execution (such as configuration of trigger or query being lagging). For example, batch 0 produces 0~999 and batch 1 produces 1000~1999, and so on. Every record produced will have a different value, even across partitions. Same applies to the generated time.
+- **Rate source per micro-batch**: Generates data at the specified number of rows _per micro-batch_ into a streaming DataFrame for performance testing. Each output row contains a `timestamp` and `value`, where timestamp is a `timestamp` type containing the time of message dispatch, and value is of `long` type containing the message count, starting from 0 as the first row.. Unlike rate data source, this data source provides a consistent set of input rows per micro-batch regardless of query execution (such as configuration of trigger or query being lagging). For example, batch 0 produces values 0~999 and batch 1 produces values 1000~1999, and so on. Every record produced will have a different value, even across partitions. Same applies to the generated time.
 
 [^1]:
     A source is fault-tolerant if it is able to replay data in the case of failure. The socket source doesn't persist the data it receives, so it can't replay data. The file source and Kafka source both support replay, so they are considered fault-tolerant.
@@ -89,9 +89,12 @@ The rate source per micro-batch is named `rate-micro-batch`.
     | Option Name             | Information                                                                                        | Default         | Required?   |
     |-------------------------|----------------------------------------------------------------------------------------------------|-----------------|-------------|
     | `rowsPerBatch` |  How many rows should be generated per micro-batch. | 0 | No |
-    | `numPartitions` | The partition number for the generated rows. | Spark's default parallelism | No |
+    | `numPartitions` | The partition number for the generated rows. | Spark's default parallelism[^2] | No |
     | `startTimestamp` | Starting value of generated time. | 0 | No |
     | `advanceMillisPerBatch` | The amount of time being advanced in generated time on each micro-batch. | 1000 | No |
+
+[^2]:
+    "Default parallelism" refers to `spark.sql.shuffle.partitions`. It defaults to 200 as of Spark 3.4, but may change in future releases.
 
 ??? example
     woah hello?     <!-- TODO(neil)-->
