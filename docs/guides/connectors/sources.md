@@ -6,7 +6,7 @@ In Structured Streaming, a source is the location from which Spark reads a strea
 
 Structured Streaming understands the following production source out-of-the-box:
 
-- **File source** - Reads the files from a directory as a stream of data into a streaming DataFrame. Files are processed in the order of the file modification time. Supported file formats are: text, CSV, JSON, ORC, and Parquet. Streaming from a file source enables you to keep your structured data in cloud storage. Leaving the data in cloud storage is less expensive than storing your data in some other type of location, such as a relational database.
+- **File source** - Reads the files from a directory as a stream of data into a streaming DataFrame. Files are processed in the order of the file modification time. Supported file formats are: text, CSV, JSON, ORC, and Parquet. Streaming from a file source enables you to keep your structured data in cloud storage, which is cheaper than storing your data in some other type of location, such as a relational database.
 - **Kafka source** - Reads data from a Kafka-compatible broker, such as a Confluent cluster or Azure EventHubs, into a streaming DataFrame.
 
 !!! note
