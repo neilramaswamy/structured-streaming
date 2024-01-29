@@ -15,7 +15,7 @@ Structured Streaming understands the following production source out-of-the-box:
 Structured Streaming also supports several non-production sources for testing purposes:
 
 - **Socket source**: Reads UTF8 text data from a socket connection into a streaming DataFrame. The listening server socket is at the driver. Never use this in production, since it isn't fault-tolerant[^1].
-- **Rate source**: Generates data at the specified number of rows _per second_ into a streaming DataFrame to test performance. Each output row contains a `timestamp` and `value`. This source is useful when load-testing your jobs, since it allows you to easily generate 1000s of rows per second.
+- **Rate source**: Generates data at the specified number of rows _per second_ into a streaming DataFrame to test performance. Each output row contains a `timestamp` and `value`. This source is useful when load-testing your jobs, since it allows you to easily generate thousands of rows per second.
 - **Rate source per micro-batch**: Generates data at the specified number of rows _per micro-batch_ into a streaming DataFrame for performance testing. Each output row contains a `timestamp` and `value`. Unlike rate data source, this data source provides a consistent set of input rows per micro-batch regardless of query execution (such as configuration of trigger or query being lagging). For example, batch 0 produces 0~999 and batch 1 produces 1000~1999, and so on. Same applies to the generated time.
 
 [^1]:
