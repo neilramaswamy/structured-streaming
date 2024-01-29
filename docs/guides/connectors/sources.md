@@ -61,8 +61,8 @@ The socket source is named `socket`.
 ??? info "Supported Options"
     | Option Name             | Information                                                                                        | Default         | Required?   |
     |-------------------------|----------------------------------------------------------------------------------------------------|-----------------|-------------|
-    | host | Host to connect to | None | Yes |
-    | port| Port to connect to | None | Yes |
+    | `host` | The string of the host to connect to, such as localhost | None | Yes |
+    | `port` | The integer of the host to connect to, such as 9999 | None | Yes |
 
 ??? example
     woah hello?     <!-- TODO(neil)-->
@@ -74,9 +74,9 @@ The rate source is named `rate`.
 ??? info "Supported Options"
     | Option Name             | Information                                                                                        | Default         | Required?   |
     |-------------------------|----------------------------------------------------------------------------------------------------|-----------------|-------------|
-    | rowsPerSecond | How many rows should be generated per second. | 1 | No |
-    | rampUpTime | How long to ramp up before the generating speed becomes rowsPerSecond. Using finer granularities than seconds will be truncated to integer seconds. This option not suppported in continuous mode. | 0 | No |
-    | numPartitions | The partition number for the generated rows. The source will try its best to reach `rowsPerSecond`, but the query may be resource constrained, and numPartitions can be tweaked to help reach the desired speed.| Spark's default parallelism | No | 
+    | `rowsPerSecond` | How many rows should be generated per second. | 1 | No |
+    | `rampUpTime` | How long to ramp up before the generating speed becomes rowsPerSecond. Using finer granularities than seconds will be truncated to integer seconds. This option not suppported in continuous mode. | 0 | No |
+    | `numPartitions` | The partition number for the generated rows. The source will try its best to reach `rowsPerSecond`, but the query may be resource constrained, and numPartitions can be tweaked to help reach the desired speed.| Spark's default parallelism | No | 
     
 ??? example
     woah hello?     <!-- TODO(neil)-->
@@ -88,10 +88,10 @@ The rate source per micro-batch is named `rate-micro-batch`.
 ??? info "Supported Options"
     | Option Name             | Information                                                                                        | Default         | Required?   |
     |-------------------------|----------------------------------------------------------------------------------------------------|-----------------|-------------|
-    | rowsPerBatch |  How many rows should be generated per micro-batch. | 1 <!--just a guess - Neil to verify--> | No |
-    | numPartitions | The partition number for the generated rows. | Spark's default parallelism | No |
-    | startTimestamp | Starting value of generated time. | 0 | No |
-    | advanceMillisPerBatch | The amount of time being advanced in generated time on each micro-batch. | 1000 | No |
+    | `rowsPerBatch` |  How many rows should be generated per micro-batch. | 0 | No |
+    | `numPartitions` | The partition number for the generated rows. | Spark's default parallelism | No |
+    | `startTimestamp` | Starting value of generated time. | 0 | No |
+    | `advanceMillisPerBatch` | The amount of time being advanced in generated time on each micro-batch. | 1000 | No |
 
 ??? example
     woah hello?     <!-- TODO(neil)-->
