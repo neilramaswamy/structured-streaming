@@ -10,7 +10,7 @@ Structured Streaming understands the following production source out-of-the-box:
 - **Kafka source** - Reads data from a Kafka-compatible broker, such as a Confluent cluster or Azure EventHubs, into a streaming DataFrame.
 
 !!! note
-    Some Spark vendors support additional sources. See your vendor's documentation.
+    Some Spark vendors support additional production sources. See your vendor's documentation.
 
 Structured Streaming also supports several non-production sources for testing purposes:
 
