@@ -1,7 +1,9 @@
-# What are stateless operators?
+# What are projection and selection operators?
 <!-- Is this the best way to introduce stateful vs. stateless? The main point is that we don't need to "remember" other records in stateless. -->
 
-Stateless operators, such as projection and selection, read each record in a stream and limit the columns or the rows (or both) from that record that are emitted downstream. This limit, based on specified conditions, is independent of any other records in the stream. On the other hand, stateful operators, such as aggregations, read each record in a stream and remember information (keep the state) for all records belonging to an aggregate to calculate a value across multiple records. For example, keeping a running total of sales per hour requires the stateful operator to keep track of (remember) information from previous records.
+Projection and selection are stateless operators that read each record in a stream and limit the columns or the rows (or both) from that record that are emitted downstream. This limit, based on specified conditions, is independent of any other records in the stream.
+
+On the other hand, stateful operators, such as aggregations, read each record in a stream and remember information (keep the state) for all records belonging to an aggregate to calculate a value across multiple records. For example, keeping a running total of sales per hour requires the stateful operator to keep track of (remember) information from previous records.
 
 ## What is projection?
 
