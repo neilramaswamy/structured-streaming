@@ -1,3 +1,5 @@
+# Monitoring query lifecycle events
+
 The APIs described in [Managing the Query Lifecycle](./lifecycle.md) enable you to actively control the query lifecycle, but it's equally important to be able to more passively listen to events from the query lifecycle. If you run a real-time service (in the fraud detection or security areas), you can write these events to your monitoring service so that you can get alerts if your streaming job has an issue.
 
 ## Emitted Events

@@ -1,3 +1,5 @@
+# Controlling query lifecycle events
+
 After you call `.start()` on your `DataStreamWriter`, your query will start running on your Spark cluster, and you'll get back a `StreamingQuery`. Through a `StreamingQuery`, you can do several things:
 
 - You can manage its lifecycle: you can wait for it to terminate or throw an exception (which you can catch), or you can explicitly stop it
