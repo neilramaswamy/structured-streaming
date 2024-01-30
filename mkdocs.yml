@@ -17,7 +17,6 @@ theme:
 
   name: material
 
-
   palette:
     # Palette toggle for automatic mode
     - media: "(prefers-color-scheme)"
@@ -50,6 +49,7 @@ theme:
     - navigation.footer
     - content.tabs.link
     - content.code.copy
+    - content.code.annotate
 markdown_extensions:
   - pymdownx.highlight:
       anchor_linenums: true
@@ -62,7 +62,6 @@ markdown_extensions:
   - admonition
   - footnotes
   - md_in_html
-  - footnotes
   - attr_list
   - pymdownx.tabbed:
       alternate_style: true
@@ -104,16 +103,14 @@ nav:
           - Deployment: tour/jobs/deployment.md
   - Guides:
       - Overview: guides/overview.md
-      # TODO(neil/matthew/etc.): How do we do sources/sinks/connectors without overlap?
-      - Connectors:
-        - Sources: guides/connectors/sources.md
-        - Sinks: guides/connectors/sinks.md
-      - Reading and Writing Binary Formats:
-          - Protobuf: guides/binary_formats/protobuf.md
-          - Avro: guides/binary_formats/avro.md
-      - Stateless Streaming:
-          - Overview: guides/stateless/overview.md
-      - Stateful Streaming:
+      - Input and Output:
+          - Sources: guides/io/sources.md
+          - Sinks: guides/io/sinks.md
+          - Binary Formats: guides/io/binary_formats.md
+      - Stateless Operators:
+          - Projection and Selection: guides/stateless/projection_selection.md
+          - Additional Operators: guides/stateless/additional_operators.md
+      - Stateful Operators:
           - Overview: guides/stateful/overview.md
           - Watermarks:
               - Overview: guides/watermarks/overview.md
@@ -121,32 +118,21 @@ nav:
           - Aggregation: guides/stateful/aggregation.md
           - Deduplication: guides/stateful/deduplication.md
           - Joins: guides/stateful/joins.md
-          # Will mostly link to "Custom Streaming Logic"
-          - Arbitrary Stateful Processing: guides/stateful/arbitrary.md
-      - Custom Streaming Logic:
-          - (Flat)MapGroupsWithState: guides/custom/groups_with_state.md
-          - State Processor: guides/custom/state_processor.md
-          - foreach(Batch): guides/custom/foreach_batch.md
-          - UDFs: guides/custom/udfs.md
+          - Groups with State: guides/stateful/groups_with_state.md
       - Stream Options:
-          - Overivew: guides/stream_options/overview.md
+          - Overview: guides/stream_options/overview.md
           - Triggers: guides/stream_options/triggers.md
           - Output Mode: guides/stream_options/output_mode.md
-          - State Stores:
-              - Overview: guides/stream_options/state/overview.md
-              - RocksDB Tuning: guides/stream_options/state/rocksdb.md
           - Checkpoints: guides/stream_options/checkpointing.md
-          - Rate Limiting: guides/stream_options/rate_limiting/overview.md
+          - State Stores: guides/stream_options/state_stores.md
       - Testing:
           - Unit Testing: guides/testing/unit_testing.md
-          - Performance Testing and Benchmarking: guides/testing/performance_testing.md
       - Operations:
-          - Deployment: guides/operations/deployment.md
+          # - Deployment: guides/operations/deployment.md
           - Managing the Query Lifecycle: guides/operations/lifecycle.md
-          - Exception Handling: guides/operations/exception_handling.md
-          - Metrics and Monitoring: guides/operations/streaming_query_listeners.md
-          - Debugging: guides/operations/debugging.md
-          - Cluster Management: guides/operations/cluster_management.md
+          - Monitoring: guides/operations/monitoring.md
+          # - Debugging: guides/operations/debugging.md
+          # - Cluster Management: guides/operations/cluster_management.md
       - Performance Considerations:
           - Partitions and Parallelism: guides/performance/partitions_parallelism.md
           - Optimizations: guides/performance/optimizations.md
