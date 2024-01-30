@@ -1,3 +1,3 @@
 Often times, you'll need to read and write data in _binary_ formats, like Protobuf or Avro. These formats are often used in systems like Kafka, where it's cheaper and faster to store data as compactly as possible, instead of something like JSON.
 
-Apache Spark supports both Protobuf and Avro, but since these aren't features specific to Structured Streaming, they live on the Apache Spark documentation. You can read about Protobuf support [here](https://spark.apache.org/docs/latest/sql-data-sources-protobuf.html), and Avro support [here](https://spark.apache.org/docs/latest/sql-data-sources-avro.html).
+Apache Spark supports both Protobuf and Avro, but since these aren't features specific to Structured Streaming, they live on the Apache Spark documentation. See [Protobuf support](https://spark.apache.org/docs/latest/sql-data-sources-protobuf.html), and [Avro support](https://spark.apache.org/docs/latest/sql-data-sources-avro.html).
