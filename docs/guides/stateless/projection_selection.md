@@ -1,39 +1,44 @@
+# What are stateless operators?
 <!-- Is this the best way to introduce stateful vs. stateless? The main point is that we don't need to "remember" other records in stateless. -->
 
-Stateless stream processing is the first type of stream processing we'll explore. It's characterized by a very simple property: every record can be emitted downstream (or not, in the case of deduplication) _fully_ independently of any other record. For example:
+Stateless operators read each record in a stream and limit the columns or the rows (or both) from that record that are emitted downstream. This limit, based on specified conditions, is independent of any other records in the stream.
 
-- Projecting is stateless, since taking a subset of a record's columns and emitting them downstream can be done without looking at any other records
-- Selection (i.e. filtering) is stateless, since whether you keep or filter a record depends only on that record's columns
+Stateful operators, on the other hand, read each record in a stream and remember information (keep the state) for all records for a period of time. For example, an aggrgation operator that calculates a running total of sales per hour from the data stream requires that the stateful operator keep track of (remember) information from the records in the stream to calculate the hourly total. Another aggregation operator could also be calculating a running total of sales per day. Similarly, a deduplication operator must remember previous records to determine if there is duplication.
 
-We use the word "stateless" because this nice property means that Structured Streaming doesn't need to have any "memory" (i.e. state) about what other records it has seen. Stateful operators, on the other hand (like aggregation), is stateful since Structured Streaming needs to remember (i.e. keep state) for all the records that belong in an aggregate.
+The most common stateless operators are projection and selection.
 
-## Projecting
+!!! note
+    In SQL, the operator for projection is `select` whereas the operator for selection is `where`. This can be a bit confusing.
 
-Projection is the operator that takes a subset of columns from an incoming stream. Often-times upstream data streams have _tons_ of columns that your particular streaming job might not want to send downstream. Suppose your task is to create a privacy-compliant downstream table from a stream of all the new users signing up for your platform. The user stream might have:
+## What is projection?
+
+A projection operator reads the columns from the incoming stream that satisfy a specified condition and emits them downstream. Columns that do not satisfy the specified condition are removed and not saved. For example, the upstream data stream may have _many_ columns that your particular streaming job does not want to send downstream. Suppose your task is to create a privacy-compliant downstream table from a stream of all the new users signing up for your platform.
+
+Let's assume that the data stream has the following columns:
 
 - First and last name
 - Birthday
 - Home address
 - Government ID
 
-You might want to only make sure the downstream table has the name and birthday columns. To do this, you should use the `select` operator, which works with streaming DataFrames just as it works with static DataFrames:
+Use the `select` operator to limit the columns emitted downstream to only the name and birthday columns from this data stream. This creates a privacy-compliant downstream table by not emitting the home address and government ID columns.
 
-TODO(neil), code example. This doesn't need to work E2E, we can just assume the existence of some DataFrame `df` with a known schema. Similar to what we already have.
+<!--TODO(neil), code example. This doesn't need to work E2E, we can just assume the existence of some DataFrame `df` with a known schema. Similar to what we already have. -->
 
-Another reason to project is that if your stream is only going to be using a few columns from an source with many columns, it's cheaper—in terms of of memory and CPU utilization—to have less unnecessary data (columns) flowing through the system.
+Another use of projection is to reduce the use of memory and CPU resources downstream by eliminating the flow of unnecessary data (columns and rows) through the Spark engine.
 
-## Selecting
+## What is selection?
 
-Selection is all about keeping certain rows that satisfy a condition that you specify. In SQL, the operator used for this is commonly known as `where`, while in programming languages, this function is usually refered to as the higher-order-function (usually abbreviated as _HOF_) named `filter`. You can use either on a DataFrame. But regardless of whether you use the SQL operator or HOF, the formula is generally the same:
+A selection operator only emits a record downstream if its columns satisfy a specified condition. In SQL, the `where` operator is used for this, while in programming languages, this function is usually refered to as the higher-order-function (usually abbreviated as _HOF_) named `filter`. You can use either on a DataFrame - the formula is generally the same:
 
 - You provide a string that contains your filtering predicate
 - Your filtering predicate can refer to column names as strings
 - You can use unary operators like `<`, `>`, `=`, `!=`
 
-TODO(neil), code example.
+<!--TODO(neil), code example-->.
 
 ## Projection and Selection
 
-Now, we'll put the following four concepts together to write a fairly useful stateless stream:
+Now, let's see these concepts together in a stateless stream:
 
-TODO(neil)
+<!--TODO(neil)-->
