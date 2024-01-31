@@ -31,8 +31,8 @@ As with all Structured Streaming code, you want to create a source, transform it
         .load())
     
     windowed_counts = (df
-        .withWatermark("timestamp", "15 minutes")
-        .groupBy(window(col("timestamp"), "30 minutes"))
+        .withWatermark("timestamp", "15 seconds")
+        .groupBy(window(col("timestamp"), "10 seconds"))
         .count())
 
     query = (windowed_counts
@@ -69,8 +69,8 @@ As with all Structured Streaming code, you want to create a source, transform it
         .load()
 
     val windowedCounts = df
-        .withWatermark("timestamp", "15 minutes")
-        .groupBy(window($"timestamp", "30 minutes"))
+        .withWatermark("timestamp", "15 seconds")
+        .groupBy(window($"timestamp", "10 seconds"))
         .count()
 
     val query = windowedCounts
@@ -107,7 +107,7 @@ To that end, we'll start with by writing a small amount of data to our source di
 After you run this, you should see the following in your console. Please see the inline annotations, which explain what precisely is going on:
 
 
-```scala
+```py
   |-------------------------------------------------|
   |              QUERY STATUS (Batch = 0)           |
   |-------------------------------------------------|
@@ -117,14 +117,14 @@ After you run this, you should see the following in your console. Please see the
   +-------------------------------------------+-----+
   |                    WATERMARK                    |
   |-------------------------------------------------|
-  | value -> 0 seconds                              | // (1)!
+  | value -> 0 seconds                              | # (1)!
   | numDroppedRows -> 0                             |
   |-------------------------------------------------|
   |                    STATE ROWS                   |
   +-------------------------------------------+-----+
   |key                                        |value|
   +-------------------------------------------+-----+
-  |{10 seconds, 20 seconds}                   |{2}  | // (2)!
+  |{10 seconds, 20 seconds}                   |{2}  | # (2)!
   +-------------------------------------------+-----+
 ```
 
@@ -148,28 +148,27 @@ Now, let's add one more record so that the watermark advances past the _end_ of 
 
 We choose a timestamp of `36` so that the watermark advances _just_ enough, so that the window is closed:
 
-
-```scala
+```py
   |-------------------------------------------------|
   |             WRITES TO SINK (Batch = 1)          |
   +-------------------------------------------+-----+
   |window                                     |count|
   +-------------------------------------------+-----+
-  |{10 seconds, 20 seconds}                   |2    | // (1)!
+  |{10 seconds, 20 seconds}                   |2    | # (1)!
   +-------------------------------------------+-----+
   |                    WATERMARK                    |
   |-------------------------------------------------|
-  | value -> 21 seconds                             | // (2)!
+  | value -> 21 seconds                             | # (2)!
   | numDroppedRows -> 0                             |
   |-------------------------------------------------|
   |                    STATE ROWS                   |
   +-------------------------------------------+-----+
   |key                                        |value|
   +-------------------------------------------+-----+
-  |{30 seconds, 40 seconds}                   |{1}  | // (3)!
+  |{30 seconds, 40 seconds}                   |{1}  | # (3)!
   +-------------------------------------------+-----+
 ```
 
-1. This record gets emitted to the sink because the watermark of 21 seconds (see the next annotation) _exceeds_ the end of the window, 20 seconds.
-2. The watermark updates to 21 seconds, since the largest event-time is 36 seconds, and the engine subtracts of the watermark duration, 15 seconds.
-3. The `michael` record gets added into state for the 30 second to 40 second window.
+1.  This record gets emitted to the sink because the watermark of 21 seconds (see the next annotation) _exceeds_ the end of the window, 20 seconds.
+2.  The watermark updates to 21 seconds, since the largest event-time is 36 seconds, and the engine subtracts of the watermark duration, 15 seconds.
+3.  The `michael` record gets added into state for the 30 second to 40 second window.
