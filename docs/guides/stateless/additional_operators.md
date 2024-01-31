@@ -14,9 +14,21 @@ The `union` function combines two or more data frames of the same schema to appe
 
 ## Using the `flatMap` function
 
-The `flatMap` function is a transformation operation that applies a given function to each element of a data frame  and "flattens" the result into a new data frame. You can use this transformation to extract all unique URLs from a data frame of web log entries. 
+The `flatMap` function is a transformation operation that applies a given function to each element of a data frame. Use `flatMap` when you want to perform a transformation that can generate zero, one, or many output elements for each input element, and you want to flatten the results into a single RDD or DataFrame.
+
+See the following pseudocode example.
+
+```
+myString.flatMap(x =>
+    if x.contains(","):
+        x.split(",")) // many records
+    else:
+        null // no records
+)
+```
+
+For example, you can use this transformation to extract all unique URLs from a data frame of web log entries into 0 or many records. 
 
 ## Using binary functions
 
-You can use binary functions to serialize and deserialization data stored in binary formats, such as Protobuf or Avro.
-See [Protobuf support](https://spark.apache.org/docs/latest/sql-data-sources-protobuf.html), and [Avro support](https://spark.apache.org/docs/latest/sql-data-sources-avro.html).
+You can use binary functions to serialize and deserialization data stored in binary formats, such as Protobuf or Avro Any function in the [Spark SQL Guide](https://spark.apache.org/docs/latest/sql-programming-guide.html) applies, including [protobuf andd avro](../binary_formats.md).
