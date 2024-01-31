@@ -53,7 +53,7 @@ The following table describes the use case for each trigger type.
     We discuss how to wait for termination (and other such lifecycle events) in [Managing the Query Lifecycle]().
 
 ## Examples
-
+ 
 === "Python"
 
     ``` python hl_lines="9 15 21 27"
