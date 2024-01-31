@@ -141,3 +141,5 @@ nav:
           - Unsupported Spark Operators: guides/unsupported/operators.md
           - Unsupported Output Modes: guides/unsupported/output_modes.md
           - Unsupported Join Types: guides/unsupported/joins.md
+  - Examples:
+      - Aggregation with Watermark: examples/aggregation-with-watermark.md
