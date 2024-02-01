@@ -135,7 +135,7 @@ nav:
       - Performance considerations:
           - Partitions and parallelism: guides/performance/partitions_parallelism.md
           - Optimizations: guides/performance/optimizations.md
-          - State Stores: guides/performance/state_stores.md
+          - State stores: guides/performance/state_stores.md
       - Unsupported behavior:
           - Unsupported Spark operators: guides/unsupported/operators.md
           - Unsupported output modes: guides/unsupported/output_modes.md
