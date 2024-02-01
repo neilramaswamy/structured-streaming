@@ -1,17 +1,20 @@
 # Monitoring query lifecycle events
 
-The APIs described in [Managing the Query Lifecycle](./lifecycle.md) enable you to actively control the query lifecycle, but it's equally important to be able to more passively listen to events from the query lifecycle. If you run a real-time service (in the fraud detection or security areas), you can write these events to your monitoring service so that you can get alerts if your streaming job has an issue.
+The APIs described in [Managing the Query Lifecycle](./lifecycle.md) enable you to actively control the query lifecycle, but it's equally important to be able to more passively listen to events from the query lifecycle. If you run a real-time service (such as for fraud detection or security), you can write these events to your monitoring service so that you can get alerts if your streaming job has an issue.
 
 ## Emitted Events
 
 There are 4 types of events that a Spark cluster emits about its streams are:
 
-| Event Name          | Description                                                                                                                                     | Practical Advice                                                                                                                                                                                                                                                                      |
+| Event Name | Description | Practical Advice |
 |---------------------|-------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `onQueryStarted`    | When a streaming query starts, an event is emitted with the query's ID and other identifiers.                                                   | This event is primarily useful for logging a message to the console.                                                                                                                                                                                                  |
-| `onQueryProgress`   | At the end of a streaming query's trigger, a progress event is emitted containing information such as trigger duration and processed row count. | You can use certain fields from this event to detect performance dips in your pipeline. For example, you can report the batch duration to a monitoring service, and you can configure that service to send an alert if batch duration increases by over 10%. |
-| `onQueryTerminated` | When a streaming query terminates, with or without exception, an event is emitted containing its query ID and an optional exception.                  | This event is important: if a streaming query terminates and there is an exception, you should report it to your monitoring service so that you investigate immediately.                                                                                                              |
-| `onQueryIdle`       | As of Spark 3.4, when a streaming query is idle for more than a configurable threshold[^1], an event with its ID is emitted.                    | If you expect your streaming query to constantly be processing data, an idle query means that the source is no longer producing data. While that would likely not be an issue with Structured Streaming, it could be a good indicator that your data pipeline has an issue.           |
+| `onQueryStarted`    | When a streaming query starts, an event is emitted with the query's ID and other identifiers. For more information, see [`QueryStartedEvent`](https://spark.apache.org/docs/latest/api//java/org/apache/spark/sql/streaming/StreamingQueryListener.QueryStartedEvent.html).                                                  | This event is primarily useful for logging a message to the console.                                                                                                                                                                                                  |
+| `onQueryProgress`   | At the end of each streaming query's trigger, a progress event is emitted containing information such as trigger duration and processed row count. For more information, see [`QueryProgressEvent`](https://spark.apache.org/docs/latest/api//java/org/apache/spark/sql/streaming/StreamingQueryListener.QueryProgressEvent.html) and [`StreamingQueryProgress`](https://spark.apache.org/docs/latest/api//java/org/apache/spark/sql/streaming/StreamingQueryProgress.html).| You can use certain fields from this event to detect performance dips in your pipeline. For example, you can report the batch duration to a monitoring service, and you can configure that service to send an alert if batch duration increases by over 10%. |
+| `onQueryTerminated` | When a streaming query terminates, with or without exception, an event is emitted containing its query ID and an optional exception. For more information, see [`QueryTerminatedEvent`](https://spark.apache.org/docs/latest/api//java/org/apache/spark/sql/streaming/StreamingQueryListener.QueryTerminatedEvent.html).                   | This event is important: if a streaming query terminates and there is an exception, you should report it to your monitoring service so that you investigate immediately.                                                                                                              |
+| `onQueryIdle`       | As of Spark 3.4, when a streaming query is idle for more than a configurable threshold[^1], an event with its ID is emitted. For more information, see [`QueryIdleEvent`](https://spark.apache.org/docs/latest/api//java/org/apache/spark/sql/streaming/StreamingQueryListener.QueryIdleEvent.html).                   | If you expect your streaming query to constantly be processing data, an idle query means that the source is no longer producing data. While that would likely not be an issue with Structured Streaming, it could be a good indicator that your data pipeline has an issue.           |
+
+
+Assuming that `spark` refers to your `SparkSession`, `spark.streams` gives you a `StreamingQueryManager`. See [Streaming query manager methods](https://spark.apache.org/docs/latest/api/python/reference/pyspark.ss/query_management.html?highlight=StreamingQueryManager).
 
 [^1]:
     If your query is using a trigger in which it repeatedly executes micro-batches (like the default trigger or processing time trigger), it will emit an idle event if it doesn't find any new data in the source for more than `spark.sql.streaming.noDataProgressEventInterval` milliseconds. The default is 10,000 milliseconds.
@@ -62,18 +65,6 @@ To start, you'll first need to override the `StreamingQueryListener` interface. 
     # If you ever need to remove a listener
     spark.streams.removeListener(MyListener())
     ```
-
-## Additional information
-
-- There are no PySpark docs for the query events.
-- For Java docs for query events:
-
-    - For query start evets, see [`QueryStartedEvent`](https://spark.apache.org/docs/latest/api//java/org/apache/spark/sql/streaming/StreamingQueryListener.QueryStartedEvent.html).
-    - For query progress events, see [`QueryProgressEvent`](https://spark.apache.org/docs/latest/api//java/org/apache/spark/sql/streaming/StreamingQueryListener.QueryProgressEvent.html).
-    - For streaming query progress events and all the metrics associated with the execution of a given trigger, see [`StreamingQueryProgress`](https://spark.apache.org/docs/latest/api//java/org/apache/spark/sql/streaming/StreamingQueryProgress.html).
-    - For query idle events, see [`QueryIdleEvent`](https://spark.apache.org/docs/latest/api//java/org/apache/spark/sql/streaming/StreamingQueryListener.QueryIdleEvent.html).
-    - For query terminated events,see [`QueryTerminatedEvent`](https://spark.apache.org/docs/latest/api//java/org/apache/spark/sql/streaming/StreamingQueryListener.QueryTerminatedEvent.html)
-    6. Assuming that `spark` refers to your `SparkSession`, `spark.streams` gives you a `StreamingQueryManager`. See [Streaming query manager methods](https://spark.apache.org/docs/latest/api/python/reference/pyspark.ss/query_management.html?highlight=StreamingQueryManager).
 
 === "Scala"
 
