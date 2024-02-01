@@ -14,7 +14,6 @@ theme:
       bug: octicons/bug-16
       example: octicons/beaker-16
       quote: octicons/quote-16
-
   name: material
 
   palette:
@@ -136,8 +135,10 @@ nav:
       - Performance considerations:
           - Partitions and parallelism: guides/performance/partitions_parallelism.md
           - Optimizations: guides/performance/optimizations.md
-          - State stores: guides/performance/state_stores.md
+          - State Stores: guides/performance/state_stores.md
       - Unsupported behavior:
           - Unsupported Spark operators: guides/unsupported/operators.md
           - Unsupported output modes: guides/unsupported/output_modes.md
           - Unsupported join types: guides/unsupported/joins.md
+  - Examples:
+      - Aggregation with watermark: examples/aggregation-with-watermark.md
