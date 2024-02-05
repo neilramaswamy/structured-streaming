@@ -14,14 +14,21 @@ As with all Structured Streaming code, you want to create a source, transform it
     from pyspark.sql import SparkSession
     from pyspark.sql.types import StructType, StringType, TimestampType
     from pyspark.sql.functions import window, col
+    from datetime import datetime
 
-    spark = SparkSession.builder.appName("streaming-agg").getOrCreate() # (1)!
+    assert(spark != None)
 
     schema = (StructType()
-        .add("name", StringType()) # (2)!
+        .add("name", StringType())
         .add("timestamp", TimestampType()))
 
     source_path = "/tmp/streaming-agg"
+
+    ts = datetime.fromtimestamp
+    spark.createDataFrame(
+        [("neil", ts(12)), ("ryan", ts(10))],
+        schema
+    ).write.mode("overwrite").parquet(source_path)
 
     df = (spark
         .readStream
@@ -42,69 +49,16 @@ As with all Structured Streaming code, you want to create a source, transform it
         .start())
     ```
 
-    1. If you're in an interactive environment like a notebook, you likely don't need this line. You can test out whether you need it by typing `spark` into your REPL and verifying that there is no error.
+    1. If you're in an interactive environment like a notebook or REPL, you likely don't need this line. You can test out whether you need it by typing `spark` into your REPL and verifying that there is no error.
     2. In PySpark, you have to explicitly _call_ (i.e. `()`) the SQL types. If you don't, you'll get an error
     3. Note: this prints to the driver's Log4J logs. In an interactive environment, you won't see them inline. Be sure to check the driver logs (from the SparkUI) to see these.
-
-=== "Scala"
-
-    ```scala
-    import org.apache.spark.sql.SparkSession
-    import org.apache.spark.sql.types.{StructType, StringType, TimestampType}
-    import org.apache.spark.sql.functions.window
-
-    val spark = SparkSession.builder.appName("streaming-agg").getOrCreate()
-
-    val schema = new StructType()
-        .add("name", StringType)
-        .add("timestamp", TimestampType)
-
-    val sourcePath = "/tmp/streaming-agg"
-
-    val df = spark
-        .readStream
-        .format("parquet")
-        .schema(schema)
-        .option("path", sourcePath)
-        .load()
-
-    val windowedCounts = df
-        .withWatermark("timestamp", "15 seconds")
-        .groupBy(window($"timestamp", "10 seconds"))
-        .count()
-
-    val query = windowedCounts
-        .writeStream
-        .format("console")
-        .outputMode("append")
-        .start()
-    ```
 
 ## Running your example
 
 While it might be tempting to write a huge amount of data to your stream and see Spark work really quickly and reliably, when writing examples, it's imperative that you first test your code, as described in [Unit Testing](../guides/testing/unit_testing.md). You should pass small amounts of data through your stream and inspect the output; this way, you'll be able to precisely see how source data, operator transformations, watermarks, state, and resulting data _actually_ behave.o
 
-To that end, we'll start with by writing a small amount of data to our source directory, using the `parquet` file format:
 
-
-=== "Python"
-
-    ```python
-    from datetime import datetime
-
-    # The rest of your code goes here
-
-    ts = datetime.fromtimestamp
-
-    spark.createDataFrame(
-        [("neil", ts(12)), ("ryan", ts(10))],
-        schema
-    ).write.mode("overwrite").parquet(local_source_path)
-
-    query.processAllAvailable()
-    ```
-
-After you run this, you should see the following in your console. Please see the inline annotations, which explain what precisely is going on:
+After you run the code above, you should see the following in your console. Please see the inline annotations, which explain what precisely is going on:
 
 
 ```py
@@ -115,9 +69,10 @@ After you run this, you should see the following in your console. Please see the
   +-------------------------------------------+-----+
   | nothing in sink                                 |
   +-------------------------------------------+-----+
-  |                    WATERMARK                    |
+  |                   EVENT TIME                    |
   |-------------------------------------------------|
-  | value -> 0 seconds                              | # (1)!
+  | maxEventTime -> 12 seconds                      |
+  | watermark -> 0 seconds                          | # (1)!
   | numDroppedRows -> 0                             |
   |-------------------------------------------------|
   |                    STATE ROWS                   |
@@ -138,28 +93,59 @@ Now, let's add one more record so that the watermark advances past the _end_ of 
 
     ```python
     # Your earlier code goes here
+
     spark.createDataFrame(
         [("michael", ts(36))],
         schema
-    ).write.mode("append").parquet(local_source_path)
+    ).write.mode("append").parquet(source_path)
 
     query.processAllAvailable()
     ```
 
-We choose a timestamp of `36` so that the watermark advances _just_ enough, so that the window is closed:
+We choose a timestamp of `36` so that the watermark advances _just_ enough, so that the window is closed. To close the window, Structured Streaming runs two batches:
+
+- The first batch processes all the data, which is reflected in the "max event-time seen"
+- The next batch updates its watermark based on the previous batch's max event-time, and closes windows
+
+As such, you should see the following:
 
 ```py
   |-------------------------------------------------|
-  |             WRITES TO SINK (Batch = 1)          |
+  |              QUERY STATUS (Batch = 1)           |
+  |-------------------------------------------------|
+  |                    SINK ROWS                    |
+  +-------------------------------------------+-----+
+  | nothing in sink                                 |
+  +-------------------------------------------+-----+
+  |                   EVENT TIME                    |
+  |-------------------------------------------------|
+  | Max event time seen -> 36 seconds               |
+  | Watermark -> 0 seconds                          |
+  | Num dropped rows -> 0                           |
+  |-------------------------------------------------|
+  |                    STATE ROWS                   |
+  +-------------------------------------------+-----+
+  |key                                        |value|
+  +-------------------------------------------+-----+
+  |{10 seconds, 20 seconds}                   |{2}  |
+  +-------------------------------------------+-----+
+```
+
+And immediately after that, you should see this:
+
+```py
+  |-------------------------------------------------|
+  |             WRITES TO SINK (Batch = 2)          |
   +-------------------------------------------+-----+
   |window                                     |count|
   +-------------------------------------------+-----+
   |{10 seconds, 20 seconds}                   |2    | # (1)!
   +-------------------------------------------+-----+
-  |                    WATERMARK                    |
+  |                   EVENT TIME                    |
   |-------------------------------------------------|
-  | value -> 21 seconds                             | # (2)!
-  | numDroppedRows -> 0                             |
+  | Max event time seen -> N/A                      |
+  | Watermark -> 21 seconds                         |
+  | Num dropped rows -> 0                           |
   |-------------------------------------------------|
   |                    STATE ROWS                   |
   +-------------------------------------------+-----+
