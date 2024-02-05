@@ -90,7 +90,7 @@ The rate source per micro-batch is named `rate-micro-batch`.
     | `rowsPerBatch` |  How many rows should be generated per micro-batch. | 0 | No |
     | `numPartitions` | The partition number for the generated rows. | Spark's default parallelism[^2] | No |
     | `startTimestamp` | Starting value of generated time. | 0 | No |
-    | `advanceMillisPerBatch` | The amount of time being advanced in generated time on each micro-batch. | 1000 | No |
+    | `advanceMillisPerBatch` | The number of milliseconds being advanced in generated time on each micro-batch. | 1000 | No |
 
 ??? example
     woah hello?     <!-- TODO(neil)-->
