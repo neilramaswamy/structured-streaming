@@ -36,8 +36,6 @@ A selection operator only emits a record downstream if its columns satisfy a spe
 
 Now, let's see these concepts together in a stateless stream:
 
-<!--TODO(neil)-->
-
 === "Python"
 
     ```python hl_lines="4"
