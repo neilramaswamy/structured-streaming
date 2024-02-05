@@ -11,7 +11,7 @@ spark structured streaming state store
 
 # State stores
 
-In Structured Streaming, [stateful operators]() need to buffer records and their intermediate state to compute their results. For example, records for the same aggregate window might arrive across several micro-batches. Stateful operators in Structured Streaming use a state store to keep track of information from preview records to aggregate values across micro-batches. State stores are key-value stores that stateful operators use to store their intermediary state. Users can configure these state stores perform optimally for the given streaming workload.
+In Structured Streaming, [stateful operators]() use multiple records to produce a single result, and to do that, they need to store state between reading individual records. For example, records for the same aggregate window might arrive across several micro-batches. Stateful operators in Structured Streaming use a state store to keep track of information from previous records to aggregate values across micro-batches. State stores are key-value stores that stateful operators use to store their intermediary state. Users can configure these state stores perform optimally for the given streaming workload.
 
 ## What capabilities do state stores provide?
 
