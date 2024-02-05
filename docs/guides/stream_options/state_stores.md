@@ -11,29 +11,27 @@ spark structured streaming state store
 
 # State stores
 
-In Structured Streaming, [stateful operations]() need to buffer records and their intermediate state to compute their results. For example, records for the same aggregate window might arrive across several micro-batches. State stores are configurable key-value stores that stateful operators use to store these buffered records and their intermediate state.
+In Structured Streaming, [stateful operators]() need to buffer records and their intermediate state to compute their results. For example, records for the same aggregate window might arrive across several micro-batches. Stateful operators in Structured Streaming use a state store to keep track of information from preview records to aggregate values across micro-batches. State stores are key-value stores that stateful operators use to store their intermediary state. Users can configure these state stores perform optimally for the given streaming workload.
 
-While state stores have a simple get/put/delete/range-scan API, their internals are more complex. 
+## What capabilities do state stores provide?
 
-## What are the complexities with state stores?
-
-They have to handle the following complexities:
+State stores provide the following capabilities:
 
 - **Large state size**: For large queries, state store sizes can be really large. If you're processing millions of keys per minute, all of the state data might not fit in memory. The state store then needs to balance state between memory and disk, which is non-trivial.
-- **Checkout location**: For failure recovery, state stores need to save their state to durable storage. See [checkpointing](../checkpointing.md). With large amounts of state, the way in which state is saved can impact performance.
+- **Checkpoint location**: For failure recovery, state stores need to save their state to durable storage. See [checkpointing](../checkpointing.md). With large amounts of state, the way in which state is saved can impact performance.
 
 Different state providers take various approaches to these two problems, and choosing the right state store depends on your workload. See [Picking the right state store](#picking-the-right-state-store).
 
-## What is an HDFS state store?
+## HDFS state store
 
-An HDFS state store is the default implementation of the state store. It stores _all_ state in memory, avoiding the need for a disk operation to service a get or a put. However, if you have too much state, you could encounter some of the following issues:
+The HDFS state store is the default implementation of the state store. It stores _all_ state in memory, avoiding the need for a disk operation to service a get or a put. However, if you have too much state, you could encounter the following issues:
 
 - **Long GC pauses**: Since all state is stored in memory in the Jave Virtual Machine (JVM), you might experience long garbage collection (GC) pauses due to the JVM trying to manage those objects.
 - **Out of Memory errors**: If the amount of state you have is less than the available JVM memory, you'll experience an out of memory exception.
 
-At the end of each batch, the HDFS state store saves its state to your [checkpoint location](../checkpointing.md) in an HDFS-compatible filesystem.
+At the end of each batch, the HDFS state store saves its state to your [checkpoint location](../checkpointing.md).
 
-## What is the RocksDB state store?
+## RocksDB state store
 
 To mitigate the performance and memory issues with large amounts of state, Spark 3.2 added support for the RocksDB state store. The RocksDB state store has two main benefits:
 
@@ -53,7 +51,7 @@ RocksDB supports two ways of saving its state to your [checkpoint location](../c
 
 First, if your query doesn't have any stateful operators, you can stop reading. Stateless operators do not save state.
 
-If you do have stateful queries, ask yourself: how many bytes of state do I have _per partition_? Answer this question by doing some [napkin math](https://wiktionary.org/wiki/napkin_math). Approximately speaking, the amount of state depends on the watermark duration, the input rate, and the size per record. A 10 minute watermark duration with an input rate of 10,000 records per second, results in 100,000 records in 10 minutes. If each record takes 64 bytes of space, this yeilds 6,400,000 bytes in your state store. Divide this by the number of partitions to determine the amount of memory needed per partition.
+If you do have stateful queries, ask yourself: how many bytes of state will I have _per partition_? Answer this question by doing some [napkin math](https://wiktionary.org/wiki/napkin_math). Approximately speaking, the amount of state depends on the watermark duration, the input rate, and the size per record. A 10 minute watermark duration with an input rate of 10,000 records per second, results in 100,000 records in 10 minutes. If each record takes 64 bytes of space, this yields 6,400,000 bytes in your state store. Divide this by the number of partitions to determine the amount of memory needed per partition.
 
 If the amount of memory per partition is less than a gigabyte, use HDFS. Otherwise, use RocksDB.
 
