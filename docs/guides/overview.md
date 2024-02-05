@@ -1,6 +1,6 @@
 # Overview of Structured Streaming
 
-Thesse guides are _opinionated_ articles that walk you through specific APIs and workflows. They primarily aim to give more clarity than precision; if you are looking for precision and nothing else, you'll want to look at the auto-generated documentation. In each guide, we link to the language-specific reference. For example, when linking to the top-level pages of the language-specific documentation, we'd show the following:
+These guides are _opinionated_ articles that walk you through specific APIs and workflows. They primarily aim to give more clarity than precision; if you are looking for precision and nothing else, you'll want to look at the auto-generated documentation. In each guide, we link to the language-specific reference. For example, when linking to the top-level pages of the language-specific documentation, we'd show the following:
 
 ???+ abstract "API Reference"
     === "Python"
