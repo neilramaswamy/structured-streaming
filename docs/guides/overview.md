@@ -77,5 +77,5 @@ For a very brief, example-oriented introduction to Structured Streaming, see the
 There are a few concepts not explicitly mentioned in this brief overview. In particular, you should be aware of the following:
 
 - There are many more operators than just `.filter` and `.groupBy`. See the sections on [stateless operators](), [stateful operators](), and [custom streaming logic]().
-- Structured Streaming uses key-value stores called _state stores_ to manage state created by operators. See [state_stores]().
+- Structured Streaming uses key-value stores called [state stores](./stream_options/state_stores.md) to manage state created by operators.
 - To tune the performance of your Structured Streaming jobs, see [performance tuning]().
