@@ -75,7 +75,7 @@ The rate source is named `rate`.
     |-------------------------|----------------------------------------------------------------------------------------------------|-----------------|-------------|
     | `rowsPerSecond` | How many rows should be generated per second. | 1 | No |
     | `rampUpTime` | How long to ramp up before the generating speed becomes `rowsPerSecond`. Using finer granularities than seconds truncates to integer seconds. This option is not supported with the continuous mode trigger. | 0 | No |
-    | `numPartitions` | The partition number for the generated rows. The source will try its best to reach `rowsPerSecond`, but the query may be resource constrained. `numPartitions` can be tweaked to help reach the desired speed.| Spark's default parallelism[^2] | No | 
+    | `numPartitions` | The number of partitions for the generated rows. The source will try its best to reach `rowsPerSecond`, but the query may be resource constrained. `numPartitions` can be tweaked to help reach the desired speed.| Spark's default parallelism[^2] | No | 
     
 ??? example
     woah hello?     <!-- TODO(neil)-->
