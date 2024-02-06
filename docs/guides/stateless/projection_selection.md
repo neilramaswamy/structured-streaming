@@ -46,33 +46,14 @@ Now, let's see these concepts together in a stateless stream:
     ```
 === "Scala"
 
-    ```scala hl_lines="4"
-    case class DeviceData(device: String, deviceType: String, signal: Double, time: DateTime)
-
-    val df: DataFrame = ... // streaming DataFrame with IOT device data with schema { device: string, deviceType: string, signal: double, time: string }
-    val ds: Dataset[DeviceData] = df.as[DeviceData]    // streaming Dataset with IOT device data
-
+    ```scala hl_lines="2-3"
     // Select the devices which have signal more than 10
     df.select("device").where("signal > 10")      // using untyped APIs
     ds.filter(_.signal > 10).map(_.device)         // using typed APIs
     ```
 === "Java"
 
-    ```java hl_lines="4"
-    import org.apache.spark.api.java.function.*;
-    import org.apache.spark.sql.*;
-    import org.apache.spark.sql.expressions.javalang.typed;
-    import org.apache.spark.sql.catalyst.encoders.ExpressionEncoder;
-
-    public class DeviceData {
-      private String device;
-      private String deviceType;
-      private Double signal;
-      private java.sql.Date time;
-      ...
-      // Getter and setter methods for each field
-    }
-
+    ```java hl_lines="5-7"
     Dataset<Row> df = ...;    // streaming DataFrame with IOT device data with schema { device: string, type: string, signal: double, time: DateType }
     Dataset<DeviceData> ds = df.as(ExpressionEncoder.javaBean(DeviceData.class)); // streaming Dataset with IOT device data
 
@@ -83,7 +64,7 @@ Now, let's see these concepts together in a stateless stream:
     ```
 === "R"
 
-    ```R
+    ```r hl_lines="4"
     df <- ...  # streaming DataFrame with IOT device data with schema { device: string, deviceType: string, signal: double, time: DateType }
 
     # Select the devices which have signal more than 10
