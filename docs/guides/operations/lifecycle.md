@@ -1,9 +1,4 @@
-After you call `.start()` on your `DataStreamWriter`, your query will start running on your Spark cluster, and you'll get back a `StreamingQuery`. Through a `StreamingQuery`, you can do several things:
-
-- You can manage its lifecycle: you can wait for it to terminate or throw an exception (which you can catch), or you can explicitly stop it
-- You can read metadata about your query, like its name, query plan, and various metrics
-
-This guide will focus mainly on managing the query lifecycle. You can find the `StreamingQuery` API for your language below, and you can read more about metrics from `StreamingQueries` on the [metrics]() guide.
+After you call `.start()` after configuring your sink, your query will start running on your Spark cluster, and `start` will return a `StreamingQuery`: 
 
 ???+ abstract "API Reference"
 
@@ -15,6 +10,13 @@ This guide will focus mainly on managing the query lifecycle. You can find the `
         
     === "Java"
         [:material-api: `StreamingQuery`](https://spark.apache.org/docs/latest/api/java/org/apache/spark/sql/streaming/StreamingQuery.html)
+
+Through a `StreamingQuery`, you can do two main things:
+
+- You can manage its lifecycle: you can wait for it to terminate or throw an exception (which you can catch). You can also explicitly stop it.
+- You can read metadata about your query, like its name, query plan, and per micro-batch metrics (called the "query progress").
+
+This guide will focus mainly on managing the query lifecycle, and you can read more about metrics on streaming queries on the [streaming query progress](./query_progress.md#via-a-streamingquery) guide.
 
     
 ## Waiting indefinitely for termination
@@ -55,7 +57,3 @@ We've mentioned the `query.stop()` API a few times, and its worth adding a few m
 3. You're developing your query in an interactive environment (like a notebook), and you just want it to stop (perhaps because you found a mistake in your code).
 
 After `query.stop()` has been called, the query will finish the trigger it is currently executing and then exit.
-
-## Reading metrics
-
-<!-- TODO(neil) -->
