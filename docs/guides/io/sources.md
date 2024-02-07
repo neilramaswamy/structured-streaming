@@ -42,12 +42,25 @@ The file source is named `files`. In addition to the generically supported optio
     | `maxFilesPerTrigger`    | The maximum number of new files to be considered in every trigger.                                     | None      | No          |
     | `latestFirst`           | Whether to process the latest new files first. This is useful when there is a large backlog of files.      | False           | No          |
     | `fileNameOnly`          | Whether to check new files based on only the filename instead of on the full path. With this set to `true`, the following files are considered as the same file: `file:///dataset.txt` and `s3://a/dataset.txt`.                                                  | False           | No          |
-    | `maxFileAge`            | All files older than this age are ignored. For the first batch though, all files are considered valid. If `latestFirst` is set to `true`, `maxFilesPerTrigger` takes precedence over `maxFilesAge`. <!-- this previous sentence does not make sense to me - Neil, please review - see my edit per Slack thread-->The max age is specified with respect to the timestamp of the latest file, and not the current system time.                                                                                              | 7 days          | No |
+    | `maxFileAge`            | All files older than this age are ignored. For the first batch though, all files are considered valid. If `latestFirst` is set to `true`, `maxFilesPerTrigger` takes precedence over `maxFilesAge`. The max age is specified with respect to the timestamp of the latest file, and not the current system time.                                                                                              | 7 days          | No |
     | `cleanSource`           | Whether to clean up files after processing. Available options are: `archive`, `delete`, and `off`. The `delete` option deletes files permanently. The `archive` option copies files to the `sourceArchiveDir`; if the source file is `/a/data.txt` and the archive directory is `/archive`, the file is moved to `/archive/a/data.txt`.                                                       | None | No |
     | `sourceArchiveDir`      | Specifies the archive directory for cleaned-up files. It cannot be a sub-directory of `path`; if it were, archived files would be considered new and processed over and over again.                 | None | Only if `cleanSource` is set to `archive`. |
 
 ??? example
-    woah hello?     <!-- TODO(neil)-->
+    === "Python"
+
+    ```python hl_lines="2-3"
+    # Returns a DataFrame that creates new column named total that is the sum of columns 1 and 2.
+    df = df.withColumn("total", sum(df["col1"], df["col2"]))
+    df.show()
+    ```
+    === "Scala"
+
+    ```scala hl_lines="2-3"
+    // Returns a DataFrame that creates new column named total that is the sum of columns 1 and 2.
+    val df = df.df.withColumn("total", sum(df["col1"], df["col2"]))
+    display(df)
+    ```
 
 ### Kafka source
 
@@ -64,7 +77,59 @@ The socket source is named `socket`.
     | `port` | The integer of the host to connect to, such as 9999. | None | Yes |
 
 ??? example
-    woah hello?     <!-- TODO(neil)-->
+    === "Python"
+
+    ```python hl_lines="3-8"
+    spark = SparkSession. ...
+    # Read text from socket
+    socketDF = spark \
+      .readStream \
+      .format("socket") \
+      .option("host", "localhost") \
+      .option("port", 9999) \
+      .load()
+    socketDF.isStreaming()    # Returns True for DataFrames that have streaming sources
+    socketDF.printSchema()
+    ```
+    === "Scala"
+
+    ```scala hl_lines="3-8"
+    val spark: SparkSession = ...
+    // Read text from socket
+    val socketDF = spark
+      .readStream
+      .format("socket")
+      .option("host", "localhost")
+      .option("port", 9999)
+      .load()
+    socketDF.isStreaming    // Returns True for DataFrames that have streaming sources
+    socketDF.printSchema
+    ```
+    === "Java"
+
+    ```java hl_lines="4-9"
+    SparkSession spark = ...
+
+    // Read text from socket 
+    Dataset<Row> socketDF = spark
+      .readStream()
+      .format("socket")
+      .option("host", "localhost")
+      .option("port", 9999)
+      .load();
+    socketDF.isStreaming();    // Returns True for DataFrames that have streaming sources
+    socketDF.printSchema();
+    ```
+    === "R"
+
+    ```r hl_lines="4"
+    sparkR.session(...) 
+
+    # Read text from socket
+    socketDF <- read.stream("socket", host = hostname, port = port)
+    isStreaming(socketDF)    # Returns TRUE for SparkDataFrames that have streaming sources
+    printSchema(socketDF)
+    ```
 
 ### Rate Source
 
@@ -78,7 +143,100 @@ The rate source is named `rate`. Each output row contains a timestamp and value,
     | `numPartitions` | The number of partitions for the generated rows. The source will try its best to reach `rowsPerSecond`, but the query may be resource constrained. `numPartitions` can be tweaked to help reach the desired speed.| Spark's default parallelism[^2] | No | 
     
 ??? example
-    woah hello?     <!-- TODO(neil)-->
+    === "Python"
+
+    ```python hl_lines="3-6"
+    spark = SparkSession. ...
+    # Create a streaming DataFrame
+    df = spark.readStream \
+      .format("rate") \ 
+      .option("rowsPerSecond", 10) \
+      .load()
+
+    # Write the streaming DataFrame to a table
+    df.writeStream \
+      .option("checkpointLocation", "path/to/checkpoint/dir") \
+     .toTable("myTable") 
+
+    # Check the table result
+    spark.read.table("myTable").show()
+
+    # Transform the source dataset and write to a new table
+    spark.readStream \
+      .table("myTable") \
+      .select("value") \
+      .writeStream \
+      .option("checkpointLocation", "path/to/checkpoint/dir") \
+      .format("parquet") \
+      .toTable("newTable")
+
+    # Check the new table result
+    spark.read.table("newTable").show() 
+    ```
+    === "Scala"
+
+    ```scala hl_lines="3-6"
+    val spark: SparkSession = ...
+    // Create a streaming DataFrame
+    val df = spark.readStream
+     .format("rate")
+     .option("rowsPerSecond", 10)
+     .load()
+
+    // Write the streaming DataFrame to a table
+    df.writeStream
+      .option("checkpointLocation", "path/to/checkpoint/dir")
+      .toTable("myTable")
+
+    // Check the table result
+    spark.read.table("myTable").show()
+
+    // Transform the source dataset and write to a new table
+    spark.readStream
+      .table("myTable")
+      .select("value")
+      .writeStream
+      .option("checkpointLocation", "path/to/checkpoint/dir")
+      .format("parquet")
+      .toTable("newTable")
+
+    // Check the new table result
+    spark.read.table("newTable").show()
+    ```
+    === "Java"
+
+    ```java hl_lines="4-7"
+    SparkSession spark = ...
+
+    // Create a streaming DataFrame
+    Dataset<Row> df = spark.readStream()
+      .format("rate")
+      .option("rowsPerSecond", 10)
+      .load();
+
+    // Write the streaming DataFrame to a table
+    df.writeStream()
+      .option("checkpointLocation", "path/to/checkpoint/dir")
+      .toTable("myTable");
+
+    // Check the table result
+    spark.read().table("myTable").show();
+
+    // Transform the source dataset and write to a new table
+    spark.readStream()
+      .table("myTable")
+      .select("value")
+      .writeStream()
+      .option("checkpointLocation", "path/to/checkpoint/dir")
+      .format("parquet")
+      .toTable("newTable");
+
+    // Check the new table result
+    spark.read().table("newTable").show();
+    ```
+    === "R"
+
+    Not available in R.
 
 ### Rate source per micro-batch
 
@@ -93,7 +251,100 @@ The rate source per micro-batch is named `rate-micro-batch`. Each output row con
     | `advanceMillisPerBatch` | The number of milliseconds being advanced in generated time on each micro-batch. | 1000 | No |
 
 ??? example
-    woah hello?     <!-- TODO(neil)-->
+    === "Python"
+
+    ```python hl_lines="3-6"
+    spark = SparkSession. ...
+    # Create a streaming DataFrame
+    df = spark.readStream \
+      .format("rate") \ 
+      .option("rowsPerBatch", 10) \
+      .load()
+
+    # Write the streaming DataFrame to a table
+    df.writeStream \
+      .option("checkpointLocation", "path/to/checkpoint/dir") \
+     .toTable("myTable") 
+
+    # Check the table result
+    spark.read.table("myTable").show()
+
+    # Transform the source dataset and write to a new table
+    spark.readStream \
+      .table("myTable") \
+      .select("value") \
+      .writeStream \
+      .option("checkpointLocation", "path/to/checkpoint/dir") \
+      .format("parquet") \
+      .toTable("newTable")
+
+    # Check the new table result
+    spark.read.table("newTable").show() 
+    ```
+    === "Scala"
+
+    ```scala hl_lines="3-6"
+    val spark: SparkSession = ...
+    // Create a streaming DataFrame
+    val df = spark.readStream
+     .format("rate")
+     .option("rowsPerBatch", 10)
+     .load()
+
+    // Write the streaming DataFrame to a table
+    df.writeStream
+      .option("checkpointLocation", "path/to/checkpoint/dir")
+      .toTable("myTable")
+
+    // Check the table result
+    spark.read.table("myTable").show()
+
+    // Transform the source dataset and write to a new table
+    spark.readStream
+      .table("myTable")
+      .select("value")
+      .writeStream
+      .option("checkpointLocation", "path/to/checkpoint/dir")
+      .format("parquet")
+      .toTable("newTable")
+
+    // Check the new table result
+    spark.read.table("newTable").show()
+    ```
+    === "Java"
+
+    ```java hl_lines="4-7"
+    SparkSession spark = ...
+
+    // Create a streaming DataFrame
+    Dataset<Row> df = spark.readStream()
+      .format("rate")
+      .option("rowsPerBatch", 10)
+      .load();
+
+    // Write the streaming DataFrame to a table
+    df.writeStream()
+      .option("checkpointLocation", "path/to/checkpoint/dir")
+      .toTable("myTable");
+
+    // Check the table result
+    spark.read().table("myTable").show();
+
+    // Transform the source dataset and write to a new table
+    spark.readStream()
+      .table("myTable")
+      .select("value")
+      .writeStream()
+      .option("checkpointLocation", "path/to/checkpoint/dir")
+      .format("parquet")
+      .toTable("newTable");
+
+    // Check the new table result
+    spark.read().table("newTable").show();
+    ```
+    === "R"
+
+    Not available in R.
 
 [^2]:
     Default parallelism refers to `spark.sql.shuffle.partitions`. It defaults to 200 as of Spark 3.4, but may change in future releases.
