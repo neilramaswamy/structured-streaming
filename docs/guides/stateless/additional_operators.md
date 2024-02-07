@@ -2,9 +2,9 @@
 
 While [projection and selection](projection_selection.md) are the most common stateless operators, you can use most Spark functions in Structured Streaming. The following additional Spark functions are examples of stateless operators that you can use in a stateless pipeline. 
 
-## Using the `withColumn()` function
+## Using the `withColumn` function
 
-You can use the `withColumn()` function to add a new column, change the value of an existing column, convert the datatype of an existing column, or derive a new column from an existing column. You could, for example, `CAST` the data type or do a substring.
+You can use the `withColumn` function to add a new column, change the value of an existing column, convert the datatype of an existing column, or derive a new column from an existing column. You could, for example, `CAST` the data type or do a substring.
 
 === "Python"
 
@@ -21,9 +21,9 @@ You can use the `withColumn()` function to add a new column, change the value of
     display(df)
     ```
 
-## Using the `union()` function
+## Using the `union` function
 
-You can use the `union()` function to combine two or more data frames of the same schema and append one data frame to another or combine two data frames. Since the `union()` function returns all rows from the data frames regardless of duplicate data, use the `distinct()` function to return just one record when duplicates exist when unioning data frames.
+You can use the `union` function to combine two or more data frames of the same schema and append one data frame to another or combine two data frames. Since the `union` function returns all rows from the data frames regardless of duplicate data, use the `distinct` function to return just one record when duplicates exist when unioning data frames.
 
 === "Python"
 
