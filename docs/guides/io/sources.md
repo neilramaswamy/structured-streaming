@@ -23,7 +23,6 @@ Structured Streaming also supports the following non-production sources for test
 
 Each of these sources support many options. See [Source reference](#source-reference). 
 
-<!-- TODO(neil): Link an example here. -->
 !!! tip
     You can also use the file source as a testing source, rather than the socket source. To do this, create static DataFrames via `spark.createDataFrame` and write them to a specific directory on your system. Then, read those files using a Structured Streaming job with the `files` source.
 
@@ -33,7 +32,7 @@ Expand the supported options boxes for each source type to find the specific opt
 
 ### File source
 
-The file source is named `files`. In addition to the generically supported options for any file type, there is documentation of file-format-specific options for [Parquet](https://spark.apache.org/docs/latest/sql-data-sources-parquet.html), [ORC](https://spark.apache.org/docs/latest/sql-data-sources-orc.html), [JSON](https://spark.apache.org/docs/latest/sql-data-sources-json.html), [CSV](https://spark.apache.org/docs/latest/sql-data-sources-csv.html), and [text files](https://spark.apache.org/docs/latest/sql-data-sources-text.html).
+The name for the file source format is one of the following:`csv`, `text`, `JSON`, or `Parquet`. In addition to the generically supported options for any file type, there is documentation of file-format-specific options for [Parquet](https://spark.apache.org/docs/latest/sql-data-sources-parquet.html), [ORC](https://spark.apache.org/docs/latest/sql-data-sources-orc.html), [JSON](https://spark.apache.org/docs/latest/sql-data-sources-json.html), [CSV](https://spark.apache.org/docs/latest/sql-data-sources-csv.html), and [text files](https://spark.apache.org/docs/latest/sql-data-sources-text.html).
 
 ??? info "Supported Options"
     | Option Name             | Information                                                                                        | Default         | Required?   |
@@ -49,17 +48,51 @@ The file source is named `files`. In addition to the generically supported optio
 ??? example
     === "Python"
 
-    ```python hl_lines="2-3"
-    # Returns a DataFrame that creates new column named total that is the sum of columns 1 and 2.
-    df = df.withColumn("total", sum(df["col1"], df["col2"]))
-    df.show()
+    ```python hl_lines="4-9"
+    spark = SparkSession. ...
+
+    # Read all the csv files written atomically in a directory
+    userSchema = StructType().add("name", "string").add("age", "integer")
+    csvDF = spark \
+      .readStream \
+      .option("sep", ";") \
+      .schema(userSchema) \
+      .csv("/path/to/directory")  # Equivalent to format("csv").load("/path/to/directory")
     ```
     === "Scala"
 
-    ```scala hl_lines="2-3"
-    // Returns a DataFrame that creates new column named total that is the sum of columns 1 and 2.
-    val df = df.df.withColumn("total", sum(df["col1"], df["col2"]))
-    display(df)
+    ```scala hl_lines="4-9"
+    val spark: SparkSession = ...
+
+    // Read all the csv files written atomically in a directory
+    val userSchema = new StructType().add("name", "string").add("age", "integer")
+    val csvDF = spark
+    .readStream
+    .option("sep", ";")
+    .schema(userSchema)      // Specify schema of the csv files
+    .csv("/path/to/directory")    // Equivalent to format("csv").load("/path/to/directory")
+    ```
+    === "Java"
+
+    ```java hl_lines="4-9"
+    SparkSession spark = ...
+
+    // Read all the csv files written atomically in a directory
+    StructType userSchema = new StructType().add("name", "string").add("age", "integer");
+    Dataset<Row> csvDF = spark
+      .readStream()
+      .option("sep", ";")
+      .schema(userSchema)      // Specify schema of the csv files
+      .csv("/path/to/directory");    // Equivalent to format("csv").load("/path/to/directory")
+    ```
+    === "R"
+
+    ```r hl_lines="4-5"
+    sparkR.session(...)
+
+    # Read all the csv files written atomically in a directory
+    schema <- structType(structField("name", "string"), structField("age", "integer"))
+    csvDF <- read.stream("csv", path = "/path/to/directory", schema = schema, sep = ";")
     ```
 
 ### Kafka source
@@ -79,8 +112,9 @@ The socket source is named `socket`.
 ??? example
     === "Python"
 
-    ```python hl_lines="3-8"
+    ```python hl_lines="4-9"
     spark = SparkSession. ...
+
     # Read text from socket
     socketDF = spark \
       .readStream \
@@ -93,8 +127,9 @@ The socket source is named `socket`.
     ```
     === "Scala"
 
-    ```scala hl_lines="3-8"
+    ```scala hl_lines="4-9"
     val spark: SparkSession = ...
+
     // Read text from socket
     val socketDF = spark
       .readStream
@@ -123,7 +158,7 @@ The socket source is named `socket`.
     === "R"
 
     ```r hl_lines="4"
-    sparkR.session(...) 
+    sparkR.session(...)
 
     # Read text from socket
     socketDF <- read.stream("socket", host = hostname, port = port)
@@ -133,7 +168,7 @@ The socket source is named `socket`.
 
 ### Rate Source
 
-The rate source is named `rate`. Each output row contains a timestamp and value, where timestamp is a `timestamp` data type containing the time of message dispatch, and value is of `long` data type containing the message count, starting from 0 as the first row.
+The name for the rate source format is `rate`. Each output row contains a timestamp and value, where timestamp is a `timestamp` data type containing the time of message dispatch, and value is of `long` data type containing the message count, starting from 0 as the first row.
 
 ??? info "Supported Options"
     | Option Name             | Information                                                                                        | Default         | Required?   |
@@ -145,8 +180,9 @@ The rate source is named `rate`. Each output row contains a timestamp and value,
 ??? example
     === "Python"
 
-    ```python hl_lines="3-6"
+    ```python hl_lines="4-7"
     spark = SparkSession. ...
+
     # Create a streaming DataFrame
     df = spark.readStream \
       .format("rate") \ 
@@ -156,7 +192,7 @@ The rate source is named `rate`. Each output row contains a timestamp and value,
     # Write the streaming DataFrame to a table
     df.writeStream \
       .option("checkpointLocation", "path/to/checkpoint/dir") \
-     .toTable("myTable") 
+      .toTable("myTable") 
 
     # Check the table result
     spark.read.table("myTable").show()
@@ -175,13 +211,14 @@ The rate source is named `rate`. Each output row contains a timestamp and value,
     ```
     === "Scala"
 
-    ```scala hl_lines="3-6"
+    ```scala hl_lines="4-7"
     val spark: SparkSession = ...
+
     // Create a streaming DataFrame
     val df = spark.readStream
-     .format("rate")
-     .option("rowsPerSecond", 10)
-     .load()
+      .format("rate")
+      .option("rowsPerSecond", 10)
+      .load()
 
     // Write the streaming DataFrame to a table
     df.writeStream
@@ -240,7 +277,7 @@ The rate source is named `rate`. Each output row contains a timestamp and value,
 
 ### Rate source per micro-batch
 
-The rate source per micro-batch is named `rate-micro-batch`. Each output row contains a timestamp and value, where timestamp is a `timestamp` data type containing the time of message dispatch, and value is of `long` data type containing the message count, starting from 0 as the first row. 
+The name for the rate source per micro-batch format is `rate-micro-batch`. Each output row contains a timestamp and value, where timestamp is a `timestamp` data type containing the time of message dispatch, and value is of `long` data type containing the message count, starting from 0 as the first row. 
 
 ??? info "Supported Options"
     | Option Name             | Information                                                                                        | Default         | Required?   |
@@ -253,8 +290,9 @@ The rate source per micro-batch is named `rate-micro-batch`. Each output row con
 ??? example
     === "Python"
 
-    ```python hl_lines="3-6"
+    ```python hl_lines="4-7"
     spark = SparkSession. ...
+
     # Create a streaming DataFrame
     df = spark.readStream \
       .format("rate") \ 
@@ -264,7 +302,7 @@ The rate source per micro-batch is named `rate-micro-batch`. Each output row con
     # Write the streaming DataFrame to a table
     df.writeStream \
       .option("checkpointLocation", "path/to/checkpoint/dir") \
-     .toTable("myTable") 
+      .toTable("myTable") 
 
     # Check the table result
     spark.read.table("myTable").show()
@@ -283,13 +321,14 @@ The rate source per micro-batch is named `rate-micro-batch`. Each output row con
     ```
     === "Scala"
 
-    ```scala hl_lines="3-6"
+    ```scala hl_lines="4-7"
     val spark: SparkSession = ...
+
     // Create a streaming DataFrame
     val df = spark.readStream
-     .format("rate")
-     .option("rowsPerBatch", 10)
-     .load()
+      .format("rate")
+      .option("rowsPerBatch", 10)
+      .load()
 
     // Write the streaming DataFrame to a table
     df.writeStream
