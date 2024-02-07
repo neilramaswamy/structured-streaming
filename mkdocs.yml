@@ -130,6 +130,7 @@ nav:
           # - Deployment: guides/operations/deployment.md
           - Managing the query lifecycle: guides/operations/lifecycle.md
           - Monitoring the query lifecycle: guides/operations/monitoring.md
+          - Reading query progress: guides/operations/query_progress.md
           # - Debugging: guides/operations/debugging.md
           # - Cluster Management: guides/operations/cluster_management.md
       - Performance considerations:
