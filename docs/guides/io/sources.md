@@ -1,13 +1,13 @@
 # Sources
 
-In Structured Streaming, a source is the location from which Spark reads a stream of data over which processing occurs. The stream of data in the source is read into a _streaming DataFrame_, which is essentially an unbounded table into which new records are incrementally appended. Spark APIs apply to a stream DataFrame in the same way that they apply to static DataFrames. 
+In Structured Streaming, a source is the location from which Spark reads a stream of data into a _streaming DataFrame_. A streaming DataFrame is essentially an unbounded table into which new records are incrementally appended.
 
 ## What are the built-in data sources?
 
 Structured Streaming supports the following production sources out-of-the-box:
 
-- **File source** - Reads the files from a directory as a stream of data into a streaming DataFrame. Files are processed in the order of the file modification time. Supported file formats are: text, CSV, JSON, ORC, and Parquet. Streaming from a file source enables you to keep your structured data in cloud storage, which is cheaper than storing your data in some other type of location, such as a relational database.
-- **Kafka source** - Reads data from a Kafka-compatible broker, such as a Confluent cluster or Azure EventHubs, into a streaming DataFrame.
+- **File source** - Reads the files from a directory. Files are processed in the order of the file modification time. Supported file formats are: text, CSV, JSON, ORC, and Parquet. Streaming from a file source enables you to keep your structured data in cloud storage, which is cheaper than storing your data in some other type of location, such as a relational database.
+- **Kafka source** - Reads data from a Kafka-compatible broker, such as a Confluent cluster or Azure EventHubs.
 
 !!! note
     Some Spark vendors support additional production sources. See your vendor's documentation.
@@ -15,8 +15,8 @@ Structured Streaming supports the following production sources out-of-the-box:
 Structured Streaming also supports the following non-production sources for testing purposes:
 
 - **Socket source**: Reads UTF-8 text data from a socket connection into a streaming DataFrame. The listening server socket is at the driver. Never use this in production, since it isn't fault-tolerant[^1].
-- **Rate source**: Generates data at the specified number of rows _per second_ into a streaming DataFrame to test performance. Each output row contains a timestamp and value, where timestamp is a `timestamp` data type containing the time of message dispatch, and value is of `long` data type containing the message count, starting from 0 as the first row. This source is useful when load testing your jobs, since it allows you to easily generate thousands of rows per second.
-- **Rate source per micro-batch**: Generates data at the specified number of rows _per micro-batch_ into a streaming DataFrame for performance testing. Each output row contains a timestamp and value, where timestamp is a `timestamp` data type containing the time of message dispatch, and value is of `long` data type containing the message count, starting from 0 as the first row. Unlike the rate data source, this data source provides a consistent set of input rows per micro-batch regardless of query execution (such as query lagging or trigger configuration). For example, batch 0 produces values 0~999 and batch 1 produces values 1000~1999, and so on. Every record produced has a different value, even across partitions. Same applies to the generated time.
+- **Rate source**: Generates data at the specified number of rows _per second_ into a streaming DataFrame to test performance. This source is useful when load testing your jobs, since it allows you to easily generate thousands of rows per second.
+- **Rate source per micro-batch**: Generates data at the specified number of rows _per micro-batch_ into a streaming DataFrame for performance testing. Unlike the rate data source, this data source provides a consistent set of input rows per micro-batch regardless of query execution (such as query lagging or trigger configuration). For example, batch 0 produces values 0~999 and batch 1 produces values 1000~1999, and so on. Every record produced has a different value, even across partitions. Same applies to the generated time.
 
 [^1]:
     A source is fault-tolerant if it is able to replay data in the case of failure. The socket source doesn't persist the data it receives, so it can't replay data. The file source and Kafka source both support replay, so they are considered fault-tolerant.
@@ -33,7 +33,7 @@ Expand the supported options boxes for each source type to find the specific opt
 
 ### File source
 
-The file source is named `files`. In addition to the generically supported options for any file type, there are file-format-specific options, as well as Spark-level options, for [Parquet](https://spark.apache.org/docs/latest/sql-data-sources-parquet.html), [ORC](https://spark.apache.org/docs/latest/sql-data-sources-orc.html), [JSON](https://spark.apache.org/docs/latest/sql-data-sources-json.html), [CSV](https://spark.apache.org/docs/latest/sql-data-sources-csv.html), and [text files](https://spark.apache.org/docs/latest/sql-data-sources-text.html).
+The file source is named `files`. In addition to the generically supported options for any file type, there is documentation of file-format-specific options for [Parquet](https://spark.apache.org/docs/latest/sql-data-sources-parquet.html), [ORC](https://spark.apache.org/docs/latest/sql-data-sources-orc.html), [JSON](https://spark.apache.org/docs/latest/sql-data-sources-json.html), [CSV](https://spark.apache.org/docs/latest/sql-data-sources-csv.html), and [text files](https://spark.apache.org/docs/latest/sql-data-sources-text.html).
 
 ??? info "Supported Options"
     | Option Name             | Information                                                                                        | Default         | Required?   |
@@ -68,7 +68,7 @@ The socket source is named `socket`.
 
 ### Rate Source
 
-The rate source is named `rate`.
+The rate source is named `rate`. Each output row contains a timestamp and value, where timestamp is a `timestamp` data type containing the time of message dispatch, and value is of `long` data type containing the message count, starting from 0 as the first row.
 
 ??? info "Supported Options"
     | Option Name             | Information                                                                                        | Default         | Required?   |
@@ -82,7 +82,7 @@ The rate source is named `rate`.
 
 ### Rate source per micro-batch
 
-The rate source per micro-batch is named `rate-micro-batch`.
+The rate source per micro-batch is named `rate-micro-batch`. Each output row contains a timestamp and value, where timestamp is a `timestamp` data type containing the time of message dispatch, and value is of `long` data type containing the message count, starting from 0 as the first row. 
 
 ??? info "Supported Options"
     | Option Name             | Information                                                                                        | Default         | Required?   |
