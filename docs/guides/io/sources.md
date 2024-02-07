@@ -1,6 +1,6 @@
 # Sources
 
-In Structured Streaming, a source is the location from which Spark reads a stream of data into a _streaming DataFrame_. A streaming DataFrame is essentially an unbounded table into which new records are incrementally appended.
+In Structured Streaming, a source is the location from which a query reads a stream of data into a _streaming DataFrame_. A streaming DataFrame is essentially an unbounded table into which new records are incrementally appended.
 
 ## What are the built-in data sources?
 
