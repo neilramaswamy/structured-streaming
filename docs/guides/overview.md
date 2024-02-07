@@ -1,4 +1,6 @@
-The guides in this section are _opinionated_ articles that aim to walk users through specific APIs and workflows. They primarily aim to give more clarity than precision; if you are looking for precision and nothing else, you'll want to look at the auto-generated documentation. In each guide, we clearly link to the language-specific reference. For example, if we were linking to the top-level pages of the language-specific documentation, we'd show the following:
+# Overview of Structured Streaming
+
+These guides are _opinionated_ articles that walk you through specific APIs and workflows. They primarily aim to give more clarity than precision; if you are looking for precision and nothing else, you'll want to look at the auto-generated documentation. In each guide, we link to the language-specific reference. For example, when linking to the top-level pages of the language-specific documentation, we'd show the following:
 
 ???+ abstract "API Reference"
     === "Python"
@@ -10,7 +12,7 @@ The guides in this section are _opinionated_ articles that aim to walk users thr
     === "Java"
         :material-api: [`Java Reference`](https://spark.apache.org/docs/latest/api/java/)
 
-For a very brief, example-oriented introduction to Structured Streaming, you can look at the example below. On most lines, there is a button you can click that concisely explain what that line does and links you to the relevant guide.
+For a very brief, example-oriented introduction to Structured Streaming, see the following example. On most lines, there is a button you can click that concisely explains what that line does and links you to the relevant guide.
 
 === "Python"
 
@@ -60,7 +62,7 @@ For a very brief, example-oriented introduction to Structured Streaming, you can
     4. Every source has its own set of supported options. For the file source, the only required option is the `path` from which to read.
     5. Once you call `.load()` on a `DataStreamReader`, you get back a streaming `DataFrame`, where you effectively use the same API as batch Spark.
     6. This is the selection operator, one of many [stateless operators]().
-    7. This line sets [a watermark](), which configures one of the few APIs that only exists on streaming `DataFrame`s. It effectively tells the engine how delayed data might be.
+    7. This line sets a [watermark](), which configures one of the few APIs that only exists on streaming `DataFrame`s. It effectively tells the engine how delayed data might be.
     8. This is the aggregation operator, one of the most common [stateful operators](). Here, it puts incoming records into 10-minute windows, based on the given record's `timestamp`.
     9. After you've applied all the operators you'd like, you must call `writeStream` on a `DataFrame` to get a `DataStreamWriter`, which you use to configure various stream options and set a sink to write the transformed records.
     10. Structured Streaming has a micro-batch architecture, and [triggers]() configure how frequently micro-batches run. In this case, we configure the engine to "trigger" a micro-batch every 1 minute.
@@ -74,6 +76,6 @@ For a very brief, example-oriented introduction to Structured Streaming, you can
 
 There are a few concepts not explicitly mentioned in this brief overview. In particular, you should be aware of the following:
 
-- There are many more operators than just `.filter` and `.groupBy`: see the sections on [stateless operators](), [stateful operators](), and [custom streaming logic]()
-- Structured Streaming uses key-value stores called _state stores_ to manage state created by operators. You can read about them [here]().
-- To tune the performance of your Structured Streaming jobs, please see [performance tuning]().
+- There are many more operators than just `.filter` and `.groupBy`. See the sections on [stateless operators](), [stateful operators](), and [custom streaming logic]().
+- Structured Streaming uses key-value stores called [state stores](./stream_options/state_stores.md) to manage state created by operators.
+- To tune the performance of your Structured Streaming jobs, see [performance tuning]().

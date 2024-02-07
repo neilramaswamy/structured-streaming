@@ -1,8 +1,8 @@
-The APIs described in [Managing the Query Lifecycle](./lifecycle.md) enable you to actively control the query lifecycle, but it's equally important to be able to more passively listen to events from the query lifecycle. If you run a real-time service (in the fraud detection or security areas), you can write these events to your monitoring service so that you can get alerts if your streaming job has an issue.
+The APIs described in [Managing the Query Lifecycle](./lifecycle.md) enable you to synchronously manage the query lifecycle, but it's equally important to be able to asynchronously (i.e. passively) listen to events from the query lifecycle. If you run a real-time service (in the fraud detection or security areas), you can write these events to your monitoring service so that you can get alerts if your streaming job has an issue.
 
 ## Emitted Events
 
-There are 4 types of events that a Spark cluster emits about its streams are:
+There are 4 types of events that a Spark cluster emits about its streams:
 
 | Event Name          | Description                                                                                                                                     | Practical Advice                                                                                                                                                                                                                                                                      |
 |---------------------|-------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|

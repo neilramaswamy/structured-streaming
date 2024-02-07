@@ -75,20 +75,20 @@ nav:
   - Tour:
       - Welcome: tour/welcome.md
       - Installation: tour/installation.md
-      - Quick Example: tour/quick_example.md
+      - Quick example: tour/quick_example.md
       - Overview:
-          - Execution Model: tour/overview/execution_model.md
-          - Sources and DataFrames: tour/overview/sources.md
-          - Spark Operators: tour/overview/spark_operators.md
+          - Execution model: tour/overview/execution_model.md
+          - Sources and dataFrames: tour/overview/sources.md
+          - Spark operators: tour/overview/spark_operators.md
           - Sinks: tour/overview/sinks.md
-      - Stateless Streaming:
-          - Selection and Projection: tour/stateless/selection_projection.md
-          - Additional Operators: tour/stateless/additional_operators.md
-      - Stateful Streaming:
+      - Stateless streaming:
+          - Selection and projection: tour/stateless/selection_projection.md
+          - Additional operators: tour/stateless/additional_operators.md
+      - Stateful streaming:
           - Introduction: tour/stateful/introduction.md
           - Concepts:
-              - Time Domains: tour/stateful/concepts/time_domains.md
-              - Emitting Results: tour/stateful/concepts/emitting_results.md
+              - Time domains: tour/stateful/concepts/time_domains.md
+              - Emitting results: tour/stateful/concepts/emitting_results.md
               - Watermarks: tour/stateful/concepts/watermarks.md
           - Operators:
               - Aggregation: tour/stateful/operators/aggregation.md
@@ -96,49 +96,50 @@ nav:
               - Joins: tour/stateful/operators/joins.md
               - (Flat)MapGroupsWithState: tour/stateful/groups_with_state.md
           - Examples: tour/stateful/examples.md
-      - Running Streaming Jobs:
-          - Triggers and Checkpoints: tour/jobs/triggers_and_checkpoints.md
-          - Operational Considerations: tour/jobs/operational_considerations.md
+      - Running streaming jobs:
+          - Triggers and checkpoints: tour/jobs/triggers_and_checkpoints.md
+          - Operational considerations: tour/jobs/operational_considerations.md
           - Deployment: tour/jobs/deployment.md
   - Guides:
       - Overview: guides/overview.md
-      - Input and Output:
+      - Input and output:
           - Sources: guides/io/sources.md
           - Sinks: guides/io/sinks.md
-          - Binary Formats: guides/io/binary_formats.md
-      - Stateless Operators:
-          - Projection and Selection: guides/stateless/projection_selection.md
-          - Additional Operators: guides/stateless/additional_operators.md
-      - Stateful Operators:
+          - Binary formats: guides/io/binary_formats.md
+      - Stateless operators:
+          - Projection and selection: guides/stateless/projection_selection.md
+          - Additional operators: guides/stateless/additional_operators.md
+      - Stateful operators:
           - Overview: guides/stateful/overview.md
           - Watermarks:
               - Overview: guides/watermarks/overview.md
-              - Multiple Watermarks: guides/watermarks/multiple.md
+              - Multiple watermarks: guides/watermarks/multiple.md
           - Aggregation: guides/stateful/aggregation.md
           - Deduplication: guides/stateful/deduplication.md
           - Joins: guides/stateful/joins.md
-          - Groups with State: guides/stateful/groups_with_state.md
-      - Stream Options:
+          - Groups with state: guides/stateful/groups_with_state.md
+      - Stream options:
           - Overview: guides/stream_options/overview.md
           - Triggers: guides/stream_options/triggers.md
-          - Output Mode: guides/stream_options/output_mode.md
+          - Output mode: guides/stream_options/output_mode.md
           - Checkpoints: guides/stream_options/checkpointing.md
-          - State Stores: guides/stream_options/state_stores.md
+          - State stores: guides/stream_options/state_stores.md
       - Testing:
-          - Unit Testing: guides/testing/unit_testing.md
+          - Unit testing: guides/testing/unit_testing.md
       - Operations:
           # - Deployment: guides/operations/deployment.md
-          - Managing the Query Lifecycle: guides/operations/lifecycle.md
-          - Monitoring: guides/operations/monitoring.md
+          - Managing the query lifecycle: guides/operations/lifecycle.md
+          - Monitoring the query lifecycle: guides/operations/monitoring.md
+          - Reading query progress: guides/operations/query_progress.md
           # - Debugging: guides/operations/debugging.md
           # - Cluster Management: guides/operations/cluster_management.md
-      - Performance Considerations:
-          - Partitions and Parallelism: guides/performance/partitions_parallelism.md
+      - Performance considerations:
+          - Partitions and parallelism: guides/performance/partitions_parallelism.md
           - Optimizations: guides/performance/optimizations.md
-          - State Stores: guides/performance/state_stores.md
-      - Unsupported Behavior:
-          - Unsupported Spark Operators: guides/unsupported/operators.md
-          - Unsupported Output Modes: guides/unsupported/output_modes.md
-          - Unsupported Join Types: guides/unsupported/joins.md
+          - State stores: guides/performance/state_stores.md
+      - Unsupported behavior:
+          - Unsupported Spark operators: guides/unsupported/operators.md
+          - Unsupported output modes: guides/unsupported/output_modes.md
+          - Unsupported join types: guides/unsupported/joins.md
   - Examples:
-      - Aggregation with Watermark: examples/aggregation-with-watermark.md
+      - Aggregation with watermark: examples/aggregation-with-watermark.md
