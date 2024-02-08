@@ -14,9 +14,9 @@ Structured Streaming supports the following production sources out-of-the-box:
 
 Structured Streaming also supports the following non-production sources for testing purposes:
 
-- **Socket source**: Reads UTF-8 text data from a socket connection into a streaming DataFrame. The listening server socket is at the driver. Never use this in production, since it isn't fault-tolerant[^1].
+- **Socket source**: Reads UTF-8 text data from a socket connection into a streaming DataFrame. Never use this in production, since it isn't fault-tolerant[^1].
 - **Rate source**: Generates data at the specified number of rows _per second_ into a streaming DataFrame to test performance. This source is useful when load testing your jobs, since it allows you to easily generate thousands of rows per second.
-- **Rate source per micro-batch**: Generates data at the specified number of rows _per micro-batch_ into a streaming DataFrame for performance testing. Unlike the rate data source, this data source provides a consistent set of input rows per micro-batch regardless of query execution (such as query lagging or trigger configuration). For example, batch 0 produces values 0~999 and batch 1 produces values 1000~1999, and so on. Every record produced has a different value, even across partitions. Same applies to the generated time.
+- **Rate source per micro-batch**: Generates data at the specified number of rows _per micro-batch_ into a streaming DataFrame for performance testing. Unlike the rate data source, this data source provides a consistent set of input rows per micro-batch regardless of query execution (such as query lagging or trigger configuration).
 
 [^1]:
     A source is fault-tolerant if it is able to replay data in the case of failure. The socket source doesn't persist the data it receives, so it can't replay data. The file source and Kafka source both support replay, so they are considered fault-tolerant.
@@ -45,55 +45,73 @@ The name for the file source format is one of the following:`csv`, `text`, `JSON
     | `cleanSource`           | Whether to clean up files after processing. Available options are: `archive`, `delete`, and `off`. The `delete` option deletes files permanently. The `archive` option copies files to the `sourceArchiveDir`; if the source file is `/a/data.txt` and the archive directory is `/archive`, the file is moved to `/archive/a/data.txt`.                                                       | None | No |
     | `sourceArchiveDir`      | Specifies the archive directory for cleaned-up files. It cannot be a sub-directory of `path`; if it were, archived files would be considered new and processed over and over again.                 | None | Only if `cleanSource` is set to `archive`. |
 
-??? example
+??? example 
     === "Python"
 
-    ```python hl_lines="4-9"
+    ```python
+
     spark = SparkSession. ...
 
     # Read all the csv files written atomically in a directory
     userSchema = StructType().add("name", "string").add("age", "integer")
-    csvDF = spark \
-      .readStream \
-      .option("sep", ";") \
-      .schema(userSchema) \
-      .csv("/path/to/directory")  # Equivalent to format("csv").load("/path/to/directory")
+    fileDF = (spark
+      .readStream
+      .format("csv")
+      .schema(userSchema)
+      .option("path", "/path/to/directory")
+      .option("sep", ";")
+      .load()
+    )
     ```
+
     === "Scala"
 
-    ```scala hl_lines="4-9"
+    ```scala
+
     val spark: SparkSession = ...
 
     // Read all the csv files written atomically in a directory
     val userSchema = new StructType().add("name", "string").add("age", "integer")
     val csvDF = spark
-    .readStream
-    .option("sep", ";")
-    .schema(userSchema)      // Specify schema of the csv files
-    .csv("/path/to/directory")    // Equivalent to format("csv").load("/path/to/directory")
+      .readStream
+      .format("csv")
+      .schema(userSchema)      // Specify schema of the csv files
+      .option("path", "/path/to/directory")
+      .option("sep", ";")
+      .load()
     ```
+
     === "Java"
 
-    ```java hl_lines="4-9"
+    ```java
+
     SparkSession spark = ...
 
     // Read all the csv files written atomically in a directory
     StructType userSchema = new StructType().add("name", "string").add("age", "integer");
     Dataset<Row> csvDF = spark
       .readStream()
-      .option("sep", ";")
+      .format("csv")
       .schema(userSchema)      // Specify schema of the csv files
-      .csv("/path/to/directory");    // Equivalent to format("csv").load("/path/to/directory")
+      .option("path", "/path/to/directory")
+      .option("sep", ";")
+      .load()
     ```
+
     === "R"
 
-    ```r hl_lines="4-5"
+    ```r
+
     sparkR.session(...)
 
     # Read all the csv files written atomically in a directory
     schema <- structType(structField("name", "string"), structField("age", "integer"))
     csvDF <- read.stream("csv", path = "/path/to/directory", schema = schema, sep = ";")
+
     ```
+
+!!! note 
+    The previous CSV examples for the file source specify the separator (`sep`) for the data in the CSV file. Specifying a seperator is only required for the CSV file source. It is not required for any of the other file sources.
 
 ### Kafka source
 
@@ -101,7 +119,7 @@ The Kafka source is named `kafka`. It's compatible with Kafka broker versions 0.
 
 ### Socket source
 
-The socket source is named `socket`.
+The socket source is named `socket`. The listening server socket is at the driver.
 
 ??? info "Supported Options"
     | Option Name             | Information                                                                                        | Default         | Required?   |
@@ -112,7 +130,8 @@ The socket source is named `socket`.
 ??? example
     === "Python"
 
-    ```python hl_lines="4-9"
+    ```python
+
     spark = SparkSession. ...
 
     # Read text from socket
@@ -122,12 +141,12 @@ The socket source is named `socket`.
       .option("host", "localhost") \
       .option("port", 9999) \
       .load()
-    socketDF.isStreaming()    # Returns True for DataFrames that have streaming sources
-    socketDF.printSchema()
     ```
+
     === "Scala"
 
-    ```scala hl_lines="4-9"
+    ```scala
+
     val spark: SparkSession = ...
 
     // Read text from socket
@@ -137,12 +156,12 @@ The socket source is named `socket`.
       .option("host", "localhost")
       .option("port", 9999)
       .load()
-    socketDF.isStreaming    // Returns True for DataFrames that have streaming sources
-    socketDF.printSchema
     ```
+
     === "Java"
 
-    ```java hl_lines="4-9"
+    ```java
+
     SparkSession spark = ...
 
     // Read text from socket 
@@ -152,18 +171,16 @@ The socket source is named `socket`.
       .option("host", "localhost")
       .option("port", 9999)
       .load();
-    socketDF.isStreaming();    // Returns True for DataFrames that have streaming sources
-    socketDF.printSchema();
     ```
+
     === "R"
 
-    ```r hl_lines="4"
+    ```r
+
     sparkR.session(...)
 
     # Read text from socket
     socketDF <- read.stream("socket", host = hostname, port = port)
-    isStreaming(socketDF)    # Returns TRUE for SparkDataFrames that have streaming sources
-    printSchema(socketDF)
     ```
 
 ### Rate Source
@@ -180,7 +197,8 @@ The name for the rate source format is `rate`. Each output row contains a timest
 ??? example
     === "Python"
 
-    ```python hl_lines="4-7"
+    ```python
+
     spark = SparkSession. ...
 
     # Create a streaming DataFrame
@@ -188,30 +206,12 @@ The name for the rate source format is `rate`. Each output row contains a timest
       .format("rate") \ 
       .option("rowsPerSecond", 10) \
       .load()
-
-    # Write the streaming DataFrame to a table
-    df.writeStream \
-      .option("checkpointLocation", "path/to/checkpoint/dir") \
-      .toTable("myTable") 
-
-    # Check the table result
-    spark.read.table("myTable").show()
-
-    # Transform the source dataset and write to a new table
-    spark.readStream \
-      .table("myTable") \
-      .select("value") \
-      .writeStream \
-      .option("checkpointLocation", "path/to/checkpoint/dir") \
-      .format("parquet") \
-      .toTable("newTable")
-
-    # Check the new table result
-    spark.read.table("newTable").show() 
     ```
+
     === "Scala"
 
-    ```scala hl_lines="4-7"
+    ```scala
+
     val spark: SparkSession = ...
 
     // Create a streaming DataFrame
@@ -219,30 +219,12 @@ The name for the rate source format is `rate`. Each output row contains a timest
       .format("rate")
       .option("rowsPerSecond", 10)
       .load()
-
-    // Write the streaming DataFrame to a table
-    df.writeStream
-      .option("checkpointLocation", "path/to/checkpoint/dir")
-      .toTable("myTable")
-
-    // Check the table result
-    spark.read.table("myTable").show()
-
-    // Transform the source dataset and write to a new table
-    spark.readStream
-      .table("myTable")
-      .select("value")
-      .writeStream
-      .option("checkpointLocation", "path/to/checkpoint/dir")
-      .format("parquet")
-      .toTable("newTable")
-
-    // Check the new table result
-    spark.read.table("newTable").show()
     ```
+
     === "Java"
 
-    ```java hl_lines="4-7"
+    ```java
+
     SparkSession spark = ...
 
     // Create a streaming DataFrame
@@ -250,34 +232,15 @@ The name for the rate source format is `rate`. Each output row contains a timest
       .format("rate")
       .option("rowsPerSecond", 10)
       .load();
-
-    // Write the streaming DataFrame to a table
-    df.writeStream()
-      .option("checkpointLocation", "path/to/checkpoint/dir")
-      .toTable("myTable");
-
-    // Check the table result
-    spark.read().table("myTable").show();
-
-    // Transform the source dataset and write to a new table
-    spark.readStream()
-      .table("myTable")
-      .select("value")
-      .writeStream()
-      .option("checkpointLocation", "path/to/checkpoint/dir")
-      .format("parquet")
-      .toTable("newTable");
-
-    // Check the new table result
-    spark.read().table("newTable").show();
     ```
+
     === "R"
 
     Not available in R.
 
 ### Rate source per micro-batch
 
-The name for the rate source per micro-batch format is `rate-micro-batch`. Each output row contains a timestamp and value, where timestamp is a `timestamp` data type containing the time of message dispatch, and value is of `long` data type containing the message count, starting from 0 as the first row. 
+The name for the rate source per micro-batch format is `rate-micro-batch`. Each output row contains a timestamp and value, where timestamp is a `timestamp` data type containing the time of message dispatch, and value is of `long` data type containing the message count, starting from 0 as the first row. For example, batch 0 produces values 0~999 and batch 1 produces values 1000~1999, and so on. Every record produced has a different message count value and a different generated time stamp, even across partitions
 
 ??? info "Supported Options"
     | Option Name             | Information                                                                                        | Default         | Required?   |
@@ -290,7 +253,8 @@ The name for the rate source per micro-batch format is `rate-micro-batch`. Each 
 ??? example
     === "Python"
 
-    ```python hl_lines="4-7"
+    ```python
+
     spark = SparkSession. ...
 
     # Create a streaming DataFrame
@@ -298,30 +262,12 @@ The name for the rate source per micro-batch format is `rate-micro-batch`. Each 
       .format("rate") \ 
       .option("rowsPerBatch", 10) \
       .load()
-
-    # Write the streaming DataFrame to a table
-    df.writeStream \
-      .option("checkpointLocation", "path/to/checkpoint/dir") \
-      .toTable("myTable") 
-
-    # Check the table result
-    spark.read.table("myTable").show()
-
-    # Transform the source dataset and write to a new table
-    spark.readStream \
-      .table("myTable") \
-      .select("value") \
-      .writeStream \
-      .option("checkpointLocation", "path/to/checkpoint/dir") \
-      .format("parquet") \
-      .toTable("newTable")
-
-    # Check the new table result
-    spark.read.table("newTable").show() 
     ```
+
     === "Scala"
 
-    ```scala hl_lines="4-7"
+    ```scala
+
     val spark: SparkSession = ...
 
     // Create a streaming DataFrame
@@ -329,30 +275,12 @@ The name for the rate source per micro-batch format is `rate-micro-batch`. Each 
       .format("rate")
       .option("rowsPerBatch", 10)
       .load()
-
-    // Write the streaming DataFrame to a table
-    df.writeStream
-      .option("checkpointLocation", "path/to/checkpoint/dir")
-      .toTable("myTable")
-
-    // Check the table result
-    spark.read.table("myTable").show()
-
-    // Transform the source dataset and write to a new table
-    spark.readStream
-      .table("myTable")
-      .select("value")
-      .writeStream
-      .option("checkpointLocation", "path/to/checkpoint/dir")
-      .format("parquet")
-      .toTable("newTable")
-
-    // Check the new table result
-    spark.read.table("newTable").show()
     ```
+
     === "Java"
 
-    ```java hl_lines="4-7"
+    ```java
+
     SparkSession spark = ...
 
     // Create a streaming DataFrame
@@ -360,27 +288,8 @@ The name for the rate source per micro-batch format is `rate-micro-batch`. Each 
       .format("rate")
       .option("rowsPerBatch", 10)
       .load();
-
-    // Write the streaming DataFrame to a table
-    df.writeStream()
-      .option("checkpointLocation", "path/to/checkpoint/dir")
-      .toTable("myTable");
-
-    // Check the table result
-    spark.read().table("myTable").show();
-
-    // Transform the source dataset and write to a new table
-    spark.readStream()
-      .table("myTable")
-      .select("value")
-      .writeStream()
-      .option("checkpointLocation", "path/to/checkpoint/dir")
-      .format("parquet")
-      .toTable("newTable");
-
-    // Check the new table result
-    spark.read().table("newTable").show();
     ```
+
     === "R"
 
     Not available in R.
