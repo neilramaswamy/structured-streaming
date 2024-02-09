@@ -203,9 +203,10 @@ The name for the rate source format is `rate`. Each output row contains a timest
 
     # Create a streaming DataFrame
     df = spark.readStream \
-      .format("rate") \ 
-      .option("rowsPerSecond", 10) \
-      .load()
+        .format("rate") \
+        .option("rowsPerSecond", 10) \
+        .load()
+
     ```
 
     === "Scala"
@@ -259,9 +260,9 @@ The name for the rate source per micro-batch format is `rate-micro-batch`. Each 
 
     # Create a streaming DataFrame
     df = spark.readStream \
-      .format("rate") \ 
-      .option("rowsPerBatch", 10) \
-      .load()
+        .format("rate-micro-batch") \
+        .option("rowsPerBatch", 10) \
+        .load()
     ```
 
     === "Scala"
@@ -272,7 +273,7 @@ The name for the rate source per micro-batch format is `rate-micro-batch`. Each 
 
     // Create a streaming DataFrame
     val df = spark.readStream
-      .format("rate")
+      .format("rate-micro-batch")
       .option("rowsPerBatch", 10)
       .load()
     ```
@@ -285,7 +286,7 @@ The name for the rate source per micro-batch format is `rate-micro-batch`. Each 
 
     // Create a streaming DataFrame
     Dataset<Row> df = spark.readStream()
-      .format("rate")
+      .format("rate-micro-batch")
       .option("rowsPerBatch", 10)
       .load();
     ```
