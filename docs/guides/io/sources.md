@@ -48,67 +48,67 @@ The name for the file source format is one of the following:`csv`, `text`, `JSON
 ??? example 
     === "Python"
 
-    ```python
+        ```python
 
-    spark = SparkSession. ...
+        spark = SparkSession. ...
 
-    # Read all the csv files written atomically in a directory
-    userSchema = StructType().add("name", "string").add("age", "integer")
-    fileDF = (spark
-      .readStream
-      .format("csv")
-      .schema(userSchema)
-      .option("path", "/path/to/directory")
-      .option("sep", ";")
-      .load()
-    )
-    ```
+        # Read all the csv files written atomically in a directory
+        userSchema = StructType().add("name", "string").add("age", "integer")
+        fileDF = (spark
+            .readStream
+            .format("csv")
+            .schema(userSchema)
+            .option("path", "/path/to/directory")
+            .option("sep", ";")
+            .load()
+        )
+        ```
 
     === "Scala"
 
-    ```scala
+        ```scala
 
-    val spark: SparkSession = ...
+        val spark: SparkSession = ...
 
-    // Read all the csv files written atomically in a directory
-    val userSchema = new StructType().add("name", "string").add("age", "integer")
-    val csvDF = spark
-        .readStream
-        .format("csv")
-        .schema(userSchema)      // Specify schema of the csv files
-        .option("path", "/path/to/directory")
-        .option("sep", ";")
-        .load()
-    ```
+        // Read all the csv files written atomically in a directory
+        val userSchema = new StructType().add("name", "string").add("age", "integer")
+        val csvDF = spark
+            .readStream
+            .format("csv")
+            .schema(userSchema)      // Specify schema of the csv files
+            .option("path", "/path/to/directory")
+            .option("sep", ";")
+            .load()
+        ```
 
     === "Java"
 
-    ```java
+        ```java
 
-    SparkSession spark = ...
+        SparkSession spark = ...
 
-    // Read all the csv files written atomically in a directory
-    StructType userSchema = new StructType().add("name", "string").add("age", "integer");
-    Dataset<Row> csvDF = spark
-        .readStream()
-        .format("csv")
-        .schema(userSchema)      // Specify schema of the csv files
-        .option("path", "/path/to/directory")
-        .option("sep", ";")
-        .load()
-    ```
+        // Read all the csv files written atomically in a directory
+        StructType userSchema = new StructType().add("name", "string").add("age", "integer");
+        Dataset<Row> csvDF = spark
+            .readStream()
+            .format("csv")
+            .schema(userSchema)      // Specify schema of the csv files
+            .option("path", "/path/to/directory")
+            .option("sep", ";")
+            .load()
+        ```
 
     === "R"
 
-    ```r
+        ```r
 
-    sparkR.session(...)
+        sparkR.session(...)
 
-    # Read all the csv files written atomically in a directory
-    schema <- structType(structField("name", "string"), structField("age", "integer"))
-    csvDF <- read.stream("csv", path = "/path/to/directory", schema = schema, sep = ";")
+        # Read all the csv files written atomically in a directory
+        schema <- structType(structField("name", "string"), structField("age", "integer"))
+        csvDF <- read.stream("csv", path = "/path/to/directory", schema = schema, sep = ";")
 
-    ```
+        ```
 
 !!! note 
     The previous CSV examples for the file source specify the separator (`sep`) for the data in the CSV file. Specifying a seperator is only required for the CSV file source. It is not required for any of the other file sources.
@@ -130,6 +130,7 @@ The socket source is named `socket`. The listening server socket is at the drive
 ??? example
 
     === "Python"
+
         ```python
 
         spark = SparkSession. ...
@@ -254,9 +255,9 @@ The name for the rate source per micro-batch format is `rate-micro-batch`. Each 
 
         # Create a streaming DataFrame
         df = spark.readStream \
-              .format("rate-micro-batch") \
-              .option("rowsPerBatch", 10) \
-              .load()
+            .format("rate-micro-batch") \
+            .option("rowsPerBatch", 10) \
+            .load()
         ```
 
     === "Scala"
