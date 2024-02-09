@@ -73,12 +73,12 @@ The name for the file source format is one of the following:`csv`, `text`, `JSON
     // Read all the csv files written atomically in a directory
     val userSchema = new StructType().add("name", "string").add("age", "integer")
     val csvDF = spark
-      .readStream
-      .format("csv")
-      .schema(userSchema)      // Specify schema of the csv files
-      .option("path", "/path/to/directory")
-      .option("sep", ";")
-      .load()
+        .readStream
+        .format("csv")
+        .schema(userSchema)      // Specify schema of the csv files
+        .option("path", "/path/to/directory")
+        .option("sep", ";")
+        .load()
     ```
 
     === "Java"
@@ -90,12 +90,12 @@ The name for the file source format is one of the following:`csv`, `text`, `JSON
     // Read all the csv files written atomically in a directory
     StructType userSchema = new StructType().add("name", "string").add("age", "integer");
     Dataset<Row> csvDF = spark
-      .readStream()
-      .format("csv")
-      .schema(userSchema)      // Specify schema of the csv files
-      .option("path", "/path/to/directory")
-      .option("sep", ";")
-      .load()
+        .readStream()
+        .format("csv")
+        .schema(userSchema)      // Specify schema of the csv files
+        .option("path", "/path/to/directory")
+        .option("sep", ";")
+        .load()
     ```
 
     === "R"
@@ -136,11 +136,11 @@ The socket source is named `socket`. The listening server socket is at the drive
 
         # Read text from socket
         socketDF = spark \
-        .readStream \
-        .format("socket") \
-        .option("host", "localhost") \
-        .option("port", 9999) \
-        .load()
+            .readStream \
+            .format("socket") \
+            .option("host", "localhost") \
+            .option("port", 9999) \
+            .load()
         ```
     === "Scala"
         ```scala
@@ -149,11 +149,11 @@ The socket source is named `socket`. The listening server socket is at the drive
 
         // Read text from socket
         val socketDF = spark
-        .readStream
-        .format("socket")
-        .option("host", "localhost")
-        .option("port", 9999)
-        .load()
+            .readStream
+            .format("socket")
+            .option("host", "localhost")
+            .option("port", 9999)
+            .load()
         ```
 
     === "Java"
@@ -163,11 +163,11 @@ The socket source is named `socket`. The listening server socket is at the drive
 
         // Read text from socket 
         Dataset<Row> socketDF = spark
-        .readStream()
-        .format("socket")
-        .option("host", "localhost")
-        .option("port", 9999)
-        .load();
+            .readStream()
+            .format("socket")
+            .option("host", "localhost")
+            .option("port", 9999)
+            .load();
         ```
     === "R"
         ```r
@@ -212,9 +212,9 @@ The name for the rate source format is `rate`. Each output row contains a timest
 
         // Create a streaming DataFrame
         val df = spark.readStream
-        .format("rate")
-        .option("rowsPerSecond", 10)
-        .load()
+            .format("rate")
+            .option("rowsPerSecond", 10)
+            .load()
         ```
 
     === "Java"
@@ -225,9 +225,9 @@ The name for the rate source format is `rate`. Each output row contains a timest
 
         // Create a streaming DataFrame
         Dataset<Row> df = spark.readStream()
-        .format("rate")
-        .option("rowsPerSecond", 10)
-        .load();
+            .format("rate")
+            .option("rowsPerSecond", 10)
+            .load();
         ```
 
     === "R"
@@ -235,7 +235,7 @@ The name for the rate source format is `rate`. Each output row contains a timest
 
 ### Rate source per micro-batch
 
-The name for the rate source per micro-batch format is `rate-micro-batch`. Each output row contains a timestamp and value, where timestamp is a `timestamp` data type containing the time of message dispatch, and value is of `long` data type containing the message count, starting from 0 as the first row. For example, batch 0 produces values 0~999 and batch 1 produces values 1000~1999, and so on. Every record produced has a different message count value and a different generated time stamp, even across partitions
+The name for the rate source per micro-batch format is `rate-micro-batch`. Each output row contains a timestamp and value, where timestamp is a `timestamp` data type containing the time of message dispatch, and value is of `long` data type containing the message count, starting from 0 as the first row. For example, batch 0 produces values 0~999 and batch 1 produces values 1000~1999, and so on. Every record produced has a different message count value and a different generated time stamp, even across partitions.
 
 ??? info "Supported Options"
     | Option Name             | Information                                                                                        | Default         | Required?   |
@@ -254,9 +254,9 @@ The name for the rate source per micro-batch format is `rate-micro-batch`. Each 
 
         # Create a streaming DataFrame
         df = spark.readStream \
-            .format("rate-micro-batch") \
-            .option("rowsPerBatch", 10) \
-            .load()
+              .format("rate-micro-batch") \
+              .option("rowsPerBatch", 10) \
+              .load()
         ```
 
     === "Scala"
@@ -267,9 +267,9 @@ The name for the rate source per micro-batch format is `rate-micro-batch`. Each 
 
         // Create a streaming DataFrame
         val df = spark.readStream
-        .format("rate-micro-batch")
-        .option("rowsPerBatch", 10)
-        .load()
+            .format("rate-micro-batch")
+            .option("rowsPerBatch", 10)
+            .load()
         ```
 
     === "Java"
@@ -280,9 +280,9 @@ The name for the rate source per micro-batch format is `rate-micro-batch`. Each 
 
         // Create a streaming DataFrame
         Dataset<Row> df = spark.readStream()
-        .format("rate-micro-batch")
-        .option("rowsPerBatch", 10)
-        .load();
+            .format("rate-micro-batch")
+            .option("rowsPerBatch", 10)
+            .load();
         ```
 
     === "R"
