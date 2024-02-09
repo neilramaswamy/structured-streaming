@@ -128,60 +128,55 @@ The socket source is named `socket`. The listening server socket is at the drive
     | `port` | The integer of the host to connect to, such as 9999. | None | Yes |
 
 ??? example
+
     === "Python"
+        ```python
 
-    ```python
+        spark = SparkSession. ...
 
-    spark = SparkSession. ...
-
-    # Read text from socket
-    socketDF = spark \
-      .readStream \
-      .format("socket") \
-      .option("host", "localhost") \
-      .option("port", 9999) \
-      .load()
-    ```
-
+        # Read text from socket
+        socketDF = spark \
+        .readStream \
+        .format("socket") \
+        .option("host", "localhost") \
+        .option("port", 9999) \
+        .load()
+        ```
     === "Scala"
+        ```scala
 
-    ```scala
+        val spark: SparkSession = ...
 
-    val spark: SparkSession = ...
-
-    // Read text from socket
-    val socketDF = spark
-      .readStream
-      .format("socket")
-      .option("host", "localhost")
-      .option("port", 9999)
-      .load()
-    ```
+        // Read text from socket
+        val socketDF = spark
+        .readStream
+        .format("socket")
+        .option("host", "localhost")
+        .option("port", 9999)
+        .load()
+        ```
 
     === "Java"
 
-    ```java
+        ```java
+        SparkSession spark = ...
 
-    SparkSession spark = ...
-
-    // Read text from socket 
-    Dataset<Row> socketDF = spark
-      .readStream()
-      .format("socket")
-      .option("host", "localhost")
-      .option("port", 9999)
-      .load();
-    ```
-
+        // Read text from socket 
+        Dataset<Row> socketDF = spark
+        .readStream()
+        .format("socket")
+        .option("host", "localhost")
+        .option("port", 9999)
+        .load();
+        ```
     === "R"
+        ```r
 
-    ```r
+        sparkR.session(...)
 
-    sparkR.session(...)
-
-    # Read text from socket
-    socketDF <- read.stream("socket", host = hostname, port = port)
-    ```
+        # Read text from socket
+        socketDF <- read.stream("socket", host = hostname, port = port)
+        ```
 
 ### Rate Source
 
@@ -197,47 +192,46 @@ The name for the rate source format is `rate`. Each output row contains a timest
 ??? example
     === "Python"
 
-    ```python
+        ```python
 
-    spark = SparkSession. ...
+        spark = SparkSession. ...
 
-    # Create a streaming DataFrame
-    df = spark.readStream \
-        .format("rate") \
-        .option("rowsPerSecond", 10) \
-        .load()
+        # Create a streaming DataFrame
+        df = spark.readStream \
+            .format("rate") \
+            .option("rowsPerSecond", 10) \
+            .load()
 
-    ```
+        ```
 
     === "Scala"
 
-    ```scala
+        ```scala
 
-    val spark: SparkSession = ...
+        val spark: SparkSession = ...
 
-    // Create a streaming DataFrame
-    val df = spark.readStream
-      .format("rate")
-      .option("rowsPerSecond", 10)
-      .load()
-    ```
+        // Create a streaming DataFrame
+        val df = spark.readStream
+        .format("rate")
+        .option("rowsPerSecond", 10)
+        .load()
+        ```
 
     === "Java"
 
-    ```java
+        ```java
 
-    SparkSession spark = ...
+        SparkSession spark = ...
 
-    // Create a streaming DataFrame
-    Dataset<Row> df = spark.readStream()
-      .format("rate")
-      .option("rowsPerSecond", 10)
-      .load();
-    ```
+        // Create a streaming DataFrame
+        Dataset<Row> df = spark.readStream()
+        .format("rate")
+        .option("rowsPerSecond", 10)
+        .load();
+        ```
 
     === "R"
-
-    Not available in R.
+        Not available in R.
 
 ### Rate source per micro-batch
 
@@ -254,46 +248,45 @@ The name for the rate source per micro-batch format is `rate-micro-batch`. Each 
 ??? example
     === "Python"
 
-    ```python
+        ```python
 
-    spark = SparkSession. ...
+        spark = SparkSession. ...
 
-    # Create a streaming DataFrame
-    df = spark.readStream \
-        .format("rate-micro-batch") \
-        .option("rowsPerBatch", 10) \
-        .load()
-    ```
+        # Create a streaming DataFrame
+        df = spark.readStream \
+            .format("rate-micro-batch") \
+            .option("rowsPerBatch", 10) \
+            .load()
+        ```
 
     === "Scala"
 
-    ```scala
+        ```scala
 
-    val spark: SparkSession = ...
+        val spark: SparkSession = ...
 
-    // Create a streaming DataFrame
-    val df = spark.readStream
-      .format("rate-micro-batch")
-      .option("rowsPerBatch", 10)
-      .load()
-    ```
+        // Create a streaming DataFrame
+        val df = spark.readStream
+        .format("rate-micro-batch")
+        .option("rowsPerBatch", 10)
+        .load()
+        ```
 
     === "Java"
 
-    ```java
+        ```java
 
-    SparkSession spark = ...
+        SparkSession spark = ...
 
-    // Create a streaming DataFrame
-    Dataset<Row> df = spark.readStream()
-      .format("rate-micro-batch")
-      .option("rowsPerBatch", 10)
-      .load();
-    ```
+        // Create a streaming DataFrame
+        Dataset<Row> df = spark.readStream()
+        .format("rate-micro-batch")
+        .option("rowsPerBatch", 10)
+        .load();
+        ```
 
     === "R"
-
-    Not available in R.
+        Not available in R.
 
 [^2]:
     Default parallelism refers to `spark.sql.shuffle.partitions`. It defaults to 200 as of Spark 3.4, but may change in future releases.
