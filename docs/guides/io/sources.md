@@ -46,6 +46,9 @@ The name for the file source format is one of the following:`csv`, `text`, `JSON
     | `sourceArchiveDir`      | Specifies the archive directory for cleaned-up files. It cannot be a sub-directory of `path`; if it were, archived files would be considered new and processed over and over again.                 | None | Only if `cleanSource` is set to `archive`. |
 
 ??? example 
+
+    These CSV examples specify the separator (`sep`) for the data in the CSV file. Specifying a seperator is only required for the CSV file source. It is not required for any of the other file sources.
+
     === "Python"
 
         ```python
@@ -109,9 +112,6 @@ The name for the file source format is one of the following:`csv`, `text`, `JSON
         csvDF <- read.stream("csv", path = "/path/to/directory", schema = schema, sep = ";")
 
         ```
-
-!!! note 
-    The previous CSV examples for the file source specify the separator (`sep`) for the data in the CSV file. Specifying a seperator is only required for the CSV file source. It is not required for any of the other file sources.
 
 ### Kafka source
 
