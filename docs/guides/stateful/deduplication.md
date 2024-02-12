@@ -1,5 +1,3 @@
-# Depuplication
-
 Very frequently, data sources have duplicate records. This mostly happens because many data systems only have at-least-once guarantees, so the same record can get delivered multiple times. For example, a web server might be trying to send a write to a database cluster; if the web server has a retry mechanism that isn't idempotent, it could produce that record many times. In that case, those records records would be duplicated!
 
 As a result, deduplication of streams is needed. You can deduplicate on one or more columns, and you can simply pass the columns on which you want to deduplicate to a deduplication function. There are two such deduplication functions:
