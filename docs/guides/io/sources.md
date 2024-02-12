@@ -47,7 +47,7 @@ The name for the file source format is one of the following:`csv`, `text`, `JSON
 
 ??? example 
 
-    These CSV examples specify the separator (`sep`) for the data in the CSV file. Specifying a seperator is only required for the CSV file source. It is not required for any of the other file sources.
+    These CSV examples specify the separator (`sep`) for the data in the CSV file. This option is specific to the CSV file source. Each file source has their own specific options. See file-format-specific options for [Parquet](https://spark.apache.org/docs/latest/sql-data-sources-parquet.html), [ORC](https://spark.apache.org/docs/latest/sql-data-sources-orc.html), [JSON](https://spark.apache.org/docs/latest/sql-data-sources-json.html), [CSV](https://spark.apache.org/docs/latest/sql-data-sources-csv.html), and [text files](https://spark.apache.org/docs/latest/sql-data-sources-text.html).
 
     === "Python"
 
