@@ -1,11 +1,11 @@
-# Deduplication
+# Deduplication in Structured Streaming
 
 Data sources frequently have duplicate records. This occurs because many data systems only have _at-least-once_ guarantees, which means that the same record can get delivered to the source system multiple times. For example, a web server might be trying to send a write to a database cluster. If that web server has a retry mechanism that isn't idempotent, that record could be produced and written multiple times. The result is duplicate records in the source, that we want to eliminate within the stream, where practical.
 
 To accomplish this, a method for deduplication of streaming data is needed. You can deduplicate on one or more columns, and then pass the columns on which you want to deduplicate data to one of the following deduplication methods.
 
 
-## What are the deduplication methods?
+## Deduplication methods
 
 Spark has two deduplication methods:
 
@@ -90,7 +90,7 @@ For example, suppose we know that we'll have duplicates within 5 minutes of each
 
 For an end-to-end example showing state removal, see [aggregation example](/examples/aggregation-with-watermark).
 
-### When you might still have duplicates
+### Situations in which you might still have duplicates
 
 When deduplicating with a watermark, you might have duplicates that arrive _after_ your watermark's maximum delay. In our example, another record with `ID = foo` that arrives after event-time 11 is _not_ deduplicated. If you have strict deduplication requirements, you have two options:
 
