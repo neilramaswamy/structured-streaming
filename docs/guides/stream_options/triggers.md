@@ -13,7 +13,7 @@ spark structured streaming interval [x]
 -->
 
 
-# Triggers
+# Triggers in Structured Streaming
 
 Structured Streaming repeatedly reads and processes data from the source in micro-batches; triggers configure how frequently a Structured Streaming query runs its micro-batches. The following are some examples of trigger definitions:
 
@@ -52,7 +52,7 @@ The following table describes the use case for each trigger type.
 [^1]:
     We discuss how to wait for termination (and other such lifecycle events) in [Managing the Query Lifecycle]().
 
-## Examples
+## Trigger examples
  
 === "Python"
 

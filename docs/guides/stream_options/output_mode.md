@@ -1,4 +1,4 @@
-# Output Mode
+# Output modes in Structured Streaming
 
 !!! info
     Before reading this article, you should be familiar with [watermarks]() and [triggers]().
@@ -55,13 +55,13 @@ To summarize, stateful operators behave in the following way:
 - In update mode, records that changed since the previous trigger are (re-)emitted
 - In complete mode, all records ever produced by the stateful operator are (re-)emitted
 
-## Selecting the right output mode
+## Select the appropriate output mode
 
 If you're using only stateless operators in your query, you don't need to configure an output mode. With a query using only stateless operators, an individual record doesn't depend on any other record, so an emitted row can never change; thus, update mode behaves the same way as append mode.
 
 If you have _any_ stateful operators in your pipeline, see the following considerations.
 
-### Consider application semantics
+### Consider your application semantics
 
 Primarily, you want to consider the semantics of your application:
 
@@ -76,14 +76,14 @@ Some operators behave in ways that make supporting certain output modes difficul
 
 Not all sinks support all output modes. This is not a Structured Streaming limitation. Rather, to support update mode, sinks need to have some notion of recency, so that they serve the most recent update that Structured Streaming wrote to them. Also, note that update mode is only supported by a handful of sinks. See [sink compatibility matrix]().
 
-### Consider non-functional requirements
+### Non-functional requirements to consider
 
 Finally, you should also keep in mind some non-functional (such as latency and cost) implications of particular output modes:
 
 - Append mode forces stateful operators to emit results only once their resulting rows won't change. For stateful aggregations and joins, this is _at least_ as long as your watermark delay. A watermark delay of `1 hour` in the append output mode means that your records _will_ have at least a 1 hour delay before being emitted downstream.
 - Update mode results in one write per trigger, per aggregate value. If you are using the [foreachBatch or foreach sink]() and are writing to an OLTP database that charges per write, your database bill might be expensive.
 
-### Closing thoughts
+### Additional considerations
 
 After going through the suggestions above, you may find that your semantics, operator or sink compatibility, and non-functional requirements don't align. For example, consider the following situation:
 
@@ -92,7 +92,7 @@ After going through the suggestions above, you may find that your semantics, ope
 
 In these cases, you need to use one of Structured Streaming's "escape" hatches to make this work: [arbitrary stateful processing]() in combination with the `foreach`/`foreachBatch` sinks.
 
-## Examples
+## Output mode examples
 
 === "Python"
 

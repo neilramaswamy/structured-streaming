@@ -1,4 +1,4 @@
-# Sources
+# Sources in Structured Streaming
 
 All Structured Streaming queries start with defining a source, some place from which to read a stream of data (such as Apache Kafka). When you _load_ a source (which we'll show shortly), you'll get back a _streaming DataFrame_, which is a [Spark DataFrame](https://spark.apache.org/docs/latest/sql-programming-guide.html#datasets-and-dataframes) that can be incrementally processed.
 
@@ -26,7 +26,7 @@ Each of these sources support many options. See [Source reference](#source-refer
 !!! tip
     You can also use the file source as a testing source, rather than the socket source. To do this, create static DataFrames via `spark.createDataFrame` and write them to a specific directory on your system. Then, read those files using a Structured Streaming job with the `files` source.
 
-## Source reference
+## Source reference for Structured Streaming
 
 Expand the supported options boxes for each source type to find the specific option name and its supported values.
 
