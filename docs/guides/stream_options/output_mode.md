@@ -21,7 +21,7 @@ There are three output modes that tell an operator _what_ records to emit during
 
 Note that append mode and update mode are semantically equivalent for stateless operators. For a stateless operator like `.select`, the row that results from taking a subset of a a source record's columns in a given trigger has two properties: it will never change in the future  (i.e. it satisfies append mode), and that particular record must not have existed in the previous trigger (i.e. it satisfies update mode).
 
-## Why do we need an output mode?
+## Conceptual output mode example
 
 Consider a [streaming aggregation]() that calculates the total revenue generatee _every hour_ at a store. Let's also assume that it uses a watermark delay of 15 minutes. Suppose our Structured Streaming query processes the following records in its first micro-batch:
 

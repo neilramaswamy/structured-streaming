@@ -2,7 +2,7 @@
 
 All Structured Streaming queries start with defining a source, some place from which to read a stream of data (such as Apache Kafka). When you _load_ a source (which we'll show shortly), you'll get back a _streaming DataFrame_, which is a [Spark DataFrame](https://spark.apache.org/docs/latest/sql-programming-guide.html#datasets-and-dataframes) that can be incrementally processed.
 
-## What are the built-in data sources?
+## Supported production and non-production data sources
 
 Structured Streaming supports the following production sources out-of-the-box:
 

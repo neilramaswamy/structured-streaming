@@ -10,7 +10,7 @@ The most common stateless operators are projection and selection.
 !!! note
     In SQL, the operator for projection is `select` whereas the operator for selection is `where`. This can be a bit confusing.
 
-## What is projection?
+## Use projection to filter columns in data stream
 
 A projection operator reads the columns from the incoming stream that satisfy a specified condition and emits them downstream. Columns that do not satisfy the specified condition are removed and not saved. For example, the upstream data stream may have _many_ columns that your particular streaming job does not want to send downstream. Suppose your task is to create a privacy-compliant downstream table from a stream of all the new users signing up for your platform.
 
@@ -27,7 +27,7 @@ Use the `select` operator to limit the columns emitted downstream to only the na
 
 Another use of projection is to reduce the use of memory and CPU resources downstream by eliminating the flow of unnecessary data (columns and rows) through the Spark engine.
 
-## What is selection?
+## Use selection to filter rows in data stream
 
 A selection operator only emits a record downstream if its columns satisfy a specified condition. In SQL, the `where` operator is used for this, while in programming languages, this function is usually refered to as the higher-order-function (usually abbreviated as _HOF_) named `filter`. You can use either on a DataFrame - the formula is generally the same:
 
