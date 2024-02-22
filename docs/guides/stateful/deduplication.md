@@ -14,6 +14,7 @@ Spark has these two deduplication methods:
 !!! warning
     Do not use the `dropDuplicates` method unless you are sure that your data stream has low cardinality. Otherwise, you may encounter out of memory errors.
 
+## API reference
 ???+ abstract "API Reference"
 
     === "Python"
@@ -36,7 +37,7 @@ Spark has these two deduplication methods:
 
 ## Local deduplication with `dropDuplicatesWithinWatermark`
 
-The `dropDuplicatesWithinWatermark` method should be your first choice for deduplication when you know the interval of time within which you might receive duplicates. <!-- (TODO: is this true? what do people use to figure this out?) --> If you know that you'll have duplicates within a `k` minute interval, you can instruct Structured Streaming to hold onto records for `k` minutes, within which this method performs deduplication. Structured Streaming also removes the records that have been around for more than `k` minutes, so that it doesn't hold onto an infinite number of records and consume large amounts of memory to hold those records.
+The `dropDuplicatesWithinWatermark` method should be your first choice for deduplication when you know the interval of time within which you might receive duplicates. <!-- (TODO: is this true? what do people use to figure this out?) --> If you know that you'll have duplicates within a `k` minute interval, you can instruct Structured Streaming to hold onto records for `k` minutes, within which this method performs deduplication. Structured Streaming also removes the records that have been around for more than `k` minutes, so that it doesn't hold onto an infinite number of records and consume large amounts of memory to hold potentially deduplicate records.
 
 For example, suppose we know that we'll have duplicates within 5 minutes of each other. If we receive a record, `ID = foo`, with event-time 6, we might receive duplicates up to event-time 5+6 = 11. What tool tells Structured Streaming when we're out of the "danger" zone of receiving an event-time before 11?
 
@@ -88,12 +89,11 @@ For example, suppose we know that we'll have duplicates within 5 minutes of each
 
 For an end-to-end example showing state removal, see [aggregation example](/examples/aggregation-with-watermark).
 
-### Situations in which you might still have duplicates
+!!! note
+    When deduplicating with a watermark, you might have duplicates that arrive _after_ your watermark's maximum delay. In our example, another record with `ID = foo` that arrives after event-time 11 is _not_ deduplicated. If you have strict deduplication requirements, you have two options:
 
-When deduplicating with a watermark, you might have duplicates that arrive _after_ your watermark's maximum delay. In our example, another record with `ID = foo` that arrives after event-time 11 is _not_ deduplicated. If you have strict deduplication requirements, you have two options:
-
-- Keep state for longer via a larger watermark delay (a larger watermark means more records arrive _within_ your watermark).
-- Keep state forever, using `dropDuplicates`.
+    - Keep state for longer via a larger watermark delay (a larger watermark means more records arrive _within_ your watermark).
+    - Keep state forever, using `dropDuplicates`.
 
 ## Global deduplication with `dropDuplicates`
 
