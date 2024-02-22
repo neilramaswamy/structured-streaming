@@ -97,7 +97,7 @@ However, the guarantee is strict only in one direction. Data delayed by more tha
 
 ## Examples of aggregations with event-time windows
 
-??? example
+??? examples
 
     === "Python"
 
