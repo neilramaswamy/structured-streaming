@@ -2,14 +2,14 @@
 
 Data sources frequently have duplicate records. Duplication occurs because many data systems only have _at-least-once_ guarantees, which means that the same record can get delivered to the source system multiple times. For example, a web server might be trying to send a write to a database cluster. If that web server has a retry mechanism that isn't idempotent, that record could be produced and written multiple times. The result is duplicate records in the source, that you want to eliminate within the stream, where practical.
 
-To accomplish this, you must select a method for deduplication of streaming data. You can deduplicate on one or more columns, and then pass the columns on which you want to deduplicate data to one of the following deduplication methods.
+To accomplish this, you must select a method for deduplication. You can deduplicate on one or more columns, and then pass the columns on which you want to deduplicate data to one of the following deduplication methods.
 
 ## Deduplication methods
 
-Spark has two deduplication methods:
+Spark has these two deduplication methods:
 
-- `dropDuplicatesWithinWatermark`: This method holds onto duplicates for at least as much time as the watermark duration in your streaming job. As a result, this method performs state removal (using the watermark). Deduplication using a watermark is more scalable than without watermarking because less memory is required as the watermark places a timne-based bound on the amount of memory required for deduplication.
-- `dropDuplicates`: This method is used when you want _global_ deduplication across your entire stream. Global deduplication is unbounded by time and requires an unbounded amount of memory. It is therefore less scalable.
+- **dropDuplicatesWithinWatermark**: The `dropDuplicatesWithinWatermark` method holds onto duplicates for at least as much time as the watermark duration in your streaming job. As a result, this method removes duplicate records stored in state. Deduplication using a watermark is more scalable than without watermarking because less memory is required as the watermark places a time-based bound on the amount of memory required for deduplication.
+- **dropDuplicates**: The `dropDuplicates` method removes duplicates across the entire stream. This method is used when you want _global_ deduplication across your entire stream. Global deduplication is unbounded by time and requires an unbounded amount of memory. It is therefore less scalable.
 
 !!! warning
     Do not use the `dropDuplicates method unless you are sure that your data stream has low cardinality. Otherwise, you may encounter out of memory errors.
