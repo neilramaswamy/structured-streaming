@@ -59,7 +59,7 @@ Spark supports three types of event-time windows for aggregations:
 
     ![tumbling windows](/assets/tumbling_windows.png)
 
-- **Sliding windows**: Sliding windows are also _fixed-sized_, but windows can overlap if the duration of slide is smaller than the duration of window. For example, the window could be a duration of 15 minutes with a slide of 5 minutes. In this case an input can be bound to the multiple windows. Sliding uses the `window` function. See [Examples of aggregations with event-time window](#examples-of-aggregations-with-event-time-windows).
+- **Sliding windows**: Sliding windows are also _fixed-sized_, but windows can overlap if the duration of the slide is smaller than the duration of window. For example, the window could be a duration of 10 minutes with a slide of 5 minutes. In this case an input can be bound to the multiple windows. Sliding uses the `window` function. See [Examples of aggregations with event-time window](#examples-of-aggregations-with-event-time-windows).
 
     ![sliding windows](/assets/sliding_windows.png)
 
