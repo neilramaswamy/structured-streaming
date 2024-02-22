@@ -63,7 +63,7 @@ Spark supports three types of event-time windows for aggregations:
 
     ![sliding windows](/assets/sliding_windows.png)
 
-- **Session windows**: <!--this section needs more clarity TO DO Neil / Carl-->Session windows have a dynamic size of the window length, depending on the inputs. A session window starts with an input, and expands itself if following input has been received within gap duration. For static gap duration, a session window closes when there’s no input received within gap duration after receiving the latest input. Session window uses session_window function. See [Examples of aggregations with event-time window](#examples-of-aggregations-with-event-time-windows).
+- **Session windows**: Session windows have a dynamic size of the window length, depending on the inputs. A session window starts with an input, and expands itself if following input has been received within gap duration. For example, the session window can be set for 5 minutes with a gap duration of an additional 5 minutes. For static gap duration, a session window closes when there’s no input received within gap duration after receiving the latest input. Session window uses session_window function. See [Examples of aggregations with event-time window](#examples-of-aggregations-with-event-time-windows).
 
     ![session windows](/assets/session_windows.png)
 
