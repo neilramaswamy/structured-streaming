@@ -69,12 +69,12 @@ Spark supports three types of event-time windows for aggregations:
 
     Instead of static gap value, you can also provide an expression to specify gap duration dynamically based on the input row. Rows with negative or zero gap duration are filtered out from the aggregation.
 
-    With dynamic gap duration, the closing of a session window does not depend on the latest input. Rather, a session window’s range is the union of all events’ ranges which are determined by event start time and evaluated gap duration during the query execution.
+    With dynamic gap duration, the closing of a session window does not depend on the latest input. Rather, a session window’s range is the union of all events’ ranges which are determined by event start time and evaluated gap duration during the query execution. See [Examples of aggregations with event-time window](#examples-of-aggregations-with-event-time-windows).
 
-    When you use session window in streaming query:
+    Session windows have the following restrictions:
 
     - Update mode as output mode is not supported.
-    - There should be at least one column in addition to session_window in grouping key.
+    - There must be at least one column in addition to session_window in the grouping key.
 
     By default, Spark does not perform partial aggregations for session window aggregation, since it requires additional sort in local partitions before grouping. It works better for the case there are only few number of input rows in same group key for each local partition, but for the case there are numerous input rows having same group key in local partition, doing partial aggregation can still increase the performance significantly despite additional sort. <!-- previous paragraph needs work TO DO Neil / Carl -->
 
