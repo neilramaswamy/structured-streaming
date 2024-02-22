@@ -4,10 +4,7 @@ Aggregations over a sliding event-time window ("streaming aggregations") with St
 
 In Structured Streaming, the grouping column is time, and event-time is the time embedded in the data itself. This allows window-based aggregations (such as the number of events every minute) to be just a special type of grouping on the event-time column – each time window is a group and each row can belong to multiple windows (groups). 
 
-Aggregations in Structured Streaming have the added complication that records can delayed and thus come out-of-order (records earlier in time can arrive after records later in time). In Structured Streaming, aggregate values are maintained for each window into which the event-time of a row falls. Because there can be late arriving records, the central questions for streaming aggregations are:
-
-- How long to wait for late arriving records to arrive.
-- When to emit aggregation values downstream - either in conjunction with each micro-batch or only when no more updates are possible.
+Aggregations in Structured Streaming have the added complication that records can delayed and thus come out-of-order (records earlier in time can arrive after records later in time). In Structured Streaming, aggregate values are maintained for each window into which the event-time of a row falls. 
 
 ## Conceptual example of streaming aggregations
 
@@ -17,7 +14,7 @@ Suppose that you have a stream of sales and want to compute the total revenue ge
 - `$10` at 2:40pm
 - `$30` at 3:10pm
 
-Let's assume that Structured Streaming has received this data as of 3:15 PM. In this case, Structured Streaming's state for hour windows would look like the following:
+Let's assume that Structured Streaming has received this data as of 3:15 PM. In this case, Structured Streaming's state for the 2:00 o'clock and the 3 o'clock hours is:
 
 - [2pm, 3pm): $25
 - [3pm, 4pm): $30
@@ -27,17 +24,19 @@ Then, let's say the aggregation operator receives two more records at 3:30 PM:
 - `$20` at 2:15pm
 - `$25` at 3:15pm
 
-Structured Streaming would use the event time rather than the time received to update its state to look like the following:
+Structured Streaming uses the event time rather than the time received to update its state as follows:
 
 - [2pm, 3pm): $45
 - [3pm, 4pm): $55
 
-So, the central questions for the streaming aggregation operator are:
+## Handling late arriving records
 
-- When should it emit records downsteam for these aggregated values? Options are after each update or after it knows that no additional records will be received for a time window.
-- When should the streaming aggregation operator stop updating the streaming aggregation value. Options are to keep updating indefinitely until the stream is stopped or to wait for a specific amount of time, such as 15 minutes after the event-time window has passed.
+Because there can be late arriving records, the central questions for streaming aggregations are:
 
-## When to emit streaming aggregation values
+- When should the streaming aggregation operator stop updating the streaming aggregation value. Options are to keep updating indefinitely until the stream is stopped or to wait for a specific amount of time, such as 15 minutes after the event-time window has passed
+- When to emit aggregation values downstream. Options are after each update or after it knows that no additional records will be received for a time window.
+
+### When to emit streaming aggregation values
 
 The [output mode](../stream_options/output_mode.md) determines when the streaming aggreation operator emits aggregate values.
 
@@ -45,7 +44,7 @@ The [output mode](../stream_options/output_mode.md) determines when the streamin
 - **Update mode**: In update mode, operators emit all rows that changed during the trigger, even if the emitted record might change in a subsequent trigger.
 - **Complete mode**: In complete mode, _all_ resulting rows ever produced by the operator are emitted downstream.
 
-## When to stop updating streaming aggregation values
+### When to stop updating streaming aggregation values
 
 The [watermark]() for a streaming aggregation operator determines how long the operator should wait for new records to appear for a given event-time window, and when the engine can clean up old aggregates to limit the size of intermediate state data. Records arriving too late are dropped, rather than updating the aggregated value.
 
