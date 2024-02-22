@@ -103,9 +103,7 @@ The `dropDuplicates` method allows you deduplicate over _all_ records of the str
 - **Con**: Potential out-of-memory errors. If you have enough records, you'll run out of space to store records and cause a machine crash.
 
 !!! danger
-    For this reason of unbounded state growth, `dropDuplicates` is one of the Spark operators that does not cleanly transfer over from the batch APIs to the streaming APIs. If you have a batch job with `dropDuplicates` and you want to migrate it to a streaming job, modify your query use `dropDuplicatesWithinWatermark`.
-
-With that out of the way, here's the syntax for it. You just pass it the columns, as strings, on which you want to deduplicate:
+    For this reason of unbounded state growth, `dropDuplicates` is one of the Spark operators that does not cleanly transfer over from the batch APIs to the streaming APIs. If you have a batch job with `dropDuplicates` and you want to migrate it to a streaming job, modify your query use the `dropDuplicatesWithinWatermark` method.
 
 ??? note "Historical note"
     Before `dropDuplicatesWithinWatermark` was introduced in Spark 3.5.0, we used to suggest deduplication with state removal by passing an event-time column to `dropDuplicates`. This still works, but we highly recommend using `dropDuplicatesWithinWatermark` instead; it's far less error-prone.
