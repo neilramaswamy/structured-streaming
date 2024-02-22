@@ -12,8 +12,7 @@ Spark has these two deduplication methods:
 - **dropDuplicates**: The `dropDuplicates` method removes duplicates across the entire stream. This method is used when you want _global_ deduplication across your entire stream. Global deduplication is unbounded by time and requires an unbounded amount of memory. It is therefore less scalable.
 
 !!! warning
-    Do not use the `dropDuplicates method unless you are sure that your data stream has low cardinality. Otherwise, you may encounter out of memory errors.
-
+    Do not use the `dropDuplicates` method unless you are sure that your data stream has low cardinality. Otherwise, you may encounter out of memory errors.
 
 ???+ abstract "API Reference"
 
