@@ -76,7 +76,9 @@ Spark supports three types of event-time windows for aggregations:
     - Update mode as output mode is not supported.
     - There must be at least one column in addition to session_window in the grouping key.
 
-    By default, Spark does not perform partial aggregations for session window aggregation, since it requires additional sort in local partitions before grouping. Session windows perform best when there are only a few input rows in same group key for each local partition. For the case where there are numerous input rows having same group key in local partition, doing partial aggregations can increase the performance significantly despite additional sort. You can enable `spark.sql.streaming.sessionWindow.merge.sessions.in.local.partition` to tell Spark to perform partial aggregations.
+    By default, Spark does not perform partial aggregations for session window aggregation, since it requires additional sort in local partitions before grouping. Session windows perform best when there are only a few input rows in same group key for each local partition.
+    
+    For the case where there are numerous input rows having same group key in local partition, doing partial aggregations can increase the performance significantly despite additional sort. Use `spark.sql.streaming.sessionWindow.merge.sessions.in.local.partition` to enable Spark to perform partial aggregations.
 
 ### Conditions for watermarking to clean aggregation state
 
