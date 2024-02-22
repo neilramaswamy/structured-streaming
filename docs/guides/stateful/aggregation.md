@@ -33,16 +33,16 @@ Structured Streaming uses the event time rather than the time received to update
 
 Because there can be late arriving records, the central questions for streaming aggregations are:
 
-- When should the streaming aggregation operator stop updating the streaming aggregation value. Options are to keep updating indefinitely until the stream is stopped or to wait for a specific amount of time, such as 15 minutes after the event-time window has passed
-- When to emit aggregation values downstream. Options are after each update or after it knows that no additional records will be received for a time window.
+- When should the streaming aggregation operator stop updating the streaming aggregation value. Options are to keep updating indefinitely until the stream is stopped or to wait for a specific amount of time, such as 15 minutes after the event-time window has passed.
+- When to emit aggregation values downstream. Options are after each update or after it knows that no additional records can be processed for a time window.
 
 ### When to emit streaming aggregation values
 
 The [output mode](../stream_options/output_mode.md) determines when the streaming aggreation operator emits aggregate values.
 
-- **Append mode**: - By default, streaming queries run in append mode. In this mode, operators only emits rows that won't change in future triggers.
-- **Update mode**: In update mode, operators emit all rows that changed during the trigger, even if the emitted record might change in a subsequent trigger.
-- **Complete mode**: In complete mode, _all_ resulting rows ever produced by the operator are emitted downstream.
+- **Append mode**: By default, all streaming queries run in append mode. In this mode, streaming operators only emit rows that won't change in future triggers.
+- **Update mode**: In update mode, streaming operators emit all rows that changed during the trigger, even if the emitted record might change in a subsequent trigger.
+- **Complete mode**: In complete mode, _all_ resulting rows ever produced by the streaming operator are emitted downstream.
 
 ### When to stop updating streaming aggregation values
 
