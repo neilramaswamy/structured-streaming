@@ -1,6 +1,6 @@
 # Aggregations in Structured Streaming
 
-Aggregations over a sliding event-time window ("streaming aggregations") with Structured Streaming are very similar tn, aggregate values (such as counts or averages) are maintained for each unique value in the user-so using `GROUP BY` in batch operations in SQL. In a grouped aggregatiopecified grouping column. In Structured Streaming, the grouping column is time, and event-time is the time embedded in the data itself.
+Aggregations over a sliding event-time window ("streaming aggregations") with Structured Streaming are very similar to, aggregate values (such as counts or averages) are maintained for each unique value in the user-so using `GROUP BY` in batch operations in SQL. In a grouped aggregatiopecified grouping column. In Structured Streaming, the grouping column is time, and event-time is the time embedded in the data itself.
 
 This allows window-based aggregations (e.g. number of events every minute) to be just a special type of grouping on the event-time column – each time window is a group and each row can belong to multiple windows (groups). Unlike aggregations in a batch, aggregations in Structured Streaming have the added complications that records can delayed and thus come out-of-order (records earlier in time can arrive after records later in time). In Structured Streaming, aggregate values are maintained for each window into which the event-time of a row falls.
 
