@@ -49,21 +49,21 @@ The [output mode](../stream_options/output_mode.md) determines when the streamin
 The [watermark]() for a streaming aggregation operator determines how long the streaming operator should wait for new records to appear for a given event-time window, and when the engine can clean up old aggregates to limit the size of intermediate state data. Records arriving too late are dropped, rather than updating the aggregated value. <!--say something here about how to decide how long to wait? Question for Neil / Carl -->
 
 !!! important
-    Always specify a watermark to prevent unlimited growth of intermediate aggregate value consuming memory and potentially causing a machine crash due to out-of-memory errors.
+    Always specify a watermark to prevent unlimited growth of intermediate aggregate values consuming memory and potentially causing a machine crash due to out-of-memory errors.
 
 ## Time windows
 
 Spark supports three types of event-time windows for aggregations:
 
-- **Tumbling (fixed)**: Tumbling windows are a series of fixed-sized, non-overlapping and contiguous time intervals, such as every 60 minutes. An input can only be bound to a single window. Tumbling uses the `window` function.
+- **Tumbling (fixed) windows**: Tumbling windows are a series of fixed-sized, non-overlapping and contiguous time intervals, such as every 60 minutes. An input can only be bound to a single window. Tumbling uses the `window` function. See [Examples of aggregations with event-time window](#examples-of-aggregations-with-event-time-windows).
 
     ![tumbling windows](/assets/tumbling_windows.png)
 
-- **Sliding**: Sliding windows are similar to the tumbling windows from the point of being _fixed-sized_, but windows can overlap if the duration of slide is smaller than the duration of window. For example, the window could be a duration of 15 minutes with a slide of 5 minutes. In this case an input can be bound to the multiple windows. Sliding uses the `window` function.<!--need example syntax? TO DO - Neil / Carl example "/aggregation-with-watermark" only shows tumbling window-->
+- **Sliding windows**: Sliding windows are also _fixed-sized_, but windows can overlap if the duration of slide is smaller than the duration of window. For example, the window could be a duration of 15 minutes with a slide of 5 minutes. In this case an input can be bound to the multiple windows. Sliding uses the `window` function. See [Examples of aggregations with event-time window](#examples-of-aggregations-with-event-time-windows).
 
     ![sliding windows](/assets/sliding_windows.png)
 
-- **Session**: <!--this section needs more clarity TO DO Neil / Carl-->Session windows have a dynamic size of the window length, depending on the inputs. A session window starts with an input, and expands itself if following input has been received within gap duration. For static gap duration, a session window closes when there’s no input received within gap duration after receiving the latest input. Session window uses session_window function. <!--need example syntax? TO DO - Neil / Carl -->
+- **Session windows**: <!--this section needs more clarity TO DO Neil / Carl-->Session windows have a dynamic size of the window length, depending on the inputs. A session window starts with an input, and expands itself if following input has been received within gap duration. For static gap duration, a session window closes when there’s no input received within gap duration after receiving the latest input. Session window uses session_window function. See [Examples of aggregations with event-time window](#examples-of-aggregations-with-event-time-windows).
 
     ![session windows](/assets/session_windows.png)
 
