@@ -13,8 +13,8 @@ Aggregations in Structured Streaming have the added complication that records ca
 
 Suppose that you have a stream of sales and want to compute the total revenue generated _every hour_ in real-time. To do this, Structured Streaming needs to keep _state_ for each event-time window for sales during each hour. For example, let's say we make the following sales at a store at the following times:
 
-- `$15` at 2:40pm
-- `$10` at 2:30pm
+- `$15` at 2:30pm
+- `$10` at 2:40pm
 - `$30` at 3:10pm
 
 Let's assume that Structured Streaming has received this data as of 3:15 PM. In this case, Structured Streaming's state for hour windows would look like the following:
