@@ -46,7 +46,7 @@ The [output mode](../stream_options/output_mode.md) determines when the streamin
 
 ### When to stop updating streaming aggregation values
 
-The [watermark]() for a streaming aggregation operator determines how long the operator should wait for new records to appear for a given event-time window, and when the engine can clean up old aggregates to limit the size of intermediate state data. Records arriving too late are dropped, rather than updating the aggregated value.
+The [watermark]() for a streaming aggregation operator determines how long the streaming operator should wait for new records to appear for a given event-time window, and when the engine can clean up old aggregates to limit the size of intermediate state data. Records arriving too late are dropped, rather than updating the aggregated value. <!--say something here about how to decide how long to wait? Question for Neil / Carl -->
 
 !!! important
     Always specify a watermark to prevent unlimited growth of intermediate aggregate value consuming memory and potentially causing a machine crash due to out-of-memory errors.
