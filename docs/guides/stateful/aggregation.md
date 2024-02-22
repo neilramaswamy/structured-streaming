@@ -84,16 +84,16 @@ Spark supports three types of event-time windows for aggregations:
 
 The following conditions must be satisfied for the watermarking to clean the state in aggregation queries (as of Spark 2.1.1).
 
-- Output mode must be _Append_ or _Update_. In complete mode, _all_ resulting rows ever produced by the operator are emitted downstream, and there is no intermediate state to drop. 
+- Output mode must be _Append_ or _Update_. In complete mode, _all_ resulting rows ever produced by the operator are emitted downstream, and therefore there is no intermediate state to drop.
 - The aggregation must have either the event-time column, or a window on the event-time column.
 -  `withWatermark` must be called on the same column as the timestamp column used in the aggregate. For example, `df.withWatermark("time", "1 min").groupBy("time2").count()` is invalid in _Append_ output mode, as watermark is defined on a different column from the aggregation column.
 - `withWatermark` must be called before the aggregation for the watermark details to be used. For example, `df.groupBy("time").count().withWatermark("time", "1 min")` is invalid in _Append_ output mode.
 
 ### Semantic guarantees of aggregation with watermarking
 
-A watermark delay (set with `withWatermark`) of _2 hours_ guarantees that the engine will never drop any data that is less than 2 hours delayed. In other words, any data less than 2 hours behind (in terms of event-time) the latest data processed till then is guaranteed to be aggregated.
+A watermark delay of _2 hours_ guarantees that the engine never drops any data that is less than 2 hours delayed. In other words, any data less than 2 hours behind the latest data processed till then (in terms of event-time) is guaranteed to be aggregated.
 
-However, the guarantee is strict only in one direction. Data delayed by more than 2 hours is not guaranteed to be dropped; it may or may not get aggregated. More delayed is the data, less likely is the engine going to process it.
+However, the guarantee is strict only in one direction. Data delayed by more than 2 hours is not guaranteed to be dropped; it may or may not get aggregated. More delayed is the data, less likely is the engine going to process it. <!--this needs more elaboration Neil / Carl -->
 
 ## Examples of aggregations with event-time windows
 
