@@ -91,7 +91,9 @@ Only supports Append output mode. The file sink supports writes to partitioned t
 
 ### Kafka sink
 
-Supports Append, Update, Complete output modes. See the [Kafka Integration Guide](https://spark.apache.org/docs/latest/structured-streaming-kafka-integration.html) for the supported options and examples.
+Supports Append, Update, Complete output modes. 
+
+See the [Kafka Integration Guide](https://spark.apache.org/docs/latest/structured-streaming-kafka-integration.html) for the supported options and examples.
 
 ### foreachBatch sink
 
@@ -160,6 +162,8 @@ With `foreachBatch`, you can do the following.
         `foreachBatch` does not work with the continuous processing mode as it fundamentally relies on the micro-batch execution of a streaming query. If you write data in the continuous mode, use `foreach` instead.
 
 ### foreach sink
+
+Supports Append, Update, Complete output modes.
 
 If `foreachBatch` is not an option (for example, corresponding batch data writer does not exist, or continuous processing mode), then you can express your custom writer logic using `foreach`. Specifically, you can express the data writing logic by dividing it into three methods: open, process, and close. Since Spark 2.4, `foreach` is available in Scala, Java and Python.
 
@@ -344,7 +348,7 @@ Supports Append, Update, Complete output modes.
 
 ### Memory sink
 
-Supports Append, Update, Complete output modes. See []().
+Supports Append, Update, Complete output modes.
 
 ??? example 
     === "Python"
