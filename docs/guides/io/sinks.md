@@ -6,9 +6,10 @@ Output sinks store Structured Streaming results from a streaming DataFrame into 
 
 Structured Streaming supports the following production sinks out-of-the-box:
 
-- **File sink** - Stores the output to a directory.
+- **File sink** - Stores the output to a specified directory and format.
 - **Kafka sink** - Stores the output to one or more topics in Kafka.
-- **Foreach sink** - Runs arbitrary computation on the records in the output. See later in the section for more details.
+- **ForeachBatch sink** - Allows arbitrary operations and custom logic on the output of each micro-batch
+- **Foreach sink** - Allows custom write logic on every row.
 - **Console sink (for debugging)** - Prints the output to the console/stdout every time there is a trigger. Both, Append and Complete output modes, are supported. This should be used for debugging purposes on low data volumes as the entire output is collected and stored in the driver’s memory after every trigger.  Never use this in production, since it isn't fault-tolerant[^1].
 - **Memory sink (for debugging)** - he output is stored in memory as an in-memory table. Both, Append and Complete output modes, are supported. This should be used for debugging purposes on low data volumes as the entire output is collected and stored in the driver’s memory. Hence, use it with caution. This sink isn't fault-tolerant[^1]. However, in Complete Mode, a restarted query recreates the full table.
 
@@ -21,7 +22,7 @@ Not all [output modes](../stream_options/output_mode.md#available-output-modes) 
 
 ### File sink
 
-Supports Append output mode. The file sink supports writes to partitioned tables. Partitioning by time may be useful. For file-format-specific options, see the related methods in DataFrameWriter for [Scala](https://spark.apache.org/docs/latest/api/scala/org/apache/spark/sql/DataFrameWriter.html), [Java](https://spark.apache.org/docs/latest/api/java/org/apache/spark/sql/DataFrameWriter.html), [Python](https://spark.apache.org/docs/latest/api/python/reference/pyspark.ss/api/pyspark.sql.streaming.DataStreamWriter.html#pyspark.sql.streaming.DataStreamWriter), and [R](https://spark.apache.org/docs/latest/api/R/write.stream.html). <!--R reference is invalid - but did not find a good link -->
+Only supports Append output mode. The file sink supports writes to partitioned tables. Partitioning by time may be useful. For file-format-specific options, see the related methods in DataFrameWriter for [Scala](https://spark.apache.org/docs/latest/api/scala/org/apache/spark/sql/DataFrameWriter.html), [Java](https://spark.apache.org/docs/latest/api/java/org/apache/spark/sql/DataFrameWriter.html), [Python](https://spark.apache.org/docs/latest/api/python/reference/pyspark.ss/api/pyspark.sql.streaming.DataStreamWriter.html#pyspark.sql.streaming.DataStreamWriter), and [R](https://spark.apache.org/docs/latest/api/R/write.stream.html). <!--R reference is invalid - but did not find a good link -->
 
 ??? info "Supported Options"
     |  Option Name             | Information                                                                                        | Default         | Required?   |
