@@ -1,6 +1,6 @@
-# What are additional stateless operators?
+# Additional stateless operators
 
-While [projection and selection](projection_selection.md) are the most common stateless operators, you can use most Spark functions in Structured Streaming. The following additional Spark functions are examples of stateless operators that you can use in a stateless pipeline. 
+While [projection and selection](projection_selection.md) are the most common stateless operators, you can use most Spark functions in Structured Streaming. The following additional Spark functions are examples of stateless operators that you can use in a stateless pipeline.
 
 ## Using the `withColumn` function
 

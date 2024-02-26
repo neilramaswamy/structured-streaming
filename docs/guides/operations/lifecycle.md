@@ -1,4 +1,4 @@
-After you call `.start()` after configuring your sink, your query will start running on your Spark cluster, and `start` will return a `StreamingQuery`: 
+After you call `.start` after configuring your sink, your query will start running on your Spark cluster, and `start` will return a `StreamingQuery`: 
 
 ???+ abstract "API Reference"
 
@@ -24,16 +24,16 @@ This guide will focus mainly on managing the query lifecycle, and you can read m
 Suppose that you have a `StreamingQuery` called `query`. At this point, `query` is running on your cluster. There are three main ways that a query will terminate:
 
 1. The query will no longer run any more micro-batches. This happens only when the query's trigger dictates that it should run a finite number of micro-batches, which is only when the query uses the [Available Now or Once triggers]().
-2. The query is explicitly stopped via `query.stop()`. For a query using a trigger that can run an _infinite_ number of micro-batches, which is the default and Processing Time triggers, this is the only way to gracefully stop the query.
+2. The query is explicitly stopped via `query.stop`. For a query using a trigger that can run an _infinite_ number of micro-batches, which is the default and Processing Time triggers, this is the only way to gracefully stop the query.
 3. The query throws an exception.
 
-Assuming that you want to wait for one of these conditions, you can use the `query.awaitTermination()` API. This method will block the calling thread until either of the first two conditions above happen. It may also throw an exception, so it's always good to wrap a call to `awaitTermination` in your languages exception-handling control structure.
+Assuming that you want to wait for one of these conditions, you can use the `query.awaitTermination` API. This method will block the calling thread until either of the first two conditions above happen. It may also throw an exception, so it's always good to wrap a call to `awaitTermination` in your languages exception-handling control structure.
 
 ## Waiting for a maximum amount of time
 
 While the example above is usually what you'll use, the `awaitTermination` API is overloaded: it also excepts a `timeout` parameter, which specifies the maximum amount of time the call to `awaitTermination` will block for. This API is useful if you're using the Available Now or Once triggers, and you _expect_ the query to finish in a fixed amount of time (if it's taking longer than your timeout, it could be using your cluster resources more than you anticipated, causing your costs to increase beyond your expectations.)
 
-For example, if your query _should_ take at maximum 30 seconds, you can `awaitTermination(30)`. This API returns you a boolean indicating whether the query terminated. If it didn't terminate, you can [explictly stop]() your query, via `query.stop()`. Then, you can send an alert to yourself so that you can investigate the issue:
+For example, if your query _should_ take at maximum 30 seconds, you can `awaitTermination(30)`. This API returns you a boolean indicating whether the query terminated. If it didn't terminate, you can [explictly stop]() your query, via `query.stop`. Then, you can send an alert to yourself so that you can investigate the issue:
 
 
 <!-- TODO(neil): Example -->
@@ -50,10 +50,10 @@ On the other hand, you _do_ want to gracefully catch exceptions during execution
 
 ## Gracefully stopping queries
 
-We've mentioned the `query.stop()` API a few times, and its worth adding a few more details about it. In general, there are three main situations in which you should use it:
+We've mentioned the `query.stop` API a few times, and its worth adding a few more details about it. In general, there are three main situations in which you should use it:
 
 1. You have a query that uses the Available Now or Once triggers, and they haven't terminated as soon as they should, and you want to just abort the whole query.
 2. You have a query that uses the default or Processing Time triggers, and you don't want that job to run any longer.
 3. You're developing your query in an interactive environment (like a notebook), and you just want it to stop (perhaps because you found a mistake in your code).
 
-After `query.stop()` has been called, the query will finish the trigger it is currently executing and then exit.
+After `query.stop` has been called, the query will finish the trigger it is currently executing and then exit.

@@ -1,4 +1,5 @@
-# What are stateless operators?
+# Stateless operators
+<!-- Is this the best way to introduce stateful vs. stateless? The main point is that we don't need to "remember" other records in stateless. -->
 
 Stateless operators read each record in a stream and limit the columns or the rows (or both) from that record that are emitted downstream. This limit, based on specified conditions, is independent of any other records in the stream.
 

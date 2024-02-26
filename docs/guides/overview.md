@@ -72,7 +72,7 @@ For a very brief, example-oriented introduction to Structured Streaming, see the
     14. Just like sources, every sink has its own set of supported options. For the file sink, we must specify a `path` to which to write results.
     15. After you have configured your stream and set a sink, you call `.start()` to start it on your cluster. This returns a `StreamingQuery`.
     16. You can configure a `StreamingQueryListener` to handle various callbacks from the streaming query. In this case, we configure a listener to handle the event `onQueryProgress`, which is called at the end of each trigger, to `#!python print()` the metrics for that trigger.
-    17. You can [wait for your query to terminate](../guides/operations/lifecycle.md) by calling `query.awaitTermination()`. However, this method will throw an exception if your query has a runtime exception, so its wise to wrap this call in a `try`/`catch`.
+    17. You can [wait for your query to terminate](../guides/operations/lifecycle.md) by calling `query.awaitTermination`. However, this method will throw an exception if your query has a runtime exception, so its wise to wrap this call in a `try`/`catch`.
 
 There are a few concepts not explicitly mentioned in this brief overview. In particular, you should be aware of the following:
 
