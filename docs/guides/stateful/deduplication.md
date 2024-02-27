@@ -9,7 +9,7 @@ To accomplish this, you must select a method for deduplication. You can deduplic
 Spark has these two deduplication methods:
 
 - **dropDuplicatesWithinWatermark**: The `dropDuplicatesWithinWatermark` method holds onto duplicates for at least as much time as the watermark duration in your streaming job. As a result, this method removes duplicate records stored in state. Deduplication using a watermark is more scalable than without watermarking because less memory is required as the watermark places a time-based bound on the amount of memory required for deduplication.
-- **dropDuplicates**: The `dropDuplicates` method removes duplicates across the entire stream. This method is used when you want _global_ deduplication across your entire stream. Global deduplication is unbounded by time and requires an unbounded amount of memory. It is therefore less scalable.
+- **dropDuplicates**: The `dropDuplicates` method removes duplicates across the entire stream. This method is used when you want _global_ deduplication across your entire stream. Global deduplication is unbounded by time and requires an unbounded amount of memory.
 
 !!! warning
     Do not use the `dropDuplicates` method unless you are sure that your data stream has low cardinality. Otherwise, you may encounter out of memory errors.
