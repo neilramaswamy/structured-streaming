@@ -2,13 +2,14 @@
 
 Data sources frequently have duplicate records. Duplication occurs because many data systems only have _at-least-once_ guarantees, which means that the same record may be present multiple times in the same stream. For example, a web server might be trying to send a log to a database cluster. If that web server has a retry mechanism that isn't idempotent, that record could be produced and written multiple times.
 
-To accomplish this, you must select a method for deduplication. You can deduplicate on one or more columns, and then pass the columns on which you want to deduplicate data to one of the following deduplication methods.
+You can pass the columns on which you want to deduplicate to one of the following deduplication methods provided by Structured Streaming.
 
 ## Deduplication methods
 
 Spark has these two deduplication methods:
 
-- **dropDuplicatesWithinWatermark**: The `dropDuplicatesWithinWatermark` method holds onto duplicates for at least as much time as the watermark duration in your streaming job. As a result, this method removes duplicate records stored in state. Deduplication using a watermark is more scalable than without watermarking because less memory is required as the watermark places a time-based bound on the amount of memory required for deduplication.
+- **dropDuplicatesWithinWatermark**: The `dropDuplicatesWithinWatermark` method holds onto duplicates for at least as much time as the watermark duration in your streaming job. Deduplication using a watermark is recommended, since records older than the watermark delay are removed, leading to less memory utilization.
+
 - **dropDuplicates**: The `dropDuplicates` method removes duplicates across the entire stream. This method is used when you want _global_ deduplication across your entire stream. Global deduplication is unbounded by time and requires an unbounded amount of memory.
 
 !!! warning
@@ -37,8 +38,9 @@ Spark has these two deduplication methods:
 
 ## Local deduplication with `dropDuplicatesWithinWatermark`
 
-The `dropDuplicatesWithinWatermark` method should be your first choice for deduplication when you know the interval of time within which you might receive duplicates. <!-- (TODO: is this true? what do people use to figure this out?) --> If you know that you'll have duplicates within a `k` minute interval, you can instruct Structured Streaming to hold onto records for `k` minutes, within which this method performs deduplication. Structured Streaming also removes the records that have been around for more than `k` minutes, so that it doesn't hold onto an infinite number of records and consume large amounts of memory to hold potentially deduplicate records.
+The `dropDuplicatesWithinWatermark` method should be your first choice for deduplication when you know the interval of time within which you might receive duplicates. <!-- (TODO: is this true? what do people use to figure this out?) --> If you know that you'll have duplicates within a `k` minute interval, you can instruct Structured Streaming to hold onto records for `k` minutes. Structured Streaming also removes the records that have been around for more than `k` minutes, so that it doesn't hold onto an infinite number of records and consume large amounts of memory to hold potentially deduplicate records.
 
+<!-- add conceptual walkthrough-->
 For example, suppose we know that we'll have duplicates within 5 minutes of each other. If we receive a record, `ID = foo`, with event-time 6, we might receive duplicates up to event-time 5+6 = 11. What tool tells Structured Streaming when we're out of the "danger" zone of receiving an event-time before 11?
 
 ??? success "See answer"
@@ -87,7 +89,7 @@ For example, suppose we know that we'll have duplicates within 5 minutes of each
     === "R"
         Not available in R.
 
-For an end-to-end example showing state removal, see [aggregation example](/examples/aggregation-with-watermark).
+For an end-to-end example, see [example](). <!--not sure what you intend here-->
 
 !!! note
     When deduplicating with a watermark, you might have duplicates that arrive _after_ your watermark's maximum delay. In our example, another record with `ID = foo` that arrives after event-time 11 is _not_ deduplicated. If you have strict deduplication requirements, you have two options:
@@ -99,7 +101,7 @@ For an end-to-end example showing state removal, see [aggregation example](/exam
 
 The `dropDuplicates` method allows you deduplicate over _all_ records of the stream. Since streams are unbounded, this means that `dropDuplicates` can deduplicate over an unbounded number of records, by keeping all the records in state. This behavior has pros and cons:
 
-- **Pro**: Total deduplication.
+- **Pro**: Perfect, total deduplication.
 - **Con**: Potential out-of-memory errors. If you have enough records, you'll run out of space to store records and cause a machine crash.
 
 !!! danger
