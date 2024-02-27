@@ -16,7 +16,7 @@ There are 4 types of events that a Spark cluster emits about its streams:
 
 ## Active vs. Passive Query Management
 
-Shortly, we'll go into details about how to write code to handle these events, but a reasonable question is: why do we need event-based listeners when we know that a query starts after we call `query.start()`, we can get the progress via `query.lastProgress`, and we know that a query terminates after `query.awaitTermination()` returns? In other words, why deviate from the advice given in [Managing the Query Lifecycle](./lifecycle.md)?
+Shortly, we'll go into details about how to write code to handle these events, but a reasonable question is: why do we need event-based listeners when we know that a query starts after we call `query.start`, we can get the progress via `query.lastProgress`, and we know that a query terminates after `query.awaitTermination` returns? In other words, why deviate from the advice given in [Managing the Query Lifecycle](./lifecycle.md)?
 
 The benefit of the event-based listener model is that it allows you to have _one piece of code_ that handles all events from all your streams: you can have one place in which you write these events to a monitoring service of your choice (like Grafana). Registering a `StreamingQueryListener` will vastly simplify your query code, since you won't need to instrument all of your streaming jobs to write to your monitoring service.
 

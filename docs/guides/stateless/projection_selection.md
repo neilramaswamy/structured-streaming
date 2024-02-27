@@ -1,4 +1,4 @@
-# What are stateless operators?
+# Stateless operators
 <!-- Is this the best way to introduce stateful vs. stateless? The main point is that we don't need to "remember" other records in stateless. -->
 
 Stateless operators read each record in a stream and limit the columns or the rows (or both) from that record that are emitted downstream. This limit, based on specified conditions, is independent of any other records in the stream.
@@ -23,8 +23,6 @@ Let's assume that the data stream has the following columns:
 
 Use the `select` operator to limit the columns emitted downstream to only the name and birthday columns from this data stream. This creates a privacy-compliant downstream table by not emitting the home address and government ID columns.
 
-<!--TODO(neil), code example. This doesn't need to work E2E, we can just assume the existence of some DataFrame `df` with a known schema. Similar to what we already have. -->
-
 Another use of projection is to reduce the use of memory and CPU resources downstream by eliminating the flow of unnecessary data (columns and rows) through the Spark engine.
 
 ## What is selection?
@@ -35,10 +33,41 @@ A selection operator only emits a record downstream if its columns satisfy a spe
 - Your filtering predicate can refer to column names as strings
 - You can use unary operators like `<`, `>`, `=`, `!=`
 
-<!--TODO(neil), code example-->.
-
 ## Projection and Selection
 
 Now, let's see these concepts together in a stateless stream:
 
-<!--TODO(neil)-->
+=== "Python"
+
+    ```python hl_lines="4"
+    df = ...  # streaming DataFrame with IOT device data with schema { device: string, deviceType: string, signal: double, time: DateType }
+
+    # Select the devices which have signal more than 10
+    df.select("device").where("signal > 10")
+    ```
+=== "Scala"
+
+    ```scala hl_lines="2-3"
+    // Select the devices which have signal more than 10
+    df.select("device").where("signal > 10")      // using untyped APIs
+    ds.filter(_.signal > 10).map(_.device)         // using typed APIs
+    ```
+=== "Java"
+
+    ```java hl_lines="5-7"
+    Dataset<Row> df = ...;    // streaming DataFrame with IOT device data with schema { device: string, type: string, signal: double, time: DateType }
+    Dataset<DeviceData> ds = df.as(ExpressionEncoder.javaBean(DeviceData.class)); // streaming Dataset with IOT device data
+
+    // Select the devices which have signal more than 10
+    df.select("device").where("signal > 10"); // using untyped APIs
+    ds.filter((FilterFunction<DeviceData>) value -> value.getSignal() > 10)
+      .map((MapFunction<DeviceData, String>) value -> value.getDevice(), Encoders.STRING());
+    ```
+=== "R"
+
+    ```r hl_lines="4"
+    df <- ...  # streaming DataFrame with IOT device data with schema { device: string, deviceType: string, signal: double, time: DateType }
+
+    # Select the devices which have signal more than 10
+    select(where(df, "signal > 10"), "device")
+    ```
