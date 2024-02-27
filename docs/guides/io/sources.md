@@ -26,7 +26,7 @@ Each of these sources support many options. See [Source reference](#source-refer
 !!! tip
     You can also use the file source as a testing source, rather than the socket source. To do this, create static DataFrames via `spark.createDataFrame` and write them to a specific directory on your system. Then, read those files using a Structured Streaming job with the `files` source.
 
-## Source reference for Structured Streaming
+## Source reference
 
 Expand the supported options boxes for each source type to find the specific option name and its supported values.
 
