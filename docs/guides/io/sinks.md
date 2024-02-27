@@ -2,7 +2,7 @@
 
 Output sinks store Structured Streaming results from a streaming DataFrame into external storage.
 
-## What are the built-in sinks?
+## Built-in sinks
 
 Structured Streaming supports the following production sinks out-of-the-box:
 
@@ -95,7 +95,7 @@ Supports Append, Update, Complete output modes.
 
 See the [Kafka Integration Guide](https://spark.apache.org/docs/latest/structured-streaming-kafka-integration.html) for the supported options and examples.
 
-### foreachBatch sink
+### ForeachBatch sink
 
 Supports Append, Update, Complete output modes. 
 
@@ -161,7 +161,7 @@ With `foreachBatch`, you can do the following.
         
         `foreachBatch` does not work with the continuous processing mode as it fundamentally relies on the micro-batch execution of a streaming query. If you write data in the continuous mode, use `foreach` instead.
 
-### foreach sink
+### Foreach sink
 
 Supports Append, Update, Complete output modes.
 
