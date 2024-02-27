@@ -39,7 +39,7 @@ While starting a micro-batch immediatley after the previous micro-batch finishes
 
 ## Trigger type use cases
 
-The following table describes the use case for each trigger type.
+The following table describes the use case for each type of trigger.
 
 | Trigger | Use case |
 | ----------- | ------------------------------------ |
