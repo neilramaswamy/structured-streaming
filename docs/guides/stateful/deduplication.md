@@ -1,6 +1,6 @@
 # Deduplication in Structured Streaming
 
-Data sources frequently have duplicate records. Duplication occurs because many data systems only have _at-least-once_ guarantees, which means that the same record can get delivered to the source system multiple times. For example, a web server might be trying to send a write to a database cluster. If that web server has a retry mechanism that isn't idempotent, that record could be produced and written multiple times. The result is duplicate records in the source, that you want to eliminate within the stream, where practical.
+Data sources frequently have duplicate records. Duplication occurs because many data systems only have _at-least-once_ guarantees, which means that the same record may be present multiple times in the same stream. For example, a web server might be trying to send a log to a database cluster. If that web server has a retry mechanism that isn't idempotent, that record could be produced and written multiple times.
 
 To accomplish this, you must select a method for deduplication. You can deduplicate on one or more columns, and then pass the columns on which you want to deduplicate data to one of the following deduplication methods.
 
