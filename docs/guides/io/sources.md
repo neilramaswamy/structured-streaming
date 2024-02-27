@@ -32,7 +32,7 @@ Expand the supported options boxes for each source type to find the specific opt
 
 ### File source
 
-The name for the file source format is one of the following:`csv`, `text`, `JSON`, or `Parquet`. In addition to the generically supported options for any file type, there is documentation of file-format-specific options for [Parquet](https://spark.apache.org/docs/latest/sql-data-sources-parquet.html), [ORC](https://spark.apache.org/docs/latest/sql-data-sources-orc.html), [JSON](https://spark.apache.org/docs/latest/sql-data-sources-json.html), [CSV](https://spark.apache.org/docs/latest/sql-data-sources-csv.html), and [text files](https://spark.apache.org/docs/latest/sql-data-sources-text.html).
+The name for the file source format is one of the following: `parquet`, `orc`, `json`, `csv`, or `text`. There are [generically supported options](https://spark.apache.org/docs/latest/sql-data-sources-generic-options.html) for any file type, as well as file-format specific data source options for each specific file source. For specific options for each of these file sources, see the docs for [Parquet](https://spark.apache.org/docs/latest/sql-data-sources-parquet.html#data-source-option), [ORC](https://spark.apache.org/docs/latest/sql-data-sources-orc.html#data-source-option), [JSON](https://spark.apache.org/docs/latest/sql-data-sources-json.html#data-source-option), [CSV](https://spark.apache.org/docs/latest/sql-data-sources-csv.html#data-source-option), and [text files](https://spark.apache.org/docs/latest/sql-data-sources-text.html#data-source-option).
 
 ??? info "Supported Options"
     | Option Name             | Information                                                                                        | Default         | Required?   |
@@ -46,6 +46,9 @@ The name for the file source format is one of the following:`csv`, `text`, `JSON
     | `sourceArchiveDir`      | Specifies the archive directory for cleaned-up files. It cannot be a sub-directory of `path`; if it were, archived files would be considered new and processed over and over again.                 | None | Only if `cleanSource` is set to `archive`. |
 
 ??? example 
+
+    The code below shows an example for the CSV source. Note that while the `maxFilesPerTrigger` option is common to all file sources, the `sep` option is specific to the CSV file source.
+
     === "Python"
 
         ```python
@@ -109,9 +112,6 @@ The name for the file source format is one of the following:`csv`, `text`, `JSON
         csvDF <- read.stream("csv", path = "/path/to/directory", schema = schema, sep = ";")
 
         ```
-
-!!! note 
-    The previous CSV examples for the file source specify the separator (`sep`) for the data in the CSV file. Specifying a seperator is only required for the CSV file source. It is not required for any of the other file sources.
 
 ### Kafka source
 
