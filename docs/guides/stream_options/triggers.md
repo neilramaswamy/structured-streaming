@@ -52,7 +52,7 @@ The following table describes the use case for each type of trigger.
 [^1]:
     We discuss how to wait for termination (and other such lifecycle events) in [Managing the Query Lifecycle]().
 
-## Trigger examples
+## Examples
  
 === "Python"
 

@@ -43,7 +43,7 @@ However, if you're sure that you no longer need to run a particular query, then 
 
 <!-- TODO(neil): Section on checkpoint performance. -->
 
-## Checkpointing examples
+## Examples
 
 === "Python"
 

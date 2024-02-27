@@ -92,7 +92,7 @@ After going through the suggestions above, you may find that your semantics, ope
 
 In these cases, you need to use one of Structured Streaming's "escape" hatches to make this work: [arbitrary stateful processing]() in combination with the `foreach`/`foreachBatch` sinks.
 
-## Output mode examples
+## Examples
 
 === "Python"
 
