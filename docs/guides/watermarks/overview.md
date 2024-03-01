@@ -31,3 +31,4 @@ The watermark delay determines the latency of our pipeline. A smaller watermark 
 
 In practice, you'll usually have SLAs on how delayed data can be, so you should use that to set your watermark delay.
 
+<!--until next microbatch closes a window, nothing get emitted - if delay if recieving next batch of data, window stays open-->
