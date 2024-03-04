@@ -1,6 +1,6 @@
 # Watermarks in Structured Streaming
 
-In Structured Streaming, stateful operators buffer records and intermediate results using a [state store](../stream_options/state_stores.md). A watermark for a stateful operator determines how long the streaming operator should wait for new records to appear for a given event-time window. Once no new records can be received for a given event-time window, results that can no longer be updated are emitted, buffered records and intermediate results are cleaned up. The longer the delay specified by the watermark, the larger the size of the intermediate state data. Records arriving too late are dropped. See [aggregations with watermarks](../stateful/aggregation.md) for a discussion of watermarks with streaming aggregations.
+In Structured Streaming, stateful operators buffer records and intermediate results using a [state store](../stream_options/state_stores.md). A watermark for a stateful operator determines how long the streaming operator should wait for new records to appear for a given event-time window. Once no new records can be received for a given event-time window, results that can no longer be updated are emitted, buffered records and intermediate results are cleaned up. The longer the delay specified by the watermark, the larger the size of the intermediate state data. Records arriving too late are dropped. See [aggregations](../stateful/aggregation.md) for a discussion of watermarks with streaming aggregations.
 
 !!! important
     Always specify a watermark to prevent unlimited growth of intermediate aggregate values consuming memory and potentially causing a machine crash due to out-of-memory errors.
@@ -32,3 +32,7 @@ The watermark delay determines the latency of the data in your pipeline. A small
 - If your watermark delay `y` is set to be larger than the maximum delay `x`, your window finalizes after receiving all records (resulting in more correct results at the expense of more latency). 
 
 In practice, you'll usually have SLAs on how delayed data can be, so you should use that to set your watermark delay.
+
+## Example
+
+See [Aggregation with watermark](../../examples/aggregation-with-watermark.md).
