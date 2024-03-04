@@ -1,6 +1,6 @@
 # Watermarks in Structured Streaming
 
-In Structured Streaming, stateful operators buffer records and intermediate results using a [state store](../stream_options/state_stores.md). A [watermark]() for a stateful operator determines how long the streaming operator should wait for new records to appear for a given event-time window, and when the engine can clean up buffered records and intermediate results to limit the size of intermediate state data. Records arriving too late are dropped. See [aggregations with watermarks](../stateful/aggregation.md) for a discussion of watermarks with streaming aggregations.
+In Structured Streaming, stateful operators buffer records and intermediate results using a [state store](../stream_options/state_stores.md). A watermark for a stateful operator determines how long the streaming operator should wait for new records to appear for a given event-time window. Once no new records can be received for a given event-time window, results that can no longer be updated are emitted, buffered records and intermediate results are cleaned up. The longer the delay specified by the watermark, the larger the size of the intermediate state data. Records arriving too late are dropped. See [aggregations with watermarks](../stateful/aggregation.md) for a discussion of watermarks with streaming aggregations.
 
 !!! important
     Always specify a watermark to prevent unlimited growth of intermediate aggregate values consuming memory and potentially causing a machine crash due to out-of-memory errors.
@@ -21,14 +21,14 @@ If the timestamps for event time in the next microbatch include records with tim
 - The streaming engine removes from state all records whose timestamp is older than 2:45 PM.
 - Emit downstream values for windows whose endtime is less thanb 2:45 PM.
 
+!!! note
+    Until the next microbatch is processed, the watermark does not advance, no time windows close, and no intermediate results are emitted - regardless of the amount of time that passes.
 
-## The Completeness and Latency Tradeoff
+## The tradeoff between completeness and latency
 
-The watermark delay determines the latency of our pipeline. A smaller watermark delay reduces the time before a stateful operator's windows closes. While low-latency is generally considered good, there is a tradeoff:
+The watermark delay determines the latency of the data in your pipeline. A smaller watermark delay reduces the time before a stateful operator's event-time windows closes. While low-latency is generally considered good, there is a tradeoff:
 
-- If your watermark delay `y` is smaller than the maximum delay `x`, your window could finalize and close before receiving all records (resulting in less correct results in favor of lower latency). 
+- If your watermark delay `y` is smaller than the maximum delay `x`, your event-time window could finalize and close before receiving all records (resulting in less correct results in favor of lower latency). 
 - If your watermark delay `y` is set to be larger than the maximum delay `x`, your window finalizes after receiving all records (resulting in more correct results at the expense of more latency). 
 
 In practice, you'll usually have SLAs on how delayed data can be, so you should use that to set your watermark delay.
-
-<!--until next microbatch closes a window, nothing get emitted - if delay if recieving next batch of data, window stays open-->
