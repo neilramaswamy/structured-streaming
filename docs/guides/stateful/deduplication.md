@@ -15,53 +15,55 @@ Spark has these two deduplication methods:
 !!! warning
     Do not use the `dropDuplicates` method unless you are sure that the columns on which you are deduplicating have low cardinality. Otherwise, you may encounter out of memory errors.
 
+## Example
+ 
+=== "Python"
+
+    ``` python
+            
+    spark = SparkSession. ...
+
+    # deduplicate using guid column with watermark based on eventTime column
+    streamingDf \
+        .withWatermark("eventTime", "10 hours") \
+        .dropDuplicatesWithinWatermark("guid")
+    ```
+
+=== "Scala"
+
+    ```scala
+
+    val spark: SparkSession = ...
+
+    // deduplicate using guid column with watermark based on eventTime column
+    streamingDf
+        .withWatermark("eventTime", "10 hours")
+        .dropDuplicatesWithinWatermark("guid")        
+    ```
+
+=== "Java"
+
+    ```java
+
+    SparkSession spark = ...
+
+    // deduplicate using guid column with watermark based on eventTime column
+    streamingDf
+        .withWatermark("eventTime", "10 hours")
+        .dropDuplicatesWithinWatermark("guid");        
+    ```
+
+=== "R"
+    Not available in R.
+
+
+
 ## Local deduplication with `dropDuplicatesWithinWatermark`
 
 The `dropDuplicatesWithinWatermark` method should be your first choice for deduplication when you know the interval of time within which you might receive duplicates. <!-- (TODO: is this true? what do people use to figure this out?) --> If you know that you'll have duplicates within a `x` minute interval, you can instruct Structured Streaming to hold onto records for `x` minutes. Structured Streaming also removes the records that have been around for more than `x` minutes, so that it doesn't hold onto an infinite number of records and consume large amounts of memory to hold potentially deduplicate records.
 
 <!-- add conceptual walkthrough-->
 For example, suppose you know that you'll have duplicates within 5 minutes of each other. If you receive a record, `ID = foo`, with event-time 6, you might receive duplicates up to an event-time of 5+6 (11). Watermarks tell Structured Streaming when its done receiving events before a certain time (in this case, time 11). If duplicates for the record `ID = foo` can arrive up until time 11, once Structured Streaming knows that it'll no longer receive event-times _before_ time 11, Structured Streaming knows to purge that record. That's where the name `dropDuplicatesWithinWatermark` comes from: for at least as many units of time within your watermark delay, Structured Streaming performs deduplication.
-
-??? example
- 
-    === "Python"
-
-        ``` python
-                
-        spark = SparkSession. ...
-
-        # deduplicate using guid column with watermark based on eventTime column
-        streamingDf \
-            .withWatermark("eventTime", "10 hours") \
-            .dropDuplicatesWithinWatermark("guid")
-        ```
-
-    === "Scala"
-
-        ```scala
-
-        val spark: SparkSession = ...
-
-        // deduplicate using guid column with watermark based on eventTime column
-        streamingDf
-            .withWatermark("eventTime", "10 hours")
-            .dropDuplicatesWithinWatermark("guid")        
-        ```
-
-    === "Java"
-
-        ```java
-
-        SparkSession spark = ...
-
-        // deduplicate using guid column with watermark based on eventTime column
-        streamingDf
-            .withWatermark("eventTime", "10 hours")
-            .dropDuplicatesWithinWatermark("guid");        
-        ```
-
-    === "R"
-        Not available in R.
 
 <!--For an end-to-end example, see [example](). not sure what you intend here-->
 
