@@ -97,151 +97,149 @@ However, the guarantee is strict only in one direction. Data delayed by more tha
 
 ## Examples of aggregations with event-time windows
 
-??? examples
+=== "Python"
 
-    === "Python"
-
-        ```python
-        spark = SparkSession. ...
-        
-        # Apply watermark to handle late data using tumbling or sliding window
-
-            windowedCounts = df \
-                .withWatermark("timestamp", "15 seconds") \
-                .groupBy(
-                    functions.window(col("timestamp"), "10 seconds"),
-                    col("value")
-                ) \
-                .count()
-
-        # Apply watermark to handle late data using static session window
-
-            windowedCounts = df \
-                .withWatermark("timestamp", "15 seconds") \
-                .groupBy(
-                    session.window(col("timestamp"), "10 seconds"),
-                    col("value")
-                ) \
-                .count()
-
-        # Apply watermark to handle late data using dynamic session window
-
-            sessionWindowExpr = when(col("storeId") == "store1", "5 seconds") \
-                .when(col("storeId") == "store2", "20 seconds") \
-                .otherwise("15 seconds")
-
-            # Create a session window column
-            sessionWindowCol = window(col("timestamp"), sessionWindowExpr)
-
-            # Apply watermark to handle late data
-            windowedCounts = df \
-                .withWatermark("timestamp", "15 seconds") \
-                .groupBy(sessionWindowCol, col("value")) \
-                .count()
-
-        ```
-
-    === "Scala"
-        ```scala
-
-        val spark: SparkSession = ...
-
-        // Apply watermark to handle late data using tumbling or sliding window
-
-            val windowedCounts = df
-                .withWatermark("timestamp", "15 seconds")
-                .groupBy(
-                    functions.window(col("timestamp"), "10 seconds"),
-                    col("value")
-                )
-                .count() 
-
-        // Apply watermark to handle late data using static session window
-
-            val windowedCounts = df
-                .withWatermark("timestamp", "15 seconds")
-                .groupBy(
-                    session.window(col("timestamp"), "10 seconds"),
-                    col("value")
-                )
-                .count()
-
-        # Apply watermark to handle late data using dynamic session window
-
-            val sessionWindowExpr = when(col("storeId") === "store1", "5 seconds")
-                .when(col("storeId") === "store2", "20 seconds")
-                .otherwise("15 seconds")
-
-            // Create a session window column
-            val sessionWindowCol = window(col("timestamp"), sessionWindowExpr)
-
-            // Apply watermark to handle late data
-            val windowedCounts = df
-                .withWatermark("timestamp", "15 seconds")
-                .groupBy(sessionWindowCol, col("value"))
-                .count()
-
-        ```
+    ```python
+    spark = SparkSession. ...
     
-    === "Java"
+    # Apply watermark to handle late data using tumbling or sliding window
 
-        ```java
-        SparkSession spark = ...
+        windowedCounts = df \
+            .withWatermark("timestamp", "15 seconds") \
+            .groupBy(
+                functions.window(col("timestamp"), "10 seconds"),
+                col("value")
+            ) \
+            .count()
 
-        // Apply watermark to handle late data using tumbling or sliding window
-        
-            Dataset<Row> windowedCounts = df
-                .withWatermark("timestamp", "15 seconds")
-                .groupBy(
-                        session_window(col("timestamp"), "10 seconds"),
-                        col("value")
+    # Apply watermark to handle late data using static session window
+
+        windowedCounts = df \
+            .withWatermark("timestamp", "15 seconds") \
+            .groupBy(
+                session.window(col("timestamp"), "10 seconds"),
+                col("value")
+            ) \
+            .count()
+
+    # Apply watermark to handle late data using dynamic session window
+
+        sessionWindowExpr = when(col("storeId") == "store1", "5 seconds") \
+            .when(col("storeId") == "store2", "20 seconds") \
+            .otherwise("15 seconds")
+
+        # Create a session window column
+        sessionWindowCol = window(col("timestamp"), sessionWindowExpr)
+
+        # Apply watermark to handle late data
+        windowedCounts = df \
+            .withWatermark("timestamp", "15 seconds") \
+            .groupBy(sessionWindowCol, col("value")) \
+            .count()
+
+    ```
+
+=== "Scala"
+    ```scala
+
+    val spark: SparkSession = ...
+
+    // Apply watermark to handle late data using tumbling or sliding window
+
+        val windowedCounts = df
+            .withWatermark("timestamp", "15 seconds")
+            .groupBy(
+                functions.window(col("timestamp"), "10 seconds"),
+                col("value")
+            )
+            .count() 
+
+    // Apply watermark to handle late data using static session window
+
+        val windowedCounts = df
+            .withWatermark("timestamp", "15 seconds")
+            .groupBy(
+                session.window(col("timestamp"), "10 seconds"),
+                col("value")
+            )
+            .count()
+
+    # Apply watermark to handle late data using dynamic session window
+
+        val sessionWindowExpr = when(col("storeId") === "store1", "5 seconds")
+            .when(col("storeId") === "store2", "20 seconds")
+            .otherwise("15 seconds")
+
+        // Create a session window column
+        val sessionWindowCol = window(col("timestamp"), sessionWindowExpr)
+
+        // Apply watermark to handle late data
+        val windowedCounts = df
+            .withWatermark("timestamp", "15 seconds")
+            .groupBy(sessionWindowCol, col("value"))
+            .count()
+
+    ```
+
+=== "Java"
+
+    ```java
+    SparkSession spark = ...
+
+    // Apply watermark to handle late data using tumbling or sliding window
+    
+        Dataset<Row> windowedCounts = df
+            .withWatermark("timestamp", "15 seconds")
+            .groupBy(
+                    session_window(col("timestamp"), "10 seconds"),
+                    col("value")
+            )
+            .count();
+
+    // Apply watermark to handle late data using static session window
+    
+        Dataset<Row> windowedCounts = df
+            .withWatermark("timestamp", "15 seconds")
+            .groupBy(
+                    functions.window(col("timestamp"), "10 seconds"),
+                    col("value")
                 )
                 .count();
 
-        // Apply watermark to handle late data using static session window
-        
-            Dataset<Row> windowedCounts = df
-                .withWatermark("timestamp", "15 seconds")
-                .groupBy(
-                     functions.window(col("timestamp"), "10 seconds"),
-                      col("value")
-                    )
-                    .count();
+    # Apply watermark to handle late data using dynamic session window
 
-        # Apply watermark to handle late data using dynamic session window
+        Column sessionWindowExpr = when(col("storeId").equalTo("store1"), lit("5 seconds"))
+            .when(col("storeId").equalTo("store2"), lit("20 seconds"))
+            .otherwise(lit("15 seconds"));
 
-            Column sessionWindowExpr = when(col("storeId").equalTo("store1"), lit("5 seconds"))
-                .when(col("storeId").equalTo("store2"), lit("20 seconds"))
-                .otherwise(lit("15 seconds"));
+        // Create a session window column
+        Column sessionWindowCol = window(col("timestamp"), sessionWindowExpr);
 
-            // Create a session window column
-            Column sessionWindowCol = window(col("timestamp"), sessionWindowExpr);
+        // Apply watermark to handle late data
+        Dataset<Row> windowedCounts = df
+            .withWatermark("timestamp", "15 seconds")
+            .groupBy(sessionWindowCol, col("value"))
+            .count();
 
-            // Apply watermark to handle late data
-            Dataset<Row> windowedCounts = df
-                .withWatermark("timestamp", "15 seconds")
-                .groupBy(sessionWindowCol, col("value"))
-                .count();
+    ```
 
-        ```
+=== "R"
+
+    ```r
+
+    sparkR.session(...)
     
-    === "R"
+    # Apply watermark to handle late data using tumbling or sliding window
+    
+    windowedCounts <- df %>%
+        withWatermark("timestamp", "15 seconds") %>%
+        groupBy(
+        window(col("timestamp"), "10 seconds"),
+        col("value")
+        ) %>%
+        count()
 
-        ```r
+    # Session windows not supported in R
 
-        sparkR.session(...)
-     
-        # Apply watermark to handle late data using tumbling or sliding window
-     
-        windowedCounts <- df %>%
-            withWatermark("timestamp", "15 seconds") %>%
-            groupBy(
-            window(col("timestamp"), "10 seconds"),
-            col("value")
-            ) %>%
-            count()
-
-        # Session windows not supported in R
-
-        ```
+    ```
 
