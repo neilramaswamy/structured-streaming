@@ -61,7 +61,7 @@ Then, repeatedly, take the following steps:
 
     1. The "snip" statement indicates that the example is excluding code from the previous code block (to avoid repeating code sections).
 
-    The final step is to set up the query to write to the [memory sink](). The memory sink provides us a convenient way to read the output of the Structured Streaming query.
+    The final step is to set up the query to write to the [memory sink](). The memory sink provides us a convenient way to read the output of the Structured Streaming query via Spark APIs.
 
     ```python
     # -- snip --
