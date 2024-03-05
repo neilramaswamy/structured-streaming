@@ -45,7 +45,7 @@ Then, repeatedly, take the following steps:
     )
     ```
 
-    Next, define your streaming Spark operators. In this example, you'll use a filter and a windowed aggregation, but you could also use other operators (such as stateless operators, deduplication, or stream-stream joins).
+    Next, define your streaming Spark operators. In this example, we'll use a filter and a windowed aggregation, but you could also use other operators (such as stateless operators, deduplication, stream-stream joins, etc.).
 
     ```python hl_lines="1 5-9"
     from pyspark.sql.functions import window, col
@@ -61,7 +61,7 @@ Then, repeatedly, take the following steps:
 
     1. The "snip" statement indicates that the example is excluding code from the previous code block (to avoid repeating code sections).
 
-    The final step is to set up the query to write to the [memory sink](). The memory sink provides us a convenient way to read the output of the Structured Streaming query.
+    The final step is to set up the query to write to the [memory sink](). The memory sink provides us a convenient way to read the output of the Structured Streaming query via Spark APIs.
 
     ```python
     # -- snip --
