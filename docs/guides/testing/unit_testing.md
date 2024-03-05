@@ -29,7 +29,7 @@ Then, repeatedly, take the following steps:
     # The directory from which your query incrementally reads files
     SOURCE_PATH = "/tmp/my-unit-test"
 
-    # The file source requires a schema to be defined first.
+    # The file source will require a schema, so we are defining one here.
     schema = (
         StructType()
             .add("name", StringType())
