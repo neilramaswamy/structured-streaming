@@ -9,9 +9,23 @@ spark structured streaming state store
 
 -->
 
-# State Stores
+# Stateful Operations and State Stores
 
 In the world of streaming, stateful operations need to buffer records and intermediate state to compute their results: records for the same aggregate window, for example, might arrive across several micro-batches. State stores are configurable key-value stores that stateful operators use to store these buffered records and intermediate state.
+
+## Overview of stateful operators
+
+Stateful operators read each record in a stream and remember information (keep the state) for all records for a period of time. For example, an aggregation operator that calculates a running total of sales per hour from the data stream requires that the stateful operator keep track of (remember) information from the records in the stream to calculate the hourly total. Another aggregation operator could also be calculating a running total of sales per day. Similarly, a deduplication operator must remember previous records to determine if there is duplication. For information on state storage options, see [state stores](../stream_options/state_stores.md).
+
+### Common stateful operators
+
+The most common stateful operators are [aggregations](../stateful/aggregation.md), [deduplication](../stateful/deduplication.md), and [stream-stream joins]().
+
+### Arbitrary stateful operations
+
+However, many use cases require more advanced stateful operations than aggregations. For example, in many usecases, you have to track sessions from data streams of events. For doing such sessionization, you will have to save arbitrary types of data as state, and perform arbitrary operations on the state using the data stream events in every trigger. Since Spark 2.2, this can be done using the operation `mapGroupsWithState` and the more powerful operation `flatMapGroupsWithState`. Both operations allow you to apply user-defined code on grouped Datasets to update user-defined state. For more concrete details, take a look at the API documentation ([Scala](https://spark.apache.org/docs/latest/api/scala/org/apache/spark/sql/streaming/GroupState.html)/[Java](https://spark.apache.org/docs/latest/api/java/org/apache/spark/sql/streaming/GroupState.html)) and the examples ([Scala](https://github.com/apache/spark/blob/v3.5.1/examples/src/main/scala/org/apache/spark/examples/sql/streaming/StructuredComplexSessionization.scala)/[Java](https://github.com/apache/spark/blob/v3.5.1/examples/src/main/java/org/apache/spark/examples/sql/streaming/JavaStructuredComplexSessionization.java)).
+
+## Overview of state stores
 
 While state stores have a simple get/put/delete/range-scan API, their internals are slightly more complex. They have to handle some of the following complexities:
 
@@ -20,7 +34,7 @@ While state stores have a simple get/put/delete/range-scan API, their internals 
 
 Different state providers take various approaches to these two problems, and choosing the right state store depends on your workload. We discuss how to choose a state store at the end of this guide. But first, we'll look at the two supported state stores, HDFS and RocksDB, in more detail.
 
-## The HDFS State Store
+## The HDFS state store
 
 The HDFS state store is the default implementation of the state store. It stores _all_ state in memory, which has the advantage that it will never have to a disk operation to service a get or a put. However, if you have too much state, you could encounter some of the following issues:
 
@@ -29,7 +43,7 @@ The HDFS state store is the default implementation of the state store. It stores
 
 At the end of each batch, the HDFS state store will save its state to your [checkpoint location](), which must be an HDFS-compatible filesystem.
 
-## The RocksDB State Store
+## The RocksDB state store
 
 As mentioned, the HDFS state store might have performance and memory issues with large amounts of state. To mitigate this, Spark 3.2 added support for the RocksDB state store. The RocksDB state store has two main benefits:
 
@@ -43,7 +57,7 @@ In the examples below, we show you how to enable changelog checkpointing.
 [^1]:
     RocksDB is an [LSM tree](https://en.wikipedia.org/wiki/Log-structured_merge-tree), so what we're referring to as "underlying data files" are its [SST files](https://github.com/facebook/rocksdb/wiki/A-Tutorial-of-RocksDB-SST-formats).
 
-## Picking the Right State Store
+## Picking the right state store
 
 First, if your query doesn't have any stateful operators, you can stop reading: state stores won't help you!
 
