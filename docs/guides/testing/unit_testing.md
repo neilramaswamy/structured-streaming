@@ -45,7 +45,7 @@ Then, repeatedly, take the following steps:
     )
     ```
 
-    Next, define your streaming Spark operators. In this example, you'll use a filter and a windowed aggregation, but you could also use other operators (such as stateless operators, deduplication, or stream-stream joins).
+    Next, define your streaming Spark operators. In this example, we'll use a filter and a windowed aggregation, but you could also use other operators (such as stateless operators, deduplication, stream-stream joins, etc.).
 
     ```python hl_lines="1 5-9"
     from pyspark.sql.functions import window, col
