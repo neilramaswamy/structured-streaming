@@ -37,7 +37,7 @@ In practice, you'll usually have SLAs on how delayed data can be, so you should 
 
 **Error message**: "Append output mode not supported when there are streaming aggregations on streaming DataFrames/DataSets without watermark".
 
-Append output mode not supported when there are streaming aggregations on streaming DataFrames/DataSets without watermark. This is by design. You must apply a watermark to the DataFrame if you want to use append mode on an aggregated DataFrame.
+Append output mode not supported when there are streaming aggregations on streaming DataFrames/DataSets without a atermark. This is by design. You must apply a watermark to the DataFrame if you want to use append mode on an aggregated DataFrame.
 
 ## Example
 
