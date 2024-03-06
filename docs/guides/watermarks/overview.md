@@ -35,15 +35,9 @@ In practice, you'll usually have SLAs on how delayed data can be, so you should 
 
 ## Watermark required when aggregrating data and using append output mode
 
-- **Error message**: "Append output mode not supported when there are streaming aggregations on streaming DataFrames/DataSets without watermark".
-- **Error message explained**: The error message indicates that you’re using append mode for writing aggregated data, but your DataFrame lacks a watermark. In other words, you’re trying to use append mode on an aggregated DataFrame without specifying an event-time column or a watermark.
-- **Solution**:
+Append output mode not supported when there are streaming aggregations on streaming DataFrames/DataSets without watermark. This is by design. You must apply a watermark to the DataFrame if you want to use append mode on an aggregated DataFrame.
 
-  - **Apply a watermark**: You must apply a watermark to your DataFrame if you want to use append mode on an aggregated DataFrame.
-  - **Event-time Column**: Ensure that your aggregation has an event-time column (usually a timestamp).
-  - **Group and aggregate**: Group the data by a window (time interval) and compute the desired aggregation (e.g., count).
-  - **Call .withWatermark()**: Apply .withWatermark("timestamp", "10 minutes") (replace with your actual timestamp column and watermark duration).
-  - **Perform Aggregation**: Perform the aggregation (such as groupBy and count) after applying the watermark.
+**Error message**: "Append output mode not supported when there are streaming aggregations on streaming DataFrames/DataSets without watermark".
 
 ## Example
 
