@@ -81,7 +81,7 @@ The `dropDuplicates` method allows you deduplicate over _all_ records of the str
 - **Con**: Potential out-of-memory errors. If you have enough records, you'll run out of space to store records and cause a machine crash.
 
 ??? note "Historical note"
-    Before `dropDuplicatesWithinWatermark` was introduced in Spark 3.5.0, the recommendation was to perform deduplication with state removal by passing an event-time column to `dropDuplicates`. This still works, but we highly recommend using `dropDuplicatesWithinWatermark` instead; it's far less error-prone. For a further discussion, see this [Stack Overflow post](https://stackoverflow.com/a/77441576).
+    Before `dropDuplicatesWithinWatermark` was introduced in Spark 3.5.0, the recommendation was to perform deduplication with state removal by passing an event-time column to `dropDuplicates`. This still works, but we highly recommend using `dropDuplicatesWithinWatermark` instead; it's less error prone. `dropDuplicates` also has an unintuitive subtlety about that you can check out in this [Stack Overflow answer](https://stackoverflow.com/a/77441576).
 
 ??? example
  
