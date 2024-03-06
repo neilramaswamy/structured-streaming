@@ -97,8 +97,7 @@ The `dropDuplicates` method allows you deduplicate over _all_ records of the str
         # With watermark using guid and eventTime columns
         streamingDf \
             .withWatermark("eventTime", "10 seconds") \
-            .dropDuplicates("guid", "eventTime")  
-  
+            .dropDuplicates("guid", "eventTime")   
         ```
 
     === "Scala"
@@ -112,7 +111,8 @@ The `dropDuplicates` method allows you deduplicate over _all_ records of the str
 
         // With watermark using guid and eventTime columns
         streamingDf
-            .withWatermark("eventTime", "10 secon        
+            .withWatermark("eventTime", "10 seconds")
+            .dropDuplicates("guid", "eventTime")        
         ```
 
     === "Java"
