@@ -101,23 +101,23 @@ nav:
           - Operational considerations: tour/jobs/operational_considerations.md
           - Deployment: tour/jobs/deployment.md
   - Guides:
-      - Overview: guides/overview.md
+      - Overview: 
+          - What is structured streaming: guides/overview.md
       - Input and output:
           - Sources: guides/io/sources.md
           - Sinks: guides/io/sinks.md
           - Binary formats: guides/io/binary_formats.md
-      - Stateless operators:
-          - Projection and selection: guides/stateless/projection_selection.md
-          - Additional operators: guides/stateless/additional_operators.md
-      - Stateful operators:
-          - Overview: guides/stateful/overview.md
-          - Watermarks:
-              - Overview: guides/watermarks/overview.md
-              - Multiple watermarks: guides/watermarks/multiple.md
-          - Aggregation: guides/stateful/aggregation.md
-          - Deduplication: guides/stateful/deduplication.md
-          - Joins: guides/stateful/joins.md
-          - Groups with state: guides/stateful/groups_with_state.md
+      - Operators:
+          - Overview: guides/operators/overview.md
+          - Stateless operators:
+              - Projection and selection: guides/operators/stateless/projection_selection.md
+              - Additional operators: guides/operators/stateless/additional_operators.md
+          - Stateful operators:
+              - Watermarks: guides/operators/stateful/watermarks.md
+              - Aggregation: guides/operators/stateful/aggregation.md
+              - Deduplication: guides/operators/stateful/deduplication.md
+              - Joins: guides/operators/stateful/joins.md
+              - Groups with state: guides/operators/stateful/groups_with_state.md
       - Stream options:
           - Overview: guides/stream_options/overview.md
           - Triggers: guides/stream_options/triggers.md
