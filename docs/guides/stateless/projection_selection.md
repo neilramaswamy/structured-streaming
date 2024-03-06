@@ -3,7 +3,7 @@
 
 Stateless operators read each record in a stream and limit the columns or the rows (or both) from that record that are emitted downstream. This limit, based on specified conditions, is independent of any other records in the stream.
 
-Stateful operators, on the other hand, read each record in a stream and remember information (keep the state) for all records for a period of time. For example, an aggrgation operator that calculates a running total of sales per hour from the data stream requires that the stateful operator keep track of (remember) information from the records in the stream to calculate the hourly total. Another aggregation operator could also be calculating a running total of sales per day. Similarly, a deduplication operator must remember previous records to determine if there is duplication.
+Stateful operators, on the other hand, read each record in a stream and remember information (keep the state) for all records for a period of time. For example, an aggregation operator that calculates a running total of sales per hour from the data stream requires that the stateful operator keep track of (remember) information from the records in the stream to calculate the hourly total. Another aggregation operator could also be calculating a running total of sales per day. Similarly, a deduplication operator must remember previous records to determine if there is duplication.
 
 The most common stateless operators are projection and selection.
 

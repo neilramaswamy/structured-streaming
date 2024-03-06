@@ -13,7 +13,7 @@ spark structured streaming interval [x]
 -->
 
 
-# Triggers
+# Triggers in Structured Streaming
 
 Structured Streaming repeatedly reads and processes data from the source in micro-batches; triggers configure how frequently a Structured Streaming query runs its micro-batches. The following are some examples of trigger definitions:
 
@@ -26,7 +26,7 @@ While starting a micro-batch immediatley after the previous micro-batch finishes
 !!! tip
     If you have a batch Spark job that you run as a [cron job](https://wikipedia.org/wiki/Cron), consider running it as a Structured Streaming job with a periodic trigger. It will be more reliable and efficient than repeated batch jobs.
 
-## Supported triggers
+## Available trigger types
 
 <!-- TODO(neil): is maxFilesPerTrigger really maxFilesPerMicroBatch? -->
 | Trigger | Description                          |
