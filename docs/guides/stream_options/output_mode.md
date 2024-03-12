@@ -1,4 +1,4 @@
-# Output Mode
+# Output modes in Structured Streaming
 
 !!! info
     Before reading this article, you should be familiar with [watermarks](), [triggers](../stream_options/triggers.md), [stateful operators](../stateful/aggregation.md), and [stateless operators](../stateless/projection_selection.md).
@@ -23,7 +23,7 @@ There are three output modes that tell an operator _what_ records to emit during
 
 Note that append mode and update mode are semantically equivalent for stateless operators. For a stateless operator like `select`, the row that results from taking a subset of a a source record's columns in a given trigger has two properties: it will never change in the future  (it satisfies the append mode requirements), and that particular record must not have existed in the previous trigger (it satisfies the update mode requirements).
 
-## Conceptual output mode example using streaming aggregation operator
+## Conceptual output mode example
 
 Consider a [streaming aggregation]() that calculates the total revenue generated _every hour_ at a store with a watermark delay of 15 minutes. Suppose our Structured Streaming query processes the following records in its first micro-batch:
 
@@ -57,13 +57,13 @@ To summarize, stateful operators behave in the following way:
 - In update mode, records that changed since the previous trigger are (re-)emitted
 - In complete mode, all records ever produced by the stateful operator are (re-)emitted
 
-## Selecting the right output mode
+## Select the appropriate output mode
 
 If you're using only stateless operators in your query, you don't need to configure an output mode. With a query using only stateless operators, an individual record doesn't depend on any other record, so an emitted row can never change; thus, update mode behaves the same way as append mode.
 
 If you have _any_ stateful operators in your pipeline, see the following considerations.
 
-### Consider application semantics
+### Consider your application semantics
 
 Primarily, you want to consider the semantics of your application:
 
@@ -78,14 +78,14 @@ Some operators behave in ways that make supporting certain output modes difficul
 
 Not all sinks support all output modes. This is not a Structured Streaming limitation. Rather, to support update mode, a sink needs to have some notion of recency, so that they serve the most recent update that Structured Streaming wrote to them. See [sink compatibility matrix](). <!--need to create - NEIL / Carl TO DO -->
 
-### Consider non-functional requirements
+### Non-functional requirements to consider
 
 Finally, you should also keep in mind some non-functional (such as latency and cost) implications of particular output modes:
 
 - Append mode forces stateful operators to emit results only once their resulting rows won't change. For stateful aggregations and joins, this is _at least_ as long as your watermark delay. A watermark delay of `1 hour` in the append output mode means that your records _will_ have at least a 1 hour delay before being emitted downstream.
 - Update mode results in one write per trigger, per aggregate value. If you are using the [foreachBatch or foreach sink]() and are writing to an OLTP database that charges per write, your database bill might be expensive.
 
-### Closing thoughts
+### Additional considerations
 
 After going through the suggestions above, you may find that your semantics, operator or sink compatibility, and non-functional requirements don't align. For example, consider the following situation:
 
