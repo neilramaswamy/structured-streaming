@@ -118,4 +118,4 @@ Then, repeatedly, take the following steps:
 
     You'll notice that in all of these examples, you are making an assertion about the output table's length. In practice, you should be doing `DataFrame` comparison, but that's out of scope for this guide.
 
-    For a reference on how to do `DataFrame` comparison, see [PySpark reference](https://spark.apache.org/docs/latest/api/python/reference/api/pyspark.testing.assertDataFrameEqual.html) or use a 3rd party testing library, such as [Chispa](https://github.com/MrPowers/chispa).
+    For a reference on how to do `DataFrame` comparison, see the [PySpark reference](https://spark.apache.org/docs/latest/api/python/reference/api/pyspark.testing.assertDataFrameEqual.html) or use a 3rd party testing library, such as [Chispa](https://github.com/MrPowers/chispa).
