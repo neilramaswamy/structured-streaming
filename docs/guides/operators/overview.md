@@ -9,7 +9,7 @@ Remember that the choice between stateful and stateless operators depends on the
 
 Stateless operators process each record in a stream independently of any other records in the stream. These operators are well-suited for simpler operations. They do not maintain any accumulated state across batches or time intervals.
 
-Use a stateless operator to limit the columns or the rows (or both) from a record that are emitted downstream. Examples of stateless operators include map, filter, and other transformations that don’t require context from previous data in the stream. See [projection and selection](../operators/stateless/projection_selection.md) and [additional stateless operators](../operators/stateless/additional_operators.md).
+Use a stateless operator to limit the columns or the rows (or both) from a record that are emitted downstream. Examples of stateless operators include `map`, `filter`, and other "higher order" functions. See [projection and selection](../operators/stateless/projection_selection.md) and [additional stateless operators](../operators/stateless/additional_operators.md).
 
 ## Stateful operators
 
@@ -22,7 +22,7 @@ While stateful operations provide powerful capabilities, they can be more memory
 
 ### Common stateful operators
 
-The most common stateful operators are [aggregations](../operators/stateful/aggregation.md), [deduplication](../operators/stateful/deduplication.md), and [stream-stream joins](../operators/stateful/joins.mc).
+The most common stateful operators are [aggregations](../operators/stateful/aggregation.md), [deduplication](../operators/stateful/deduplication.md), and [stream-stream joins](../operators/stateful/joins.md).
 
 ### Arbitrary stateful operations
 
