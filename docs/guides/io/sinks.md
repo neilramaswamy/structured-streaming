@@ -2,9 +2,9 @@
 
 Structured Streaming writes its results to a sink that you specify.
 
-## Built-in sinks
+## Built-in production and development sinks
 
-Structured Streaming supports the following production sinks out-of-the-box:
+Structured Streaming supports the following sinks out-of-the-box:
 
 - **File sink** - Stores the output to a specified directory and format. Supports exactly-once fault tolerance.
 - **Kafka sink** - Stores the output to one or more topics in Kafka. Supports at-least-once fault tolerance.
