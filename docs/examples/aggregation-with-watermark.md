@@ -4,7 +4,7 @@ In this example, we'll discuss how to write an aggregation with a watermark. We'
 - [Watermarks]()
 - [Unit testing](../guides/testing/unit_testing.md)
 
-## Writing the code
+## Write the code
 
 As with all Structured Streaming code, you want to create a source, transform it, set stream options, and then write it to a sink. For ease of understanding examples, we'll use the file source and enhanced console sink, available in Spark 4.0 and higher. See the inline annotations for information about what we're doing.
 
@@ -53,7 +53,7 @@ As with all Structured Streaming code, you want to create a source, transform it
     2. In PySpark, you have to explicitly _call_ (i.e. `()`) the SQL types. If you don't, you'll get an error
     3. Note: this prints to the driver's Log4J logs. In an interactive environment, you won't see them inline. Be sure to check the driver logs (from the SparkUI) to see these.
 
-## Running your example
+## Run your example
 
 While it might be tempting to write a huge amount of data to your stream and see Spark work really quickly and reliably, when writing examples, it's imperative that you first test your code, as described in [Unit Testing](../guides/testing/unit_testing.md). You should pass small amounts of data through your stream and inspect the output; this way, you'll be able to precisely see how source data, operator transformations, watermarks, state, and resulting data _actually_ behave.o
 

@@ -25,7 +25,7 @@ The checkpoint location directory stores the following:
 
 Both progress tracking and state management are central to the fault-tolerance of the Structured Streaming engine, so the default interval at which progress and operator state are written is every micro-batch. Checkpointing cannot be fully disabled, but there are some [checkpoint optimizations]() you can enable to make the effects of checkpoint location operations less expensive.
 
-## Select a checkpoint location
+## Choose a checkpoint location
 
 Your checkpoint location should be a fixed, per-query directory in cloud-storage (like Amazon S3). For your convenience, it should be somewhat self-describing, so that you know the query to which a given checkpoint location corresponds. For example, if you are in the Data Science division of your company and you are generating a product usage dashboard, you could use `s3://data-science/streams/product-usage` as the directory location name.
 
