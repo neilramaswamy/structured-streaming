@@ -1,13 +1,13 @@
 # Streaming Operators
 
-In Structured Streaming, operators incrementally perform computation on a data stream as each batch of data arrives, such as filtering columns and rows, aggregating values, and performing joins. To process a given record, _stateless_ operators can do so independently of other records in the data stream, while _stateful_ operators need to use context (i.e. "state") of the other records they have seen in the data stream.```
+In Structured Streaming, operators incrementally perform computation on a data stream as each batch of data arrives, such as filtering columns and rows, aggregating values, and performing joins. To process a given record, _stateless_ operators can do so independently of other records in the data stream, while _stateful_ operators need to use context ("state") of the other records they have seen in the data stream.
 
-Whether stateful or stateless, Spark Streaming provides flexibility to handle various use cases efficiently.
+Whether stateful or stateless, Structured Streaming provides flexibility to handle various use cases efficiently.
 Remember that the choice between stateful and stateless operators depends on the complexity of your processing logic and the specific requirements of your streaming application.
 
 ## Stateless operators
 
-Stateless operators process each record in a stream independently of any other records in the stream. These operators are well-suited for simpler operations with real-time processing requirements. They do not maintain any accumulated state across batches or time intervals.
+Stateless operators process each record in a stream independently of any other records in the stream. These operators are well-suited for simpler operations. They do not maintain any accumulated state across batches or time intervals.
 
 Use a stateless operator to limit the columns or the rows (or both) from a record that are emitted downstream. Examples of stateless operators include map, filter, and other transformations that don’t require context from previous data in the stream. See [projection and selection](../operators/stateless/projection_selection.md) and [additional stateless operators](../operators/stateless/additional_operators.md).
 
