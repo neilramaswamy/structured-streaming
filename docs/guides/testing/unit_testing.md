@@ -22,12 +22,14 @@ Then, repeatedly, take the following steps:
     To setup your query, start by reading from a local directory of Parquet files. The choice of using Parquet is arbitrary; you can use any file format described in the [file source reference](../io/sources.md#file-source):
 
     ```python
+    import os
     from pyspark.sql.types import StructType, StringType, TimestampType
 
     assert(spark != None)
 
     # The directory from which your query incrementally reads files
     SOURCE_PATH = "/tmp/my-unit-test"
+    os.makedirs(SOURCE_PATH, exist_ok=True)
 
     # The file source will require a schema, so we are defining one here.
     schema = (
@@ -65,7 +67,7 @@ Then, repeatedly, take the following steps:
 
     ```python
     # -- snip --
-    QUERY_NAME = "my-unit-test"
+    QUERY_NAME = "my_unit_test"
 
     query = (windowed_counts
         .writeStream
@@ -104,7 +106,7 @@ Then, repeatedly, take the following steps:
     import pyspark.testing.assertDataFrameEqual
 
     spark.createDataFrame(
-        ["bird", ts(36)],
+        [("bird", ts(36))],
         schema
     ).write.mode("append").parquet(SOURCE_PATH)
 

@@ -3,7 +3,7 @@
 
 Stateless operators read each record in a stream and limit the columns or the rows (or both) from that record that are emitted downstream. This limit, based on specified conditions, is independent of any other records in the stream.
 
-Stateful operators, on the other hand, read each record in a stream and remember information (keep the state) for all records for a period of time. For example, an aggrgation operator that calculates a running total of sales per hour from the data stream requires that the stateful operator keep track of (remember) information from the records in the stream to calculate the hourly total. Another aggregation operator could also be calculating a running total of sales per day. Similarly, a deduplication operator must remember previous records to determine if there is duplication.
+Stateful operators, on the other hand, read each record in a stream and remember information (keep the state) for all records for a period of time. For example, an aggregation operator that calculates a running total of sales per hour from the data stream requires that the stateful operator keep track of (remember) information from the records in the stream to calculate the hourly total. Another aggregation operator could also be calculating a running total of sales per day. Similarly, a deduplication operator must remember previous records to determine if there is duplication.
 
 The most common stateless operators are projection and selection.
 
@@ -23,8 +23,6 @@ Let's assume that the data stream has the following columns:
 
 Use the `select` operator to limit the columns emitted downstream to only the name and birthday columns from this data stream. This creates a privacy-compliant downstream table by not emitting the home address and government ID columns.
 
-<!--TODO(neil), code example. This doesn't need to work E2E, we can just assume the existence of some DataFrame `df` with a known schema. Similar to what we already have. -->
-
 Another use of projection is to reduce the use of memory and CPU resources downstream by eliminating the flow of unnecessary data (columns and rows) through the Spark engine.
 
 ## What is selection?
@@ -35,10 +33,41 @@ A selection operator only emits a record downstream if its columns satisfy a spe
 - Your filtering predicate can refer to column names as strings
 - You can use unary operators like `<`, `>`, `=`, `!=`
 
-<!--TODO(neil), code example-->.
-
 ## Projection and Selection
 
 Now, let's see these concepts together in a stateless stream:
 
-<!--TODO(neil)-->
+=== "Python"
+
+    ```python hl_lines="4"
+    df = ...  # streaming DataFrame with IOT device data with schema { device: string, deviceType: string, signal: double, time: DateType }
+
+    # Select the devices which have signal more than 10
+    df.select("device").where("signal > 10")
+    ```
+=== "Scala"
+
+    ```scala hl_lines="2-3"
+    // Select the devices which have signal more than 10
+    df.select("device").where("signal > 10")      // using untyped APIs
+    ds.filter(_.signal > 10).map(_.device)         // using typed APIs
+    ```
+=== "Java"
+
+    ```java hl_lines="5-7"
+    Dataset<Row> df = ...;    // streaming DataFrame with IOT device data with schema { device: string, type: string, signal: double, time: DateType }
+    Dataset<DeviceData> ds = df.as(ExpressionEncoder.javaBean(DeviceData.class)); // streaming Dataset with IOT device data
+
+    // Select the devices which have signal more than 10
+    df.select("device").where("signal > 10"); // using untyped APIs
+    ds.filter((FilterFunction<DeviceData>) value -> value.getSignal() > 10)
+      .map((MapFunction<DeviceData, String>) value -> value.getDevice(), Encoders.STRING());
+    ```
+=== "R"
+
+    ```r hl_lines="4"
+    df <- ...  # streaming DataFrame with IOT device data with schema { device: string, deviceType: string, signal: double, time: DateType }
+
+    # Select the devices which have signal more than 10
+    select(where(df, "signal > 10"), "device")
+    ```
