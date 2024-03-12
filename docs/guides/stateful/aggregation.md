@@ -1,10 +1,12 @@
 # Aggregations in Structured Streaming
 
-Aggregations over event-time windows ("streaming aggregations") with Structured Streaming are similar to using `GROUP BY` in batch operations in SQL: they compute some aggregate value for each value in the grouping columns you specify. 
+Aggregations over event-time windows (streaming aggregations) with Structured Streaming are similar to using `GROUP BY` in batch operations in SQL - they compute some aggregate value for each value in the grouping columns you specify. 
 
-In Structured Streaming, the grouping column is time, and event-time is the time embedded in the data itself. This allows window-based aggregations (such as the number of events every minute) to be just a special type of grouping on the event-time column – each time window is a group and each row can belong to multiple windows (groups). 
+In Structured Streaming, the grouping column is generally time, and event-time is the time embedded in the data itself. While you can group on any column, grouping on time is essential for handling data that arrives out of order or with varying timestamps (records earlier in time can arrive after records later in time). By grouping data based on event-time, you can perform aggregations (such as counting, summing, averaging) over specific time windows (such as 5-minute intervals) or other custom intervals.
 
-Aggregations in Structured Streaming have the added complication that records can delayed and thus come out-of-order (records earlier in time can arrive after records later in time). In Structured Streaming, aggregate values are maintained for each window into which the event-time of a row falls. 
+- Grouping by time allows you to create time windows for aggregations.
+- A time window defines a fixed-size interval of time (e.g., 10 minutes) and aggregates data within that window.
+For instance, you can group events into 10-minute windows and compute the count of events within each window.
 
 ## Conceptual example of streaming aggregations
 
@@ -38,10 +40,10 @@ Because there can be late arriving records, the central questions for streaming 
 
 ### When to emit streaming aggregation values
 
-The [output mode](../stream_options/output_mode.md) determines when the streaming aggreation operator emits aggregate values.
+ In Structured Streaming, the choice of when to emit streaming aggregation values depends on the desired behavior and use case. The [output mode](../stream_options/output_mode.md) determines when the streaming aggreation operator emits aggregate values.
 
-- **Append mode**: By default, all streaming queries run in append mode. In this mode, streaming operators only emit rows that won't change in future triggers.
-- **Update mode**: In update mode, streaming operators emit all rows that changed during the trigger, even if the emitted record might change in a subsequent trigger.
+- **Append mode**: By default, all streaming queries run in append mode. In this mode, streaming operators only emit rows that won't change due to later arriving records in a future micro-batch. Intermediate, buffered results are not emitted until the time period for receiving late arriving records has passed. See [watermarks](../stateful/watermarks.md).
+- **Update mode**: In update mode, streaming operators emit all rows that changed during the trigger, even if the emitted record might change as the result of a data in subsequent micro-batch.
 - **Complete mode**: In complete mode, _all_ resulting rows ever produced by the streaming operator are emitted downstream.
 
 ### When to stop updating streaming aggregation values
@@ -53,47 +55,50 @@ The [watermark]() for a streaming aggregation operator determines how long the s
 
 ## Time windows
 
-Spark supports three types of event-time windows for aggregations:
+Spark supports three types of event-time windows for aggregations. See [Examples of aggregations with event-time window](#examples-of-aggregations-with-event-time-windows).
 
-- **Tumbling (fixed) windows**: Tumbling windows are a series of fixed-sized, non-overlapping and contiguous time intervals, such as every 60 minutes. An input can only be bound to a single window. Tumbling uses the `window` function. See [Examples of aggregations with event-time window](#examples-of-aggregations-with-event-time-windows).
+### Tumbling (fixed) windows
 
-    ![tumbling windows](/assets/tumbling_windows.png)
+Tumbling windows are a series of fixed-sized, non-overlapping and contiguous time intervals, such as every 60 minutes. An input can only be bound to a single window. Tumbling uses the `window` function.
 
-- **Sliding windows**: Sliding windows are also fixed-sized, but windows can overlap if the duration of the slide is smaller than the duration of window. For example, the window could be a duration of 10 minutes with a slide of 5 minutes. In this case an input can be bound to the multiple windows. Sliding uses the `window` function. See [Examples of aggregations with event-time window](#examples-of-aggregations-with-event-time-windows).
+![tumbling windows](/assets/tumbling_windows.png)
 
-    ![sliding windows](/assets/sliding_windows.png)
+### Sliding windows
 
-- **Session windows**: Session windows have a dynamic size of the window length, depending on the inputs. A session window starts with an input, and expands itself if following input has been received within gap duration. For example, the session window can be set for 5 minutes with a gap duration of an additional 5 minutes. For static gap duration, a session window closes when there’s no input received within gap duration after receiving the latest input. Session window uses session_window function. See [Examples of aggregations with event-time window](#examples-of-aggregations-with-event-time-windows).
+Sliding windows are also fixed-sized, but windows can overlap if the duration of the slide is smaller than the duration of window. For example, the window could be a duration of 10 minutes with a slide of 5 minutes. In this case an input can be bound to the multiple windows. Sliding uses the `window` function.
 
-    ![session windows](/assets/session_windows.png)
+![sliding windows](/assets/sliding_windows.png)
 
-    Instead of static gap value, you can also provide an expression to specify gap duration dynamically based on the input row. Rows with negative or zero gap duration are filtered out from the aggregation.
+### Session windows
 
-    With dynamic gap duration, the closing of a session window does not depend on the latest input. Rather, a session window’s range is the union of all events’ ranges which are determined by event start time and evaluated gap duration during the query execution. See [Examples of aggregations with event-time window](#examples-of-aggregations-with-event-time-windows).
+Session windows have a different characteristic compared to the previous two types. A session window has a dynamic size of the window length, depending on the inputs. A session window starts with an input and expands itself if the following input has been received within the gap duration. A session window closes when there's no input received within the gap duration after receiving the latest input. This enables you to group events until there are no new events for a specified time duration (inactivity).
 
-    Session windows have the following restrictions:
+A session window works similar to a session on a website that has session timeout. If you log into a website and don’t show any activity for some duration, the website will prompt you to retain login status and force logging out if you are still inactive after the timeout has been exceeded. The session timeout is extended whenever you show activity.
 
-    - Update mode as output mode is not supported.
-    - There must be at least one column in addition to session_window in the grouping key.
+A new session window is initiated when a new event, such as a streaming job, occurs, and following events within the timeout are included in the same session window. Each event extends the session timeout, which introduces a different characteristic compared to the other time windows. The time duration of the session window is not static, whereas both tumbling and sliding windows have a static time duration.
 
-    By default, Spark does not perform partial aggregations for session window aggregation, since it requires additional sort in local partitions before grouping. Session windows perform best when there are only a few input rows in same group key for each local partition.
-    
-    For the case where there are numerous input rows having same group key in local partition, doing partial aggregations can increase the performance significantly despite additional sort. Use `spark.sql.streaming.sessionWindow.merge.sessions.in.local.partition` to enable Spark to perform partial aggregations.
+A session window uses `session_window` function.
 
-### Conditions for watermarking to clean aggregation state
+![session windows with static gap duration](/assets/session_windows.png)
 
-The following conditions must be satisfied for the watermarking to clean the state in aggregation queries (as of Spark 2.1.1).
+A session window can have either a static gap duration or a dynamic gap duration per session. You use an expression to specify gap duration dynamically based on the input row.
 
-- Output mode must be _Append_ or _Update_. In complete mode, _all_ resulting rows ever produced by the operator are emitted downstream, and therefore there is no intermediate state to drop.
-- The aggregation must have either the event-time column, or a window on the event-time column.
--  `withWatermark` must be called on the same column as the timestamp column used in the aggregate. For example, `df.withWatermark("time", "1 min").groupBy("time2").count()` is invalid in _Append_ output mode, as watermark is defined on a different column from the aggregation column.
-- `withWatermark` must be called before the aggregation for the watermark details to be used. For example, `df.groupBy("time").count().withWatermark("time", "1 min")` is invalid in _Append_ output mode.
+![session windows with dynamic gap duration](/assets/session_windows_dynamic_gap.png)
 
-### Semantic guarantees of aggregation with watermarking
+The boxes below the line of time denote each event with its gap duration. There are four events and their (event time, gap duration) pairs are (12:04, 4 mins) in blue, (12:06, 9 mins) in orange, (12:09, 5 mins) in yellow, and (12:15, 5 mins) in green.
 
-A watermark delay of _2 hours_ guarantees that the engine never drops any data that is less than 2 hours delayed. In other words, any data less than 2 hours behind the latest data processed till then (in terms of event-time) is guaranteed to be aggregated.
+The box above the line denotes the actual session which is made from these events. You can consider each event as an individual session, and sessions having an intersection are merged into one. As you may indicate, the time range of the session is “union” of the time range of all events included in the session. Note that the end time of the session is no longer the time + gap duration of the latest event in the session.
 
-However, the guarantee is strict only in one direction. Data delayed by more than 2 hours is not guaranteed to be dropped; it may or may not get aggregated. More delayed is the data, less likely is the engine going to process it. <!--this needs more elaboration Neil / Carl -->
+The function `session_window` receives two parameters, event time column and gap duration.
+
+For dynamic session windows, you can provide an expression to the gap duration parameter in the session_window function. The expression should resolve to an interval, suc as 5 minutes. Since the gap duration parameter receives an expression, you can also leverage UDF as well.
+
+Session windows have the following restrictions:
+
+- Update mode as output mode is not supported.
+- There must be at least one column in addition to session_window in the grouping key.
+
+<!-- TODO partial aggregations-->
 
 ## Examples of aggregations with event-time windows
 
@@ -243,3 +248,17 @@ However, the guarantee is strict only in one direction. Data delayed by more tha
 
     ```
 
+## Conditions for watermarking to clean aggregation state
+
+The following conditions must be satisfied for the watermarking to clean the state in aggregation queries (as of Spark 2.1.1).
+
+- Output mode must be _Append_ or _Update_. In complete mode, _all_ resulting rows ever produced by the operator are emitted downstream, and therefore there is no intermediate state to drop.
+- The aggregation must have either the event-time column, or a window on the event-time column.
+-  `withWatermark` must be called on the same column as the timestamp column used in the aggregate. For example, `df.withWatermark("time", "1 min").groupBy("time2").count()` is invalid in _Append_ output mode, as watermark is defined on a different column from the aggregation column.
+- `withWatermark` must be called before the aggregation for the watermark details to be used. For example, `df.groupBy("time").count().withWatermark("time", "1 min")` is invalid in _Append_ output mode.
+
+## Semantic guarantees of aggregation with watermarking
+
+A watermark delay of _2 hours_ guarantees that the engine never drops any data that is less than 2 hours delayed. In other words, any data less than 2 hours behind the latest data processed till then (in terms of event-time) is guaranteed to be aggregated.
+
+However, the guarantee is strict only in one direction. Data delayed by more than 2 hours is not guaranteed to be dropped; it may or may not get aggregated. More delayed is the data, less likely is the engine going to process it. <!--this needs more elaboration Neil / Carl -->

@@ -1,7 +1,7 @@
 # Output modes in Structured Streaming
 
 !!! info
-    Before reading this article, you should be familiar with [watermarks](), [triggers](../stream_options/triggers.md), [stateful operators](../stateful/aggregation.md), and [stateless operators](../stateless/projection_selection.md).
+    Before reading this article, you should be familiar with [watermarks](../stateful/watermarks.md), [triggers](../stream_options/triggers.md), [stateful operators](../stateful/aggregation.md), and [stateless operators](../stateless/projection_selection.md).
 
 A Structured Streaming query's output mode configures what records the query's operators emit during each trigger. For example, operators could emit the records that changed since the last trigger, or the rows that will never change in _future_ triggers.
 
