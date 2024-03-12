@@ -14,7 +14,7 @@ Suppose that you have a stream of sales and want to compute the total revenue ge
 - `$10` at 2:40pm
 - `$30` at 3:10pm
 
-Let's assume that Structured Streaming has received this data as of 3:15 PM. In this case, Structured Streaming's state for the 2:00 o'clock and the 3 o'clock hours is:
+Let's assume that Structured Streaming has received this data at 3:15 PM. In this case, the streaming aggregation operator's internal state is as follows:
 
 - [2pm, 3pm): $25
 - [3pm, 4pm): $30
