@@ -1,6 +1,6 @@
 # Streaming Operators
 
-In Structured Streaming, operators perform incremental transformations and computations on a data stream as each batch of data arrives, such as filtering columns and rows, performing counts, and aggregating values.Some operators perform independently of other records in the data stream (stateless operators) and some perform in the context of other records in the data stream (stateful operators).
+In Structured Streaming, operators incrementally perform computation on a data stream as each batch of data arrives, such as filtering columns and rows, aggregating values, and performing joins. To process a given record, _stateless_ operators can do so independently of other records in the data stream, while _stateful_ operators need to use context (i.e. "state") of the other records they have seen in the data stream.```
 
 Whether stateful or stateless, Spark Streaming provides flexibility to handle various use cases efficiently.
 Remember that the choice between stateful and stateless operators depends on the complexity of your processing logic and the specific requirements of your streaming application.
