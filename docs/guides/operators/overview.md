@@ -22,7 +22,7 @@ While stateful operations provide powerful capabilities, they can be more memory
 
 ### Common stateful operators
 
-The most common stateful operators are [aggregations](../operators/stateful/aggregation.md), [deduplication](../operators/stateful/deduplication.md), and [stream-stream joins](../operators/stateful/joins.mc).
+The most common stateful operators are [aggregations](../operators/stateful/aggregation.md), [deduplication](../operators/stateful/deduplication.md), and [stream-stream joins](../operators/stateful/joins.md).
 
 ### Arbitrary stateful operations
 
