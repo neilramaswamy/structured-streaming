@@ -17,6 +17,8 @@ Then, repeatedly, take the following steps:
 
 ## Examples
 
+<!-- TODO: We need to add a Scala example as well! -->
+
 === "Python"
 
     To setup your query, start by reading from a local directory of Parquet files. The choice of using Parquet is arbitrary; you can use any file format described in the [file source reference](../io/sources.md#file-source):
@@ -103,7 +105,6 @@ Then, repeatedly, take the following steps:
 
     ```python
     # -- snip -- 
-    import pyspark.testing.assertDataFrameEqual
 
     spark.createDataFrame(
         [("bird", ts(36))],
