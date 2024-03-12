@@ -1,6 +1,6 @@
 # Projection and Selection Operators
 
-Projection and selection are the most common stateless operators and limit the columns and/or rows emitted downstream.
+Projection and selection are the most common stateless operators and limit the columns and rows, respectively, emitted downstream.
 
 !!! note
     In SQL, the operator for projection is `select` whereas the operator for selection is `where`. This can be a bit confusing.
