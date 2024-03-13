@@ -1,23 +1,46 @@
 # Watermarks in Structured Streaming
 
-In Structured Streaming, stateful operators buffer records and intermediate results using a [state store](../stream_options/state_stores.md) until it is determined that no new records will appear. A watermark for a stateful operator determines how long the streaming operator should wait for new records to appear for a given event-time window. Once no new records can be received for a given event-time window, results that can no longer be updated are emitted, buffered records and intermediate results are cleaned up. The longer the delay specified by the watermark, the larger the size of the intermediate state data. Records arriving too late are dropped.
+In Structured Streaming, having out of order data is normal and expected. For the streaming engine and stateful operators to produce complete, correct, and repeatable results, there must be a mechanism for determining when the stream won't receive any more events before a certain time (it needs to know, "I've received everything from before 4pm").
+
+The name for such a timestamp is called a _watermark_. The engine computes the watermark at the end of each micro-batch by subtracting a user-provided maximum delay (called the _watermark delay_) from the maximum event-time seen in the most recently completed micro-batch.
+
+Effectively, the watermark delay specifies the stream's tolerance for late data. Let's see why this is useful. Suppose you define an [aggregation operator](../stateful/aggregation.md) that aggregates data for non-overlapping 5 minute windows and the watermark delay is 1 minute. If the largest event time processed in a micro-batch is 4:02 PM, the engine would compute the watermark to be 4:01 PM. This tells the engine that all data before 4:01pm had been received. Then, the 3:55pm to 4:00pm window could never receive new records, and the aggregation operator could safely emit the aggregate value downstream.
+
+Until a time window for stateful operations is closed, records are buffered and intermediate results are stored using a [state store](../stream_options/state_stores.md). Once a time window has closed, buffered records and intermediate results are cleaned up and emitted downstream as appropriate for the given stateful operator. The longer the delay specified by the watermark, the larger the size of the intermediate state data. Records arriving too late are dropped.
+
+## Watermark general principles
+
+There are three basic principles of watermarks:
+
+- When defining a watermark and its watermark delay, you walk the line between event times that you will and will not receive.
+- The current watermark is recalculated at the end of processing each micro-batch.
+- The current watermark trails the maximum time seen in the most recently completed micro-batch by the watermark delay value. 
 
 ## Watermark conceptual example
 
-Suppose you have a source record `foo` generated at `t1` (its event time), and you have other source records generated at `t2` anbd `t3`. Suppose also that there is a delay of `x` minutes (or hours or days) before `foo` arrives as part of the data stream (it could arrive before or after the records generated at `t2` anbd `t3`). A watermark tells a stateful operator how long to wait for delayed records to arrive, and to drop all records older than this time. After each microbatch, the streaming engine recalculates the time before which it will not receive new records based on the records received in that microbatch.
+Let's assume a watermark delay defined as 5 minutes. Suppose you have source records with the following timestamp values:
 
-A watermark value of `d` for a stateful operator tells the streaming engine to not receive any new records older than maximum event time received in the most recent microbatch minus that specified delay (`d`). So, if the stateful operator receives records in a microbatch with `t1` = 2:45 PM, `t2` = 2:40 PM, and `t3` = to 2:42 PM -  and if the watermark is set to 30 minutes (`d`), the timestamp before which records in the next microbatch will not be received is 2:15 PM (2:45pm - 30 minutes).
+- `t1` = 2:41 PM
+- `t2` = 2:43 PM
+- `t3` = 2:45 PM
+- `t4` = 2:47 PM
+- `t5` = 2:49 PM
+- `t6` = 2:51 PM
+- `t7` = 2:53 PM
+- `t8` = 2:55 PM
+- `t9` = 2:57 PM
 
-If the timestamps for event time in the next microbatch include records with timestamps of 2:00 PM (`t4`), 3:00 PM (`t5`), and 3:15 PM (`t6`):
+Suppose further that micro-batch `a` runs at 2:50 PM and processes records for `t1`, `t4`, and `t5` (the `t2` and `t3` records are delayed). After processing micro-batch `a`, the watermark is 2:44 PM (2:49 PM - 5 minutes). 
 
-- The record with a timestamp of `t4` is dropped because it is older than 2:15 PM.
-- The records with timestamps of `t5` and `t6` are added to the buffer and update intermediate results in state.
-- The new time before which the streaming operator will not receive new records is 2:45 PM (`MAX(t4, t5, t6) - d`).
-- The streaming engine removes from state all records whose timestamp is older than 2:45 PM.
-- Emit downstream values for windows whose endtime is less thanb 2:45 PM.
+Let's assume further that micro-batch `b` runs at 2:55 PM and picks up records for `t2`, `t3`, `t6`, and `t7`. 
+
+- The record for `t2` is discarded as its timestamp value is less that our watermark value.
+- The records for the other three records (`t3`, `t6`, and `t7`) are processed as their timestamp values are greater than our watermark value.
+- After micro-batch `b` completes, the new watermark value is 2:48 PM (max of (`t2`, `t3`, `t6`, and `t7`) - 5).
+- The record for `t3` is processed as part of micro-batch `b` even though its timestamp value (2:45 PM) is more than 5 minutes older than the maximum timestamp value in micro-batch `b` (2:48 PM). This is because the new watermark value is not calculated until micro-batch `b` completes and only applies to the next micro-batch.
 
 !!! note
-    Until the next microbatch is processed, the watermark does not advance, no time windows close, and no intermediate results are emitted - regardless of the amount of time that passes.
+    Until the next micro-batch is processed, the watermark does not advance, no time windows close, and no intermediate results are emitted - regardless of the amount of time that passes.
 
 ## The tradeoff between completeness and latency
 
