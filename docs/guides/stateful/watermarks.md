@@ -2,7 +2,7 @@
 
 In Structured Streaming, having out of order data is normal and expected. For the streaming engine and stateful operators to produce complete, correct, and repeatable results, there must be a mechanism for determining when the stream won't receive any more events before a certain time (it needs to know, "I've received everything from before 4pm").
 
-The name for such a timestamp is called a _watermark_. The engine computes the watermark at the end of each micro-batch by subtracting a user-provided delay value (called the _watermark delay_) from the maximum event-time seen so far. This determines the maximum delay that events can have between being generated and being processed.
+The name for such a timestamp is called a _watermark_. The engine computes the watermark at the end of each micro-batch by subtracting a user-provided delay value (called the _watermark delay_) from the maximum event-time seen so far. The maximum delay that events can have between being generated and being processed influences what the watermark delay value should be.
 
 Let's see how this is useful. Suppose you define an [aggregation operator](../stateful/aggregation.md) that aggregates data for non-overlapping 5 minute windows and the watermark delay is 1 minute. If the largest event time processed in a micro-batch is 4:02 PM and the watermark delay is 1 minute, then we should have received all events before 4:01pm. That is our watermark, and it tells that all data before 4:01pm had been received. Then, the 3:55pm to 4:00pm window could never receive new records, and the aggregation operator could safely emit that window's aggregate value downstream.
 
@@ -24,7 +24,7 @@ The _watermark delay_ is a user-specified maximum delay that events can have. Th
 
 /* TODO(neil): Insert a diagram here. */
 
- ### Principle 3 
+ ### Principle 3: Watermark recalculated with each micro-batch
 
 The watermark is recalculated at the end of each micro-batch.
 
@@ -33,21 +33,21 @@ The watermark is recalculated at the end of each micro-batch.
 Let's assume a watermark delay defined as 5 minutes. Suppose further that micro-batch `a` runs at 2:50 PM and processes records for the following records:
 
 - `t1` = 2:41 PM
-- `t2` = 2:47 PM
+- `t2` = 2:43 PM
 - `t3` = 2:49 PM
 
 After processing micro-batch `a`, the watermark is 2:44 PM (2:49 PM - 5 minutes). Next, let's assume further that micro-batch `b` runs at 2:55 PM and picks up the following records:
 
-- `t4` = 2:43 PM
-- `t5` = 2:45 PM
+- `t4` = 2:45 PM
+- `t5` = 2:47 PM
 - `t6` = 2:53 PM
 
 The result of this micro-batch is the following:
 
-- The record for `t4` is discarded as its timestamp value is less that our watermark value (Principle 1). A longer watermark delay would result in the record associated with this timestamp being processed, but resulting in greater latency.
-- The records for the other three records (`t5` and `t6`) are processed as their timestamp values are greater than our watermark value (Principle 3).
-- After micro-batch `b` completes, the new watermark value is 2:48 PM (max of processed records - watermark delay) (Principle 2).
-- The record for `t5` is processed as part of micro-batch `b` even though its timestamp value (2:45 PM) is more than 5 minutes older than the maximum timestamp value in micro-batch `b` (2:48 PM). This is because the new watermark value is not calculated until micro-batch `b` completes and only applies to the next micro-batch (Principle 3). 
+- The record for `t4` is discarded as its timestamp value is less that our watermark value (Principle 1).
+- The records for the other three records (`t5` and `t6`) are processed as their timestamp values are greater than our watermark value (Principle 1).
+- After micro-batch `b` completes, the new watermark value is 2:48 PM (max of processed records - watermark delay) (Principle 2 and 3).
+- The record for `t5` is processed as part of micro-batch `b` even though its timestamp value (2:45 PM) is more than 5 minutes older than the maximum timestamp value in micro-batch `b` (2:48 PM). This is because the new watermark value is not calculated until micro-batch `b` completes and only applies to the next micro-batch (Principle 2 and 3). 
 
 !!! note
     Until the next micro-batch is processed, the watermark does not advance, no time windows close, and no intermediate results are emitted - regardless of the amount of time that passes.
