@@ -10,7 +10,7 @@ Until a time window for stateful operations is closed, records are buffered and 
 
 ## Watermark general principles
 
-There are three basic principles of watermarks.
+There are three basic principles of watermarks in Structured Streaming.
 
 ### Principle 1: Watermarks are boundaries
 
