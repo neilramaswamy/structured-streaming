@@ -14,7 +14,7 @@ There are three basic principles of watermarks in Structured Streaming.
 
 ### Principle 1: Watermarks are boundaries
 
-Watermarks define the boundary between event-times the engine won't receive, and event-times the engine will receive. A watermark of 4pm tells the engine that it won't have to process any more events before 4pm.
+Watermarks define the boundary between event-times the engine won't receive, and event-times the engine will receive. For example, a watermark of 4pm tells the engine that it won't have to process any more events before 4pm.
 
 /* TODO(neil): Insert a diagram here. */
 
