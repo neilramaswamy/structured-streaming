@@ -54,7 +54,7 @@ The result of this micro-batch is the following:
 
 ## The tradeoff between completeness and latency
 
-The watermark delay trades off latency and completeness in your pipeline. With a smaller watermark delay, the watermark progresses faster and reduces the time before a stateful operator's event-time windows closes. For example, if you have an event at 4:15 PM and your watermark delay is 30 minutes - your watermark is 3:45 PM. But, if your watermark delay is 5 minutes, your watermark is 4:10 PM.
+The watermark delay trades off latency and completeness in your pipeline. For example, if you have an event at 4:15 PM and your watermark delay is 30 minutes - your watermark is 3:45 PM. But, if your watermark delay is 5 minutes, your watermark is 4:10 PM.
 
 While you might immediately gravitate towards a small watermark delay to get low latency, there is a tradeoff:
 
