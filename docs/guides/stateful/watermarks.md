@@ -6,7 +6,7 @@ The name for such a timestamp is called a _watermark_. The engine computes the w
 
 Effectively, the watermark delay specifies the stream's tolerance for late data. Let's see why this is useful. Suppose you define an [aggregation operator](../stateful/aggregation.md) that aggregates data for non-overlapping 5 minute windows and the watermark delay is 1 minute. If the largest event time processed in a micro-batch is 4:02 PM, the engine would compute the watermark to be 4:01 PM. This tells the engine that all data before 4:01pm had been received. Then, the 3:55pm to 4:00pm window could never receive new records, and the aggregation operator could safely emit the aggregate value downstream.
 
-Until a time window for stateful operations is closed, records are buffered and intermediate results are stored using a [state store](../stream_options/state_stores.md). Once a time window has closed, buffered records and intermediate results are cleaned up and emitted downstream as appropriate for the given stateful operator. The longer the delay specified by the watermark, the larger the size of the intermediate state data. Records arriving too late are dropped.
+Until a time window for stateful operations is closed, records are buffered and intermediate results are stored using a [state store](../stream_options/state_stores.md). The longer the delay specified by the watermark, the larger the size of the intermediate state data. Records arriving too late are dropped.
 
 ## Watermark general principles
 
