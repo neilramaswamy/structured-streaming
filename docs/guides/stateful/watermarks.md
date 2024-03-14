@@ -51,7 +51,7 @@ The record for `t4` is discarded as its timestamp value is less that our waterma
 
 The watermark delay trades off latency and completeness in your pipeline. With a smaller watermark delay, the watermark progresses faster and reduces the time before a stateful operator's event-time windows closes. For example, if you have an event at 4:15 PM and your watermark delay is 30 minutes - your watermark is 3:45 PM. But, if your watermark delay is 5 minutes, your watermark is 4:10 PM.
 
-While low-latency is generally considered good, there is a tradeoff:
+While you might immediately gravitate towards a small watermark delay to get low latency, there is a tradeoff:
 
 - If your watermark delay `d` is smaller than the maximum delay `x`, your event-time window could finalize and close before receiving all records (resulting in less correct results in favor of lower latency). 
 - If your watermark delay `d` is set to be larger than the maximum delay `x`, your window finalizes after receiving all records (resulting in more correct results at the expense of more latency). 
