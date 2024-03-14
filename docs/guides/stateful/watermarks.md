@@ -30,33 +30,28 @@ The watermark is recalculated at the end of each micro-batch.
 
 ## Watermark conceptual example
 
-Let's assume a watermark delay defined as 5 minutes. Suppose you have source records with the following timestamp values:
+Let's assume a watermark delay defined as 5 minutes. Suppose further that micro-batch `a` runs at 2:50 PM and processes records for the following records:
 
 - `t1` = 2:41 PM
-- `t2` = 2:43 PM
-- `t3` = 2:45 PM
-- `t4` = 2:47 PM
-- `t5` = 2:49 PM
-- `t6` = 2:51 PM
-- `t7` = 2:53 PM
-- `t8` = 2:55 PM
-- `t9` = 2:57 PM
+- `t2` = 2:47 PM
+- `t3` = 2:49 PM
 
-Suppose further that micro-batch `a` runs at 2:50 PM and processes records for `t1`, `t4`, and `t5` (the `t2` and `t3` records are delayed). After processing micro-batch `a`, the watermark is 2:44 PM (2:49 PM - 5 minutes). 
+After processing micro-batch `a`, the watermark is 2:44 PM (2:49 PM - 5 minutes). Next, let's assume further that micro-batch `b` runs at 2:55 PM and picks up the following records:
 
-Let's assume further that micro-batch `b` runs at 2:55 PM and picks up records for `t2`, `t3`, `t6`, and `t7`. 
+- `t4` = 2:43 PM
+- `t5` = 2:45 PM
+- `t6` = 2:53 PM
 
-- The record for `t2` is discarded as its timestamp value is less that our watermark value.
-- The records for the other three records (`t3`, `t6`, and `t7`) are processed as their timestamp values are greater than our watermark value.
-- After micro-batch `b` completes, the new watermark value is 2:48 PM (max of (`t2`, `t3`, `t6`, and `t7`) - 5).
-- The record for `t3` is processed as part of micro-batch `b` even though its timestamp value (2:45 PM) is more than 5 minutes older than the maximum timestamp value in micro-batch `b` (2:48 PM). This is because the new watermark value is not calculated until micro-batch `b` completes and only applies to the next micro-batch.
+The record for `t4` is discarded as its timestamp value is less that our watermark value. The records for the other three records (`t5` and `t6`) are processed as their timestamp values are greater than our watermark value. After micro-batch `b` completes, the new watermark value is 2:48 PM (max of processed records - watermark delay). The record for `t5` is processed as part of micro-batch `b` even though its timestamp value (2:45 PM) is more than 5 minutes older than the maximum timestamp value in micro-batch `b` (2:48 PM). This is because the new watermark value is not calculated until micro-batch `b` completes and only applies to the next micro-batch.
 
 !!! note
     Until the next micro-batch is processed, the watermark does not advance, no time windows close, and no intermediate results are emitted - regardless of the amount of time that passes.
 
 ## The tradeoff between completeness and latency
 
-The watermark delay determines the latency of the data in your pipeline. A smaller watermark delay reduces the time before a stateful operator's event-time windows closes. While low-latency is generally considered good, there is a tradeoff:
+The watermark delay trades off latency and completeness in your pipeline. With a smaller watermark delay, the watermark progresses faster and reduces the time before a stateful operator's event-time windows closes. For example, if you have an event at 4:15 PM and your watermark delay is 30 minutes - your watermark is 3:45 PM. But, if your watermark delay is 5 minutes, your watermark is 4:10 PM.
+
+While low-latency is generally considered good, there is a tradeoff:
 
 - If your watermark delay `d` is smaller than the maximum delay `x`, your event-time window could finalize and close before receiving all records (resulting in less correct results in favor of lower latency). 
 - If your watermark delay `d` is set to be larger than the maximum delay `x`, your window finalizes after receiving all records (resulting in more correct results at the expense of more latency). 
