@@ -2,7 +2,7 @@
 
 In Structured Streaming, having out of order data is normal and expected. For the streaming engine and stateful operators to produce complete, correct, and repeatable results, there must be a mechanism for determining when the stream won't receive any more events before a certain time (it needs to know, "I've received everything from before 4pm").
 
-The name for such a timestamp is called a _watermark_. The engine computes the watermark at the end of each micro-batch by subtracting a user-provided delay value (called the _watermark delay_) from the maximum event-time seen in the most recently completed micro-batch. This determines the maximum delay that events can have between being generated and being processed.
+The name for such a timestamp is called a _watermark_. The engine computes the watermark at the end of each micro-batch by subtracting a user-provided delay value (called the _watermark delay_) from the maximum event-time seen so far. This determines the maximum delay that events can have between being generated and being processed.
 
 Let's see how this is useful. Suppose you define an [aggregation operator](../stateful/aggregation.md) that aggregates data for non-overlapping 5 minute windows and the watermark delay is 1 minute. If the largest event time processed in a micro-batch is 4:02 PM and the watermark delay is 1 minute, then we should have received all events before 4:01pm. That is our watermark, and it tells that all data before 4:01pm had been received. Then, the 3:55pm to 4:00pm window could never receive new records, and the aggregation operator could safely emit that window's aggregate value downstream.
 
