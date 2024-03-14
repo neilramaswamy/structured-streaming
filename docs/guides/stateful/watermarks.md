@@ -10,11 +10,23 @@ Until a time window for stateful operations is closed, records are buffered and 
 
 ## Watermark general principles
 
-There are three basic principles of watermarks:
+There are three basic principles of watermarks.
 
-- When defining a watermark and its watermark delay, you walk the line between event times that you will and will not receive.
-- The current watermark is recalculated at the end of processing each micro-batch.
-- The current watermark trails the maximum time seen in the most recently completed micro-batch by the watermark delay value. 
+### Principle 1: Watermarks are boundaries
+
+Watermarks define the boundary between event-times the engine won't receive, and event-times the engine will receive. A watermark of 4pm tells the engine that it won't have to process any more events before 4pm.
+
+/* TODO(neil): Insert a diagram here. */
+
+### Principle 2: Watermark delays define watermarks
+
+The _watermark delay_ is a user-specified maximum delay that events can have. The watermark is computed by subtracting the watermark delay from the largest event-time seen so far.
+
+/* TODO(neil): Insert a diagram here. */
+
+ ### Principle 3 
+
+The watermark is recalculated at the end of each micro-batch.
 
 ## Watermark conceptual example
 
