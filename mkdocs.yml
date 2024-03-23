@@ -69,6 +69,8 @@ markdown_extensions:
       emoji_generator: !!python/name:material.extensions.emoji.to_svg
 extra_css:
   - stylesheets/tables.css
+extra_javascript:
+  - js/join-diagram.js
 
 nav:
   - Home: index.md
