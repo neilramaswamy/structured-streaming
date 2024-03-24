@@ -115,10 +115,10 @@ Practically, what does this mean for you? Usually, you'll have SLAs on how delay
 
 ## Monitoring and tuning your watermark delay
 
-In the [Monitoring the Query Lifecycle](../operations/monitoring.md) guide, we discuss how to register a listener that receives `StreamingQueryProgress` events. In the streaming query progress, you have access to the `StateOperatorProgress`, which contains information on the number of dropped rows (`numRowsDroppedByWatermark`). In your listener, you can monitor the number of dropped rows and stop your stream (or send an alert) if the number of dropped rows exceeds a certain threshold.
+In the [Monitoring the Query Lifecycle](../../operations/monitoring.md) guide, we discuss how to register a listener that receives `StreamingQueryProgress` events. In the streaming query progress, you have access to the `StateOperatorProgress`, which contains information on the number of dropped rows (`numRowsDroppedByWatermark`). In your listener, you can monitor the number of dropped rows and stop your stream (or send an alert) if the number of dropped rows exceeds a certain threshold.
 
 If you notice that the number of records dropped by the watermark is 0, two things are possible: your watermark delay could be too large, or it could actually be "just right." Unfortunately, it's difficult to automatically assess which situation you're in. You could try to reduce the watermark delay and see if the number of dropped rows increases. However, this isn't quite practical for production jobs, especially if they're dealing with sensitive data that you don't want to drop.
 
 ## Example of watermarks and aggregations
 
-To see a real, runnable example of a streaming aggregation and its interaction with watermarks, please read the [aggregation with watermark](../../examples/aggregation-with-watermark.md) example.
+To see a real, runnable example of a streaming aggregation and its interaction with watermarks, please read the [aggregation with watermark](../../../examples/aggregation-with-watermark.md) example.

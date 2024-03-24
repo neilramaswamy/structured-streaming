@@ -59,4 +59,4 @@ You can use the `flatMap` operator to extract all unique URLs from a data frame 
 
 ## Using binary functions
 
-You can use binary functions to serialize and deserialize data stored in binary formats, such as Protobuf or Avro. Any function in the [Spark SQL Guide](https://spark.apache.org/docs/latest/sql-programming-guide.html) applies, including [protobuf andd avro](../binary_formats.md).
+You can use binary functions to serialize and deserialize data stored in binary formats, such as Protobuf or Avro. Any function in the [Spark SQL Guide](https://spark.apache.org/docs/latest/sql-programming-guide.html) applies, including [Protobuf and Avro](../../io/binary_formats.md).

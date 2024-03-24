@@ -2,7 +2,7 @@
 
 <!-- Note: there are several things that were removed from the Structured Streaming programming guide, including the support matrix. This matrix makes stream-stream joins out to be unnecessarily complex, and we shouldn't be telling users that "time-interval conditions for left-outer joins need a watermark on the right to emit null records and optionally need a watermark on the left to evict all state." We should simply tell users to *always* specify 2 watermarks and a time-bound, and then everything will JUST work. Advanced users can ask questions on SO or the dev@ list, and we can provide this nuance there. But we shouldn't degrade the experience for the 99% just to cater to the 1%. -->
 
-Structured Streaming supports joining streaming DataFrames with another static or streaeming DataFrame. A _stream-static_ join can be useful if you want to augment the rows of a stream you're reading—for example, you could augment a `Purchases` stream with product information by joining with a static `Products` DataFrame. A stream-static join is actually a [_stateless_ operation](), since for every incoming row in the stream, Structured Streaming "just" has to look it up in the static table—there's no need to buffer any rows in a [state store](../stream_options/state_stores.md).
+Structured Streaming supports joining streaming DataFrames with another static or streaeming DataFrame. A _stream-static_ join can be useful if you want to augment the rows of a stream you're reading—for example, you could augment a `Purchases` stream with product information by joining with a static `Products` DataFrame. A stream-static join is actually a [_stateless_ operation](), since for every incoming row in the stream, Structured Streaming "just" has to look it up in the static table—there's no need to buffer any rows in a [state store](../../stream_options/state_stores.md).
 
 A more powerful type of streaming join is the _stream-stream_ join, where both DataFrames are streaming DataFrames. For example, if you want to measure the success of an advertising campaign, you might want to join all product purchases that happen within an hour of an ad impression. Stream-stream joins have some subtleties around watermarks and state cleanup, so we'll explore them in more detail shortly.
 
@@ -47,7 +47,7 @@ Note: full outer joins are not supported for stream-static joins. If you do an o
 
 ## Stream-stream joins
 
-In stream-stream joins, each stream can progress independently of the other: one stream's data could not be delayed at all, and the other stream's data could be delayed by many minutes. To accomodate this, the stream-stream join operator needs to _buffer_ data from both streams in its [state store](../stream_options/state_stores.md). 
+In stream-stream joins, each stream can progress independently of the other: one stream's data could not be delayed at all, and the other stream's data could be delayed by many minutes. To accomodate this, the stream-stream join operator needs to _buffer_ data from both streams in its [state store](../../stream_options/state_stores.md). 
 
 However, we need some way to _remove_ records from state, for two reasons:
 

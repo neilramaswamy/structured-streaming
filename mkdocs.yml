@@ -87,12 +87,11 @@ nav:
                       - Additional operators: guides/operators/stateless/additional_operators.md
                 - Stateful operators:
                       - Watermarks: guides/operators/stateful/watermarks.md
-                      # - Aggregation: guides/operators/stateful/aggregation.md
+                      - Aggregation: guides/operators/stateful/aggregation.md
                       - Deduplication: guides/operators/stateful/deduplication.md
                       - Joins: guides/operators/stateful/joins.md
-                      # - Groups with state: guides/operators/stateful/groups_with_state.md
+                      - Groups with state: guides/operators/stateful/groups_with_state.md
           - Stream options:
-                - Overview: guides/stream_options/overview.md
                 - Triggers: guides/stream_options/triggers.md
                 - Output mode: guides/stream_options/output_mode.md
                 - Checkpoints: guides/stream_options/checkpointing.md
