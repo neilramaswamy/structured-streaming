@@ -113,9 +113,7 @@ nav:
           - Additional operators: guides/stateless/additional_operators.md
       - Stateful operators:
           - Overview: guides/stateful/overview.md
-          - Watermarks:
-              - Overview: guides/watermarks/overview.md
-              - Multiple watermarks: guides/watermarks/multiple.md
+          - Watermarks: guides/stateful/watermarks.md
           - Aggregation: guides/stateful/aggregation.md
           - Deduplication: guides/stateful/deduplication.md
           - Joins: guides/stateful/joins.md
