@@ -1,6 +1,12 @@
-## Structured Streaming OSS Documentation
+## Structured Streaming OSS Documentation Improvement Proposal
 
-This is the private repo in which the new Structured Streaming OSS documentation will be developed.
+This project is a proof-of-concept to improve the Apache Spark Structured Streaming documentation. It is effectively a re-organization of the [Structured Streaming Programming Guide](https://spark.apache.org/docs/latest/structured-streaming-programming-guide.html), the document from which it borrows many concepts and shares code snippets. It also tries to add practical advice in relevant places, emphasizing clarity over precision. In no way does this repo claim to be fully original work: this project would be nothing without the years of effort that went into the Apache Spark documentation.
+
+In particular, this project has the following notable features:
+
+1. Programatically generated diagrams for [watermarks](https://structured-streaming.vercel.app/guides/operators/stateful/watermarks/) and [joins](https://structured-streaming.vercel.app/guides/operators/stateful/joins/), which are notoriously tricky topics
+2. Extended discussion about operations and testing
+3. Organization that should be conducive to good SEO (currently, our programming guide is not very SEO-friendly)
 
 ## Developing Locally
 
