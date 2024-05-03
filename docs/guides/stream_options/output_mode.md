@@ -23,7 +23,7 @@ Note that append mode and update mode are semantically equivalent for stateless 
 
 ## Conceptual output mode example
 
-Consider a [streaming aggregation]() that calculates the total revenue generatee _every hour_ at a store. Let's also assume that it uses a watermark delay of 15 minutes. Suppose our Structured Streaming query processes the following records in its first micro-batch:
+Consider a [streaming aggregation]() that calculates the total revenue generate _every hour_ at a store. Let's also assume that it uses a watermark delay of 15 minutes. Suppose our Structured Streaming query processes the following records in its first micro-batch:
 
 - $15 at 2:40pm
 - $10 at 2:30pm
