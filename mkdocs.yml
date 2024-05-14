@@ -104,3 +104,4 @@ nav:
                 - Reading query progress: guides/operations/query_progress.md
     - Examples:
           - Aggregation with watermark: examples/aggregation-with-watermark.md
+          - Deduplication: examples/deduplication.md
