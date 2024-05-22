@@ -77,7 +77,7 @@ Lastly, we'll add a sink so that we can see the result of our query:
 
 The `query` above is a `StreamingQuery`, which is introduced in [Managing the query lifecycle](../guides/operations/lifecycle.md). One of the most important pieces of information that it contains is the [streaming query progress](../guides/operations/query_progress.md), which contains metrics about each micro-batch that the engine runs. The actual data that your query returns is written to your sink; in our case, it will be written to your console.
 
-Assuming you've called `start` on your query, it's already running in the background; let's add some data to our source to see it run:
+Assuming you've called `start` on your query, it's already running in the background. Shortly, we'll add some data to our source to see the deduplication happen.
 
 === "Python"
 
@@ -97,6 +97,93 @@ Assuming you've called `start` on your query, it's already running in the backgr
 We'll now explore how the engine deduplicates these records.
 
 ### Which records get deduplicated?
+
+The `dropDuplicatesWithinWatermark` operator will deduplicate two records with equivalent values for their deduplication columns if **either** of the following is true:
+
+1. They occur within the same batch
+2. Their event-times differ by less than the watermark delay
+
+The second condition is where the name "drop duplicates _within_ watermark" comes from: any records whose event-times are within the watermark delay of each other will be deduplicated.
+
+Suppose the watermark delay is 10 seconds, and assume records have the form `(id, timestamp)`. We will deduplicate based on `id`. Consider the following examples:
+
+- `(a, 10)` and `(a, 25)` would be deduplicated if they were part of the same batch, due to rule 1.
+- `(b, 10)` and `(b, 15)` would always be deduplicated, due to rule 2.
+- `(c, 10)` and `(d, 10)` would _not_ be deduplicated, since their `id`'s are different
+
+Let's see the deduplication actually happen by sending these records through. Let's add the first two records, `(a, 10)` and `(a, 25)`:
+
+=== "Python"
+
+    ```python
+    # Continued from previous code snippet
+
+    # A utility function to convert from seconds to timestamps
+    # ts(1) -> 1970 00:00:01, 1 second after the UNIX epoch
+    ts = datetime.fromtimestamp
+
+    spark.createDataFrame(
+        [("a", ts(10)), ("a", ts(25))],
+        schema
+    ).write.mode("overwrite").parquet(SOURCE_PATH)
+    ```
+
+Because these two records were processed in the same batch, they are deduplicated even though differ by more than 10 seconds, the watermark delay. You should only see `(a, ts(10))` in your console:
+
+TODO.
+
+Now, let's add the following:
+
+=== "Python"
+
+    ```python
+    spark.createDataFrame(
+        [("b", ts(10)), ("b", ts(15))],
+        schema
+    ).write.mode("append").parquet(SOURCE_PATH)
+    ```
+
+These two records both occur within the same batch and are within the watermark delay of each other, so you should only see the first record in your console:
+
+TODO.
+
+And of course, if you have two records whose `id`'s are distinct, then they aren't deduplicated. So, we'll add the following records:
+
+=== "Python"
+
+    ```python
+    spark.createDataFrame(
+        [("c", ts(10)), ("d", ts(10))],
+        schema
+    ).write.mode("append").parquet(SOURCE_PATH)
+    ```
+
+Even though their timestamps are the same, they are _not_ deduplicated becaues their ID's differ:
+
+TODO.
+
+### Data that is too late is dropped
+
+All stateful operators in Structured Streaming _drop_ records whose event-times are less than the current watermark. Such records are considered "too late", and are dropped before the deduplication operator even sees them.
+
+The [Watermarks](../guides/operators/stateful/watermarks.md) guide explains that the watermark is calculated by subtracing the watermark delay from the largest event-time. Assuming you've already inserted the last 3 records shown earlier in this article, our current watermark would be 25 - 10 = 15 seconds. The 25 comes from `(a, 25)`, whose event-time is still considered the largest, even though it was deduplicated.
+
+We'll now insert `(e, 14)` and `(f, 16)`. Even though both of their `id`'s are unique, `(e, 14)` will _not_ show up in the output. This is because its event-time of 14 is less than the watermark of 15, so it is dropped as late data. On the other hand, `(f, 16)` has an event-time..
+
+
+if you have [(a, 10)] and then [(a, 100)], the second is still deduplicated. And then `[(a, 101)]` is not deduplicated.
+
+
+but note, if 25 had come first...
+
+Structured Streaming will deduplicate two records 
+
+Two records `foo` and `bar` are deduplicated if the following criteria are met:
+
+1. They are in the same batch.
+2. They are in separate batches, and their event-times differ by less than the watermark duration.
+
+There are two rules that you should keep in mind 
 
 In each micro-batch, the following logic is employed:
 
