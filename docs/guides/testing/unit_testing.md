@@ -17,11 +17,9 @@ Then, repeatedly, take the following steps:
 
 ## Examples
 
-<!-- TODO: We need to add a Scala example as well! -->
+To setup your query, start by reading from a local directory of Parquet files. The choice of using Parquet is arbitrary; you can use any file format described in the [file source reference](../io/sources.md#file-source):
 
 === "Python"
-
-    To setup your query, start by reading from a local directory of Parquet files. The choice of using Parquet is arbitrary; you can use any file format described in the [file source reference](../io/sources.md#file-source):
 
     ```python
     import os
@@ -47,28 +45,69 @@ Then, repeatedly, take the following steps:
         .option("path", SOURCE_PATH)
         .load()
     )
+
+
+
+    ```
+=== "Scala"
+
+    ```scala
+    import org.apache.spark.sql.types.{StructType, StringType, TimestampType}
+    import java.nio.file.{Files, Paths}
+
+    // Ensure the Spark session is initialized
+    assert(spark != null)
+
+    // The directory from which your query incrementally reads files
+    val SOURCE_PATH = "/tmp/my-unit-test"
+    Files.createDirectories(Paths.get(SOURCE_PATH))
+
+    // The file source will require a schema, so we are defining one here.
+    val schema = (new StructType()
+        .add("name", StringType)
+        .add("timestamp", TimestampType))
+
+    val df = (spark
+        .readStream
+        .format("parquet")
+        .schema(schema)
+        .option("path", SOURCE_PATH)
+        .load())
+
     ```
 
-    Next, define your streaming Spark operators. In this example, we'll use a filter and a windowed aggregation, but you could also use other operators (such as stateless operators, deduplication, stream-stream joins, etc.).
+Next, define your streaming Spark operators. In this example, we'll use a filter and a windowed aggregation, but you could also use other operators (such as stateless operators, deduplication, stream-stream joins, etc.).
 
-    ```python hl_lines="1 5-9"
+=== "Python"
+
+    ```python
     from pyspark.sql.functions import window, col
-
-    # -- snip -- (1)
 
     windowed_counts = (df
         .withWatermark("timestamp", "15 seconds")
         .groupBy(window(col("timestamp"), "10 seconds"))
         .count()
     )
+
     ```
 
-    1. The "snip" statement indicates that the example is excluding code from the previous code block (to avoid repeating code sections).
+=== "Scala"
 
-    The final step is to set up the query to write to the [memory sink](). The memory sink provides us a convenient way to read the output of the Structured Streaming query via Spark APIs.
+    ```scala
+    import org.apache.spark.sql.functions.{window, col}
+
+    val windowed_counts = (df
+        .withWatermark("timestamp", "15 seconds")
+        .groupBy(window(col("timestamp"), "10 seconds"))
+        .count())
+
+    ```
+
+The final step is to set up the query to write to the [memory sink](). The memory sink provides us a convenient way to read the output of the Structured Streaming query via Spark APIs.
+
+=== "Python"
 
     ```python
-    # -- snip --
     QUERY_NAME = "my_unit_test"
 
     query = (windowed_counts
@@ -77,12 +116,27 @@ Then, repeatedly, take the following steps:
         .queryName(QUERY_NAME)
         .start()
     )
+
     ```
 
-    Now, the query is running. At this point, you can progress to repeatedly writing data to your source and making assertions about the sink. Recall that you have defined a 10-second tumbling window aggregation with a 15 second watermark. If you write two records between 10 seconds and 20 seconds to your source, you shouldn't see anything in your sink. See [aggregation operator]() and [watermark]().
+=== "Scala"
+
+    ```scala
+    val QUERY_NAME = "my_unit_test"
+
+    val query = (windowed_counts
+        .writeStream
+        .format("memory")
+        .queryName(QUERY_NAME)
+        .start())
+
+    ```
+
+Now, the query is running. At this point, you can progress to repeatedly writing data to your source and making assertions about the sink. Recall that you have defined a 10-second tumbling window aggregation with a 15 second watermark. If you write two records between 10 seconds and 20 seconds to your source, you shouldn't see anything in your sink. See [aggregation operator]() and [watermark]().
+
+=== "Python"
 
     ```python
-    # -- snip -- 
     from datetime import datetime
 
     # A utility function to convert from seconds to timestamps
@@ -101,11 +155,37 @@ Then, repeatedly, take the following steps:
     assert(spark.table(QUERY_NAME).count() == 0)
     ```
 
-    Now, let's say that you add another record that causes the window from 10 to 20 to close. Since the watermark is 15 seconds, such a record must have timestamp greater than 20 + 15, 35. So, add such a timestamp:
+=== "Scala"
+
+    ```scala
+    import java.sql.Timestamp
+
+    // We need these to create test data
+    import org.apache.spark.sql.Row
+    import scala.collection.JavaConverters._
+
+    // A utility function to convert from seconds to timestamps
+    // ts(1) -> 1970 00:00:01, 1 second after the UNIX epoch
+    def ts(seconds: Long): Timestamp = new Timestamp(seconds * 1000)
+
+    spark.createDataFrame(
+        Seq(Row("dog", ts(12)), Row("cat", ts(17))).asJava,
+        schema
+    ).write.mode("overwrite").parquet(SOURCE_PATH)
+
+    // Wait for the micro-batch(es) to finish before continuing
+    query.processAllAvailable()
+
+    // Write an assertion about the sink
+    assert(spark.table(QUERY_NAME).count() == 0)
+
+    ```
+
+Now, let's say that you add another record that causes the window from 10 to 20 to close. Since the watermark is 15 seconds, such a record must have timestamp greater than 20 + 15, 35. So, add such a timestamp:
+
+=== "Python"
 
     ```python
-    # -- snip -- 
-
     spark.createDataFrame(
         [("bird", ts(36))],
         schema
@@ -114,8 +194,23 @@ Then, repeatedly, take the following steps:
     query.processAllAvailable()
 
     assert(spark.table(QUERY_NAME).count() == 1)
+
     ```
 
-    You'll notice that in all of these examples, you are making an assertion about the output table's length. In practice, you should be doing `DataFrame` comparison, but that's out of scope for this guide.
+=== "Scala"
 
-    For a reference on how to do `DataFrame` comparison, see the [PySpark reference](https://spark.apache.org/docs/latest/api/python/reference/api/pyspark.testing.assertDataFrameEqual.html) or use a 3rd party testing library, such as [Chispa](https://github.com/MrPowers/chispa).
+    ```scala
+    spark.createDataFrame(
+        Seq(Row("bird", ts(36))).asJava,
+        schema
+    ).write.mode("append").parquet(SOURCE_PATH)
+
+    query.processAllAvailable()
+
+    assert(spark.table(QUERY_NAME).count() == 1)
+
+    ```
+
+You'll notice that in all of these examples, you are making an assertion about the output table's length. In practice, you should be doing `DataFrame` comparison, but that's out of scope for this guide.
+
+For a reference on how to do `DataFrame` comparison, see the [PySpark reference](https://spark.apache.org/docs/latest/api/python/reference/api/pyspark.testing.assertDataFrameEqual.html) or use a 3rd party testing library, such as [Chispa](https://github.com/MrPowers/chispa).
