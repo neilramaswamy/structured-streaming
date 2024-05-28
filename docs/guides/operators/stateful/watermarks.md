@@ -5,17 +5,19 @@ In Structured Streaming, having out of order data is normal and expected. For th
 The name for such a timestamp is called a _watermark_. The engine computes the watermark at the end of each micro-batch by subtracting a user-provided delay value (called the _watermark delay_) from the maximum timestamp on the records seen so far. Usually, the term "event-time" is used to refer to the timestamp embedded within records themselves; the term "processing-time" usually refers to the time at which a record is processed. To make sure that all out-of-order records are processed, the watermark delay should be the maximum delay between event-time and processing-time.
 
 !!! question "Why subtract the watermark delay from the maximum event-time seen so far?"
-    Suppose that we receive a record `foo` generated at timestamp 60, and the maximum delay that a record can have is 20 seconds. What is the time before which the stream will no longer produce records?
+    Suppose that we receive a record `bob` generated at timestamp 60, and the maximum delay that a record can have is 20 seconds.
 
-    Let's consider some options. Can we receive 41? Yes, a record with timestamp 41 may arrive anywhere between 41 and 61, so at time 60, we can still receive it (there's still one second left in which it may arrive). But what about a record with timestamp 39? Even if 39 is _maximally_ delayed, it would have arrived by timestamp 59. Thus, we cannot receive a timestamp of 39 any longer.
+    Hypothetically, consider a record generated at timestamp 39. Even if it were maximally delayed (by 20 seconds), it would have arrived at or before timestamp 59:
+    
+    <join-diagram one-sided left-label="Event Time" left-events="(alice, 39)" left-zones="(39, 59, Potential arrival, red)" ></join-diagram>
 
-    What these small examples tell us is that if we receive a record at time 60 and the maximum delay that events can have is 20, then every record _before_ 60 - 20 must have already arrived, including 39:
+    So, even before record 60 was _generated_ (let alone make it over the network to the streaming system), the record generated at timestamp 39 must have _arrived_. More generally, anything less than the maximum event-time seen so far minus the maximum delay must have already arrived:
 
-    <join-diagram one-sided left-label="Event Time" left-events="(foo, 60)" left-zones="(0, 40, All records by time = 40 have arrived, red)" ></join-diagram>
+    <join-diagram one-sided left-label="Event Time" left-events="(bob, 60)" left-zones="(0, 40, All records by time 40 have arrived, red)" ></join-diagram>
 
     In this picture, the name for the timestamp 40 is called the stream's current _watermark_. It designates that no more records before time 40 will be received. For the rest of this article, we'll usually depict the stream above as:
 
-    <join-diagram one-sided left-label="Event Time" left-events="(foo, 60)" left-zones="(0, 40, Watermark = 40, red)" ></join-diagram>
+    <join-diagram one-sided left-label="Event Time" left-events="(bob, 60)" left-zones="(0, 40, Watermark = 40, red)" ></join-diagram>
     
     Of course, if your watermark delay isn't large enough, you may receive records less than your watermark. In that case, Structured Streaming will _drop_ those records.
 
